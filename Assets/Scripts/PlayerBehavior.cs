@@ -15,17 +15,18 @@ public class PlayerBehavior : MonoBehaviour
     private CharacterController cc;
     private Vector2 direction = new Vector2(0, 0);
     private float walkingAcceleration = 50f;
-    private float speed = 0f;
-    private float maxSpeed = 5f;
+    private float runSpeed = 0f;
+    private float runSpeedMax = 5f;
     private Vector3 bounceVelocity = new Vector3();
 
     // Bolt
     private float boltDuration = 0f;
-    private float boltDurationMax = .5f;
+    private float boltDurationMax = .25f;
     private float boltCooldown = 0f;
-    private float boltCooldownMax = 3f;
+    private float boltCooldownMax = 5f;
     private Vector3 boltVelocity = new Vector3();
-    private float boltSpeedBonus = 1f;
+    private float boltMaxSpeed = 25f;
+    private float boltSpeedBump = 1f;
 
     // Shooting
     // TODO get these constants from the other file
@@ -58,18 +59,24 @@ public class PlayerBehavior : MonoBehaviour
     {
         boltDuration -= Time.deltaTime;
         boltCooldown -= Time.deltaTime;
+        Vector3 direction = cc.velocity.normalized;
+
 
         if (boltPressed && boltCooldown <= 0f)
         {
+            runSpeed = Mathf.Max(cc.velocity.magnitude, runSpeedMax)+boltSpeedBump;
             boltDuration = boltDurationMax;
             boltPressed = false;
             boltCooldown = boltCooldownMax;
 
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
-            Vector3 direction = new Vector3(v.x, 0, v.z).normalized;
-            boltVelocity = (Mathf.Max(cc.velocity.magnitude, maxSpeed) + boltSpeedBonus)*direction;
-        } if (boltDuration > 0f)
+            direction = new Vector3(v.x, 0, v.z).normalized;
+        }
+        
+        if (boltDuration > 0f && boltDuration-Time.deltaTime>0f)
         {
+            float boltSpeed = boltMaxSpeed - ((boltDurationMax-boltDuration)/boltDurationMax) * (boltMaxSpeed-runSpeed);
+            boltVelocity = boltSpeed * direction;
             if (bounceVelocity != Vector3.zero)
             {
                 boltVelocity = bounceVelocity;
@@ -77,6 +84,10 @@ public class PlayerBehavior : MonoBehaviour
             }
 
             cc.Move(boltVelocity * Time.deltaTime);
+        } 
+        else if (boltDuration > 0f)
+        {
+            cc.Move(direction * runSpeed * Time.deltaTime);
         }
     }
 
@@ -127,7 +138,7 @@ public class PlayerBehavior : MonoBehaviour
             // issuing move command
             // TODO make sure that the movement logic is different below a threshold
             float currentSpeed = cc.velocity.magnitude;
-            bool atMaxSpeed = (currentSpeed < (maxSpeed + .05));
+            bool atMaxSpeed = (currentSpeed < (runSpeedMax + .05));
             float acceleration = atMaxSpeed ? walkingAcceleration : walkingAcceleration / 2;
             
             Vector3 v = cc.velocity + new Vector3(direction.x, 0, direction.y).normalized * acceleration * Time.deltaTime;
@@ -135,7 +146,7 @@ public class PlayerBehavior : MonoBehaviour
             Vector3 newVelocity = 
                 (runningHeld && !atMaxSpeed)
                 ? ((v).normalized * cc.velocity.magnitude)
-                : ((v).normalized * Mathf.Min(v.magnitude, maxSpeed));
+                : ((v).normalized * Mathf.Min(v.magnitude, runSpeedMax));
 
             cc.Move(newVelocity * Time.deltaTime);
         } else {
@@ -156,14 +167,8 @@ public class PlayerBehavior : MonoBehaviour
         {
             Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
             bounceVelocity = (cc.velocity - 2 * Vector3.Project(cc.velocity, mirror)).normalized * cc.velocity.magnitude;
-
-            Debug.Log("mirror: " + mirror);
-            Debug.Log("oldVelocity: " + cc.velocity);
-            Debug.Log("bounceVelocity : " + bounceVelocity);
-
             // TODO add something here:
             // - stop for some frames
-            // - don't let the actual movement redirection happen here
         }
     }
 

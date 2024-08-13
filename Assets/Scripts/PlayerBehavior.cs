@@ -5,6 +5,8 @@ using Unity.Mathematics;
 using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
+using UnityEngine.XR;
 
 public class PlayerBehavior : MonoBehaviour
 {
@@ -12,10 +14,10 @@ public class PlayerBehavior : MonoBehaviour
     // Regular Movement
     private CharacterController cc;
     private Vector2 direction = new Vector2(0, 0);
-    private float acceleration = 30f;
-    private float deceleration = 30f;
+    private float walkingAcceleration = 50f;
     private float speed = 0f;
     private float maxSpeed = 5f;
+    private Vector3 bounceVelocity = new Vector3();
 
     // Bolt
     private float boltDuration = 0f;
@@ -23,7 +25,7 @@ public class PlayerBehavior : MonoBehaviour
     private float boltCooldown = 0f;
     private float boltCooldownMax = 3f;
     private Vector3 boltVelocity = new Vector3();
-    private float boltSpeedBonus = 3f;
+    private float boltSpeedBonus = 1f;
 
     // Shooting
     // TODO get these constants from the other file
@@ -37,10 +39,12 @@ public class PlayerBehavior : MonoBehaviour
 
     /* Controls */
     private bool boltPressed = false;
+    private bool runningHeld = false;
 
-    void CheckIfBoltPressed()
+    void CheckControls()
     {
         boltPressed |= (boltCooldown<=0) && Input.GetKeyDown(KeyCode.LeftShift);
+        runningHeld = Input.GetKey(KeyCode.Space);
     }
 
     private void Awake()
@@ -63,12 +67,15 @@ public class PlayerBehavior : MonoBehaviour
 
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
             Vector3 direction = new Vector3(v.x, 0, v.z).normalized;
-            Debug.Log("Cursor world position: " + getCursorWorldPosition());
-            Debug.Log("character controller center: " + cc.transform.position);
-            Debug.Log(direction);
             boltVelocity = (Mathf.Max(cc.velocity.magnitude, maxSpeed) + boltSpeedBonus)*direction;
         } if (boltDuration > 0f)
         {
+            if (bounceVelocity != Vector3.zero)
+            {
+                boltVelocity = bounceVelocity;
+                bounceVelocity.Set(0f, 0f, 0f);
+            }
+
             cc.Move(boltVelocity * Time.deltaTime);
         }
     }
@@ -93,7 +100,7 @@ public class PlayerBehavior : MonoBehaviour
     private void Update()
     {
         // handle inputs
-        CheckIfBoltPressed();
+        CheckControls();
         HandleVisuals();
     }
 
@@ -113,16 +120,50 @@ public class PlayerBehavior : MonoBehaviour
         direction.y = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
         direction.x = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
 
-        if (direction.x != 0 || direction.y != 0) {
+        if (bounceVelocity != Vector3.zero) {
+            cc.Move(bounceVelocity*Time.deltaTime);
+            bounceVelocity.Set(0f, 0f, 0f);
+        } else if (direction.x != 0 || direction.y != 0) {
             // issuing move command
-            // TODO handle velocity cap
-            Debug.Log(cc.velocity);
-            Vector3 dVelocity = cc.velocity + new Vector3(direction.x, 0, direction.y).normalized * acceleration * Time.deltaTime;
-            cc.Move(dVelocity*Time.deltaTime);
+            // TODO make sure that the movement logic is different below a threshold
+            float currentSpeed = cc.velocity.magnitude;
+            bool atMaxSpeed = (currentSpeed < (maxSpeed + .05));
+            float acceleration = atMaxSpeed ? walkingAcceleration : walkingAcceleration / 2;
+            
+            Vector3 v = cc.velocity + new Vector3(direction.x, 0, direction.y).normalized * acceleration * Time.deltaTime;
+
+            Vector3 newVelocity = 
+                (runningHeld && !atMaxSpeed)
+                ? ((v).normalized * cc.velocity.magnitude)
+                : ((v).normalized * Mathf.Min(v.magnitude, maxSpeed));
+
+            cc.Move(newVelocity * Time.deltaTime);
         } else {
-            Vector3 reverse = -(new Vector3(cc.velocity.x, 0, cc.velocity.z));
-            Vector3 dVelocity = cc.velocity + reverse.normalized * deceleration * Time.deltaTime;
-            cc.Move(dVelocity * Time.deltaTime);
+            if (!runningHeld) {
+                Vector3 reverse = -(new Vector3(cc.velocity.x, 0, cc.velocity.z));
+                Vector3 dVelocity = cc.velocity + reverse.normalized * walkingAcceleration  * Time.deltaTime;
+                cc.Move(dVelocity * Time.deltaTime);
+            } else
+            {
+                cc.Move(cc.velocity*Time.deltaTime);
+            }
+        }
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (runningHeld)
+        {
+            Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
+            bounceVelocity = (cc.velocity - 2 * Vector3.Project(cc.velocity, mirror)).normalized * cc.velocity.magnitude;
+
+            Debug.Log("mirror: " + mirror);
+            Debug.Log("oldVelocity: " + cc.velocity);
+            Debug.Log("bounceVelocity : " + bounceVelocity);
+
+            // TODO add something here:
+            // - stop for some frames
+            // - don't let the actual movement redirection happen here
         }
     }
 

@@ -14,7 +14,7 @@ public class Follow : MonoBehaviour
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Mouse2))
         {
             cameraLockFactor = (cameraLockFactor==0)?1:0;
         }

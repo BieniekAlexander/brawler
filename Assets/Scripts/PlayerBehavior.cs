@@ -1,13 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Mathematics;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
 
 public class PlayerBehavior : MonoBehaviour
 {
@@ -38,6 +31,7 @@ public class PlayerBehavior : MonoBehaviour
     /* Visuals */
     // Bolt Visualization
     private Material _material;
+    TrailRenderer tr;
 
     /* Controls */
     private bool boltPressed = false;
@@ -57,24 +51,27 @@ public class PlayerBehavior : MonoBehaviour
     {
         cc = GetComponent<CharacterController>();
         _material = GetComponent<Renderer>().material;
+        tr = GetComponent<TrailRenderer>();
         var f = GetComponent<Transform>();
     }
 
     private void HandleVisuals()
     {
+        /*
+         * Bolt Indicator
+         */
         // duration
         if (boltDuration > 0)
-        {
             _material.color = Color.red;
-        }
         else if (boltCooldown <= 0f)
-        {
             _material.color = Color.green;
-        }
         else
-        {
             _material.color = Color.gray;
-        }
+
+        /*
+         * Trail Renderer
+         */
+        tr.emitting = (currentSpeed > boltMaxSpeed / 2);
     }
 
     private void Update()

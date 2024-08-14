@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3004744251814084208}
   - component: {fileID: 425229922898553916}
   - component: {fileID: 1370712460824804173}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rocket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3772571765898746259
 MeshFilter:
@@ -150,6 +150,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transTarget: {fileID: 0}
   rotationalControl: 120
-  maxSpeed: 3
+  maxSpeed: 7.5
   explosionPrefab: {fileID: 2617401508143349843, guid: 9a812356252808c4ab05e86024a34739,
     type: 3}

@@ -11,7 +11,7 @@ public class RocketBehavior : MonoBehaviour
     private Rigidbody _rb;
     [SerializeField] public Transform transTarget;
     [SerializeField] float rotationalControl = 120f;
-    [SerializeField] float maxSpeed = 3f;
+    [SerializeField] float maxSpeed = 7.5f;
 
     // Visual Effects
     public Transform explosionPrefab;

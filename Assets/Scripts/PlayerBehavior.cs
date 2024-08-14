@@ -136,8 +136,14 @@ public class PlayerBehavior : MonoBehaviour
                     direction = GetBiasedDirection(cc.velocity, biasDirection * walkingAcceleration * Time.deltaTime / 2);
             } else {
                 Vector3 newVelocity = (cc.velocity + (biasDirection*walkingAcceleration * Time.deltaTime));
-                direction = newVelocity.normalized;
-                currentSpeed = Mathf.Min(newVelocity.magnitude, runSpeedMax);
+
+                if (newVelocity.normalized == -cc.velocity.normalized)
+                    currentSpeed = 0;
+                else
+                {
+                    direction = newVelocity.normalized;
+                    currentSpeed = Mathf.Min(newVelocity.magnitude, runSpeedMax);
+                }
             }
         }
 
@@ -146,7 +152,6 @@ public class PlayerBehavior : MonoBehaviour
          */
         if (bounceDirection != Vector3.zero)
         {
-            
             direction = bounceDirection;
             bounceDirection.Set(0f, 0f, 0f);
         }

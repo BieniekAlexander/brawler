@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -5,14 +6,19 @@ using UnityEngine.Assertions;
 public class PlayerBehavior : MonoBehaviour
 {
     /* Movement */
-    // Regular Movement
     private CharacterController cc;
     private Vector3 direction = new Vector3();
-    private float walkingAcceleration = 50f;
-    private float currentSpeed = 0f;
-    private float runSpeed = 0f;
-    private float runSpeedMax = 5f;
+    private float currentSpeed = 0f;    
     private Vector3 bounceDirection = new Vector3();
+
+    // Walking
+    private float walkAcceleration = 50f;
+    private float walkSpeedMax = 5f;
+
+    // Running
+    private float runSpeed = 0f;
+    private float runDeceleration = 5f;
+    private float runRotationalSpeed = 5f;
 
     // Bolt
     private float boltDuration = 0f;
@@ -20,7 +26,7 @@ public class PlayerBehavior : MonoBehaviour
     private float boltCooldown = 0f;
     private float boltCooldownMax = 5f;
     private float boltMaxSpeed = 25f;
-    private float boltSpeedBump = 1f;
+    private float boltSpeedBump = 2.5f;
 
     // Shooting
     // TODO get these constants from the other file
@@ -96,7 +102,7 @@ public class PlayerBehavior : MonoBehaviour
          */
         if (boltPressed && boltCooldown <= 0f)
         { // bolting - update speed and direction
-            runSpeed = Mathf.Max(cc.velocity.magnitude, runSpeedMax) + boltSpeedBump;
+            runSpeed = Mathf.Min(Mathf.Max(cc.velocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
             currentSpeed = boltMaxSpeed;
             boltDuration = boltDurationMax;
             boltPressed = false;
@@ -111,35 +117,38 @@ public class PlayerBehavior : MonoBehaviour
             biasDirection.z = (Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0);
             biasDirection.x = (Input.GetKey(KeyCode.D) ? 1 : 0) - (Input.GetKey(KeyCode.A) ? 1 : 0);
 
-            if (biasDirection == Vector3.zero && !runningHeld)
-                biasDirection = -cc.velocity.normalized;
-            else
+            if (biasDirection != Vector3.zero)
                 biasDirection = biasDirection.normalized;
 
             // handle speed
-            bool atRunSpeed = (currentSpeed > (runSpeedMax + .05f));
+            bool aboveWalkSpeed = (currentSpeed > (walkSpeedMax + .05f));
             
-            if (atRunSpeed) {
-                if (runningHeld) {
+            if (aboveWalkSpeed) {
+                if (runningHeld || boltDuration > 0f) { // keeping up running speed - limit rotational control
                     if (boltDuration > 0f && boltDuration - Time.deltaTime > 0f)
                         currentSpeed = boltMaxSpeed - ((boltDurationMax - boltDuration) / boltDurationMax) * (boltMaxSpeed - runSpeed);
                     else if (boltDuration > 0f)
                         currentSpeed = runSpeed;
-                } else {
-                    currentSpeed = Mathf.Max(currentSpeed - walkingAcceleration*Time.deltaTime, 0);
-                }
 
-                if (biasDirection != Vector3.zero)
-                    direction = GetBiasedDirection(cc.velocity, biasDirection * walkingAcceleration * Time.deltaTime / 2);
+                    if (biasDirection != Vector3.zero)
+                        direction = GetBiasedDirection(cc.velocity, biasDirection * walkAcceleration * Time.deltaTime / 2);
+                } else {  // running not held - drop speed and free up rotational control
+                    currentSpeed = Mathf.Max(currentSpeed - runDeceleration*Time.deltaTime, 0);
+                    if (biasDirection != Vector3.zero)
+                        direction = Vector3.RotateTowards(cc.velocity, biasDirection, runRotationalSpeed * Time.deltaTime, 1).normalized;
+                }
             } else {
-                Vector3 newVelocity = (cc.velocity + (biasDirection*walkingAcceleration * Time.deltaTime));
+                if (biasDirection == Vector3.zero)
+                    biasDirection = -cc.velocity.normalized;
+
+                Vector3 newVelocity = (cc.velocity + (biasDirection * walkAcceleration * Time.deltaTime));
 
                 if (newVelocity.normalized == -cc.velocity.normalized)
                     currentSpeed = 0;
                 else
                 {
                     direction = newVelocity.normalized;
-                    currentSpeed = Mathf.Min(newVelocity.magnitude, runSpeedMax);
+                    currentSpeed = Mathf.Min(newVelocity.magnitude, walkSpeedMax);
                 }
             }
         }
@@ -163,13 +172,10 @@ public class PlayerBehavior : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (runningHeld)
-        {
-            Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-            bounceDirection = (cc.velocity - 2 * Vector3.Project(cc.velocity, mirror)).normalized;
-            // TODO add something here:
-            // - stop for some frames
-        }
+        Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
+        bounceDirection = (cc.velocity - 2 * Vector3.Project(cc.velocity, mirror)).normalized;
+        // TODO add something here:
+        // - stop for some frames
     }
 
     private void HandleShoot()

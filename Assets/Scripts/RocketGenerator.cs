@@ -1,10 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.Video;
 
 public class RocketGenerator : MonoBehaviour
 {
@@ -12,6 +6,7 @@ public class RocketGenerator : MonoBehaviour
     [SerializeField] Transform transTarget;
     private float timer;
     private float reloadTime = 5f;
+    
     void Start()
     {
         timer = 5f;
@@ -33,7 +28,7 @@ public class RocketGenerator : MonoBehaviour
             {
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
-                Vector3 initialPosition = new Vector3(randX, 1, randZ);
+                Vector3 initialPosition = new Vector3(randX, transTarget.position.y, randZ);
                 GameObject go = Instantiate(rocketPrefab, initialPosition, Quaternion.Euler(new Vector3(0, 0, 0)));
                 RocketBehavior rocket = go.GetComponent<RocketBehavior>();
                 rocket.transTarget = transTarget;

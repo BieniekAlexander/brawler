@@ -1,25 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Drawing;
+using System.Transactions;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 public class RocketBehavior : MonoBehaviour
 {
-    // Start is called before the first frame update
-    private Rigidbody _rb;
+    /* Movement */
+    private CharacterController _cc;
+    private Vector3 velocity;
     [SerializeField] public Transform transTarget;
     [SerializeField] float rotationalControl = 120f;
     [SerializeField] float maxSpeed = 7.5f;
 
-    // Visual Effects
-    public Transform explosionPrefab;
+    /* Target */
+    [SerializeField] private HurtBox hurtBox;
 
-    void Start()
+    private void Start()
     {
-        _rb = GetComponent<Rigidbody>();
-        _rb.velocity = (transTarget.position - _rb.position).normalized * maxSpeed;
+        _cc = GetComponent<CharacterController>();
+        velocity = (transTarget.position - _cc.transform.position).normalized * maxSpeed;
     }
 
     private void FixedUpdate()
@@ -27,28 +25,33 @@ public class RocketBehavior : MonoBehaviour
         if (transTarget != null)
         {
             // source: https://www.youtube.com/watch?v=Z6qBeuN-H1M
-            Vector3 direction = transTarget.position - _rb.position;
-            var rotation = Quaternion.LookRotation(direction);
-            _rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, rotationalControl * Time.deltaTime));
-            _rb.velocity = transform.forward * maxSpeed * (180 - Quaternion.Angle(transform.rotation, rotation)) / 180;
+            Vector3 targetDirection = transTarget.position - _cc.transform.position;
+            var targetRotation = Quaternion.FromToRotation(velocity, targetDirection);
+            Quaternion currentRotation = Quaternion.RotateTowards(
+                Quaternion.Euler(velocity.normalized),
+                targetRotation,
+                rotationalControl * Time.deltaTime
+            );
+
+            velocity = currentRotation * velocity.normalized * maxSpeed * (180 - Quaternion.Angle(transform.rotation, targetRotation)) / 180;
+            velocity.y = 0;
         }
+
+        _cc.Move(velocity * Time.deltaTime);
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        ContactPoint contact = collision.contacts[0];
-        Quaternion.FromToRotation(Vector3.up, contact.normal);
+private void OnControllerColliderHit(ControllerColliderHit hit)
+{
+        Vector3 contactCoordinates = hit.collider.ClosestPoint(_cc.transform.position);
 
+        //Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+        Quaternion rotation = Quaternion.Euler(Vector3.zero);
         Instantiate(
-            explosionPrefab,
-            contact.point,
-            Quaternion.FromToRotation(
-                Vector3.up,
-                contact.normal
-            )
-        );
-
-        Destroy(collision.gameObject);
+            hurtBox,
+            contactCoordinates,
+            rotation
+        ).Initialize(contactCoordinates, rotation);
+        
         Destroy(gameObject);
     }
 }

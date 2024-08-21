@@ -1,10 +1,14 @@
 using System.Collections.Concurrent;
+using Unity.Burst.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PlayerBehavior : MonoBehaviour
+public class CharacterBehavior : MonoBehaviour
 {
+    // is this me? TODO better way to do this
+    [SerializeField] bool me;
+
     /* Movement */
     private CharacterController cc;
     private Vector3 direction = new Vector3();
@@ -23,16 +27,18 @@ public class PlayerBehavior : MonoBehaviour
     // Bolt
     private float boltDuration = 0f;
     private float boltDurationMax = .25f;
-    private float boltCooldown = 0f;
-    private float boltCooldownMax = 5f;
     private float boltMaxSpeed = 25f;
     private float boltSpeedBump = 2.5f;
 
+    /* Offense */
     // Shooting
     // TODO get these constants from the other file
     private float reloadTimer = 0f;
     private float reloadDuration = 1f;
     [SerializeField] private Projectile projectilePrefab;
+
+    /* Defense */
+    private float hp = 100f;
 
     /* Visuals */
     // Bolt Visualization
@@ -40,6 +46,12 @@ public class PlayerBehavior : MonoBehaviour
     TrailRenderer tr;
 
     /* Controls */
+    private int charges;
+    private int maxCharges = 3;
+    private float chargeCooldown = 0f;
+    private float chargeCooldownMax = 1f;
+    private float rechargeTimer = 0f;
+    private float rechargeRate = 3f;
     private bool boltPressed = false;
     private bool runningHeld = false;
 
@@ -49,16 +61,20 @@ public class PlayerBehavior : MonoBehaviour
 
     void CheckControls()
     {
-        boltPressed |= (boltCooldown<=0) && Input.GetKeyDown(KeyCode.LeftShift);
-        runningHeld = Input.GetKey(KeyCode.Space);
+        if (me) {
+            boltPressed |= (chargeCooldown <= 0) && Input.GetKeyDown(KeyCode.LeftShift);
+            runningHeld = Input.GetKey(KeyCode.Space);
+        }
+        
     }
 
-    private void Awake()
+    private void Start()
     {
         cc = GetComponent<CharacterController>();
         _material = GetComponent<Renderer>().material;
         tr = GetComponent<TrailRenderer>();
         var f = GetComponent<Transform>();
+        charges = maxCharges;
     }
 
     private void HandleVisuals()
@@ -67,9 +83,9 @@ public class PlayerBehavior : MonoBehaviour
          * Bolt Indicator
          */
         // duration
-        if (boltDuration > 0)
+        if (boltDuration > 0f)
             _material.color = Color.red;
-        else if (boltCooldown <= 0f)
+        if (chargeCooldown < 0 && charges>0)
             _material.color = Color.green;
         else
             _material.color = Color.gray;
@@ -87,8 +103,21 @@ public class PlayerBehavior : MonoBehaviour
         HandleVisuals();
     }
 
+    private void HandleCharges()
+    {
+        rechargeTimer = (charges >= maxCharges) ? rechargeRate: rechargeTimer-Time.deltaTime;
+        if (rechargeTimer <= 0f) {
+            charges += 1;
+            rechargeTimer = rechargeRate;
+        }
+
+        chargeCooldown -= Time.deltaTime;
+    }
+
     void FixedUpdate()
     {
+
+        HandleCharges();
         HandleMove();
         HandleShoot();
     }
@@ -96,17 +125,20 @@ public class PlayerBehavior : MonoBehaviour
     private void HandleMove()
     {
         Assert.AreEqual(cc.velocity.y, 0); // TODO ensure this somehow
+        bool aboveWalkSpeed = (currentSpeed > (walkSpeedMax + .05f));
+        if (!me) return;
 
         /*
          * MOVEMENT SPEED
          */
-        if (boltPressed && boltCooldown <= 0f)
+        if (boltPressed && charges>0 && chargeCooldown<0)
         { // bolting - update speed and direction
+            charges -= 1;
+            chargeCooldown = chargeCooldownMax;
             runSpeed = Mathf.Min(Mathf.Max(cc.velocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
             currentSpeed = boltMaxSpeed;
             boltDuration = boltDurationMax;
             boltPressed = false;
-            boltCooldown = boltCooldownMax;
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
             direction = new Vector3(v.x, 0, v.z).normalized;
         }
@@ -121,8 +153,6 @@ public class PlayerBehavior : MonoBehaviour
                 biasDirection = biasDirection.normalized;
 
             // handle speed
-            bool aboveWalkSpeed = (currentSpeed > (walkSpeedMax + .05f));
-            
             if (aboveWalkSpeed) {
                 if (runningHeld || boltDuration > 0f) { // keeping up running speed - limit rotational control
                     if (boltDuration > 0f && boltDuration - Time.deltaTime > 0f)
@@ -158,6 +188,9 @@ public class PlayerBehavior : MonoBehaviour
          */
         if (bounceDirection != Vector3.zero)
         {
+            if (!aboveWalkSpeed)
+                currentSpeed = 0;
+
             direction = bounceDirection;
             bounceDirection.Set(0f, 0f, 0f);
         }
@@ -167,7 +200,6 @@ public class PlayerBehavior : MonoBehaviour
          */
         cc.Move(direction * currentSpeed * Time.deltaTime);
         boltDuration -= Time.deltaTime;
-        boltCooldown -= Time.deltaTime;
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
@@ -180,6 +212,8 @@ public class PlayerBehavior : MonoBehaviour
 
     private void HandleShoot()
     {
+        if (!me) return;
+
         if (Input.GetMouseButton(0) && (reloadTimer == 0))
         {
             reloadTimer = reloadDuration;
@@ -190,7 +224,7 @@ public class PlayerBehavior : MonoBehaviour
             var direction = new Vector3(worldPosition.x - playerPosition.x, 0, worldPosition.z - playerPosition.z).normalized;
 
             // position
-            var shotRadius = cc.GetComponent<SphereCollider>().radius * 1.5f;
+            var shotRadius = cc.GetComponent<CapsuleCollider>().radius * 1.5f;
             var position = playerPosition + shotRadius * direction;
 
             var projectile = Instantiate(projectilePrefab, position, transform.rotation);
@@ -218,8 +252,18 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
+    public void TakeDamage(float damage)
+    {
+        hp -= damage;
+        if (hp < 0f)
+            Destroy(gameObject);
+    }
+
     void OnGUI(){
         // TODO remove: here for debugging
+        if (!me) return;
         GUI.Label(new Rect(20,40,80,20), cc.velocity.magnitude + "m/s");
+        GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
+        GUI.Label(new Rect(20, 100, 80, 20), "HP: "+hp);
     }
 }

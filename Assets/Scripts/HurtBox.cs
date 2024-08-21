@@ -1,20 +1,42 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.UI;
+using System;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class HurtBox : MonoBehaviour
 {
     [SerializeField] private float damage = 40f;
-    [SerializeField] private float knockback = 1f;
-    [SerializeField] private float scaleFactor = 10f; // TODO make this an actual 3D object
+    // [SerializeField] private float knockback = 1f;
     private Vector3 position;
     private Quaternion rotation;
+    
+    // Collision
+    [SerializeField] private Collider collider;
 
     // Visual Effects
     [SerializeField] private Transform explosionPrefab;
+
+    public static Collider[] MyOverlap(Collider collider)
+    {
+        if (collider == null)
+            throw new ArgumentException("Collider is null.");
+        else if (collider is SphereCollider){
+            SphereCollider sc = (SphereCollider)collider;
+            return Physics.OverlapSphere(
+                sc.transform.position,
+                sc.radius);
+        } else if (collider is CapsuleCollider) {
+            CapsuleCollider cc = (CapsuleCollider)collider;
+            return new Collider[0]; // TODO
+            /*return Physics.OverlapCapsule(
+                cc.transform.position+cc.direction*cc.height,
+                cc.transform.position-cc.direction*cc.height,
+                cc.radius);
+            */
+        } else if (collider is BoxCollider) {
+            return new Collider[0]; // TODO
+        } else {
+            throw new ArgumentException("Unhandled collider type.");
+        }
+    }
 
     public void Initialize(Vector3 _position, Quaternion _rotation)
     {
@@ -23,19 +45,20 @@ public class HurtBox : MonoBehaviour
 
         Instantiate(
             explosionPrefab,
-            position,
+            position, 
             rotation
         );
 
-        GameObject[] gos = GameObject.FindGameObjectsWithTag("Character");
-        Vector3 pos2d = new Vector2(position.x, position.z);
-
-        foreach (GameObject go in gos)
+        collider.transform.position = position;
+    
+        foreach (Collider otherCollider in MyOverlap(collider))
         {
-            Vector2 goPos2d = new Vector2(go.transform.position.x, go.transform.position.z);
-            if (Vector2.Distance(pos2d, goPos2d) < transform.localScale.x*scaleFactor)
+            GameObject go = otherCollider.gameObject;
+            CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
+
+            if (cb)
             {
-                CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
+                Debug.Log(go);
                 cb.TakeDamage(damage);
             }
         }

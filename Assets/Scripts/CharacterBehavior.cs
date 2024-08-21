@@ -124,7 +124,6 @@ public class CharacterBehavior : MonoBehaviour
 
     private void HandleMove()
     {
-        Assert.AreEqual(cc.velocity.y, 0); // TODO ensure this somehow
         bool aboveWalkSpeed = (currentSpeed > (walkSpeedMax + .05f));
         if (!me) return;
 
@@ -199,6 +198,7 @@ public class CharacterBehavior : MonoBehaviour
          * FINALIZE
          */
         cc.Move(direction * currentSpeed * Time.deltaTime);
+        //cc.SimpleMove(direction * currentSpeed * Time.deltaTime);
         boltDuration -= Time.deltaTime;
     }
 
@@ -224,7 +224,7 @@ public class CharacterBehavior : MonoBehaviour
             var direction = new Vector3(worldPosition.x - playerPosition.x, 0, worldPosition.z - playerPosition.z).normalized;
 
             // position
-            var shotRadius = cc.GetComponent<CapsuleCollider>().radius * 1.5f;
+            var shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
             var position = playerPosition + shotRadius * direction;
 
             var projectile = Instantiate(projectilePrefab, position, transform.rotation);

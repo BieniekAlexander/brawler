@@ -1263,7 +1263,6 @@ GameObject:
   - component: {fileID: 1869139037}
   - component: {fileID: 1869139038}
   - component: {fileID: 1869139039}
-  - component: {fileID: 1869139040}
   m_Layer: 6
   m_Name: Player
   m_TagString: Character
@@ -1376,7 +1375,7 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1
   m_Radius: 0.49999997
-  m_SlopeLimit: 45
+  m_SlopeLimit: 10
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
@@ -1494,29 +1493,6 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
---- !u!136 &1869139040
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1869139032}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.6
-  m_Height: 1.2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1980988876
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1589,6 +1565,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3473392452646398674, guid: db0f6882d4c4aa9428dee713aee7e4ab,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3473392452646398674, guid: db0f6882d4c4aa9428dee713aee7e4ab,
         type: 3}

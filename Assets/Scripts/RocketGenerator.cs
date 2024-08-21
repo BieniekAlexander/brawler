@@ -28,7 +28,7 @@ public class RocketGenerator : MonoBehaviour
             {
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
-                Vector3 initialPosition = new Vector3(randX, transTarget.position.y, randZ);
+                Vector3 initialPosition = new Vector3(randX, transTarget.position.y+.1f, randZ);
                 GameObject go = Instantiate(rocketPrefab, initialPosition, Quaternion.Euler(new Vector3(0, 0, 0)));
                 RocketBehavior rocket = go.GetComponent<RocketBehavior>();
                 rocket.transTarget = transTarget;

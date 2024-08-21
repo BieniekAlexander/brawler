@@ -1,6 +1,9 @@
 using System.Drawing;
 using System.Transactions;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.Analytics;
+using UnityEngine.UIElements;
 
 public class RocketBehavior : MonoBehaviour
 {
@@ -38,20 +41,29 @@ public class RocketBehavior : MonoBehaviour
         }
 
         _cc.Move(velocity * Time.deltaTime);
+        handleCollisions();
     }
 
-private void OnControllerColliderHit(ControllerColliderHit hit)
-{
-        Vector3 contactCoordinates = hit.collider.ClosestPoint(_cc.transform.position);
+    private void handleCollisions()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, transform.localScale.x);
 
-        //Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-        Quaternion rotation = Quaternion.Euler(Vector3.zero);
-        Instantiate(
-            hurtBox,
-            contactCoordinates,
-            rotation
-        ).Initialize(contactCoordinates, rotation);
-        
-        Destroy(gameObject);
+        foreach (Collider c in colliders)
+        {
+            if (c.gameObject == gameObject)
+                continue;
+            if (c.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+                continue;
+            
+            Quaternion rotation = Quaternion.Euler(Vector3.zero);
+            Instantiate(
+                hurtBox,
+                transform.position,
+                rotation
+            ).Initialize(transform.position, rotation);
+
+            Destroy(gameObject);
+            break;
+        }
     }
 }

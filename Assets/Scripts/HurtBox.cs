@@ -3,11 +3,18 @@ using UnityEngine;
 
 public class HurtBox : MonoBehaviour
 {
-    [SerializeField] private float damage = 40f;
-    // [SerializeField] private float knockback = 1f;
+    /* Position */
     private Vector3 position;
     private Quaternion rotation;
-    
+       
+    /* Damage */
+    [SerializeField] private float damage = 40f;
+
+    /* Knockback */
+    [SerializeField] private float knockbackMagnitude = 1f;
+    [SerializeField] private Vector3 knockbackDirection;
+    [SerializeField] private String knockbackOrientation = "CENTERED"; // TODO name
+
     // Collision
     [SerializeField] private Collider collider;
 
@@ -58,8 +65,8 @@ public class HurtBox : MonoBehaviour
 
             if (cb)
             {
-                Debug.Log(go);
-                cb.TakeDamage(damage);
+                cb.TakeDamage(damage, knockbackDirection, 1f, .5f);
+                // TODO produce knockback
             }
         }
     }

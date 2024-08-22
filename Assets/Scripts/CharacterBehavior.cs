@@ -14,6 +14,7 @@ public class CharacterBehavior : MonoBehaviour
     private Vector3 direction = new Vector3();
     private float currentSpeed = 0f;    
     private Vector3 bounceDirection = new Vector3();
+    private float hitStunTimer = 0f;
 
     // Walking
     private float walkAcceleration = 50f;
@@ -120,6 +121,11 @@ public class CharacterBehavior : MonoBehaviour
         HandleCharges();
         HandleMove();
         HandleShoot();
+    }
+
+    private void HandleKnockback()
+    {
+
     }
 
     private void HandleMove()
@@ -252,11 +258,21 @@ public class CharacterBehavior : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(
+        float damage,
+        Vector3 knockbackDirection,
+        float knockBackMagnitude,
+        float hitStunDuration
+        )
     {
         hp -= damage;
-        if (hp < 0f)
+        if (hp < 0f) {
             Destroy(gameObject);
+        } else {
+            hitStunTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
+
+        }
+            
     }
 
     void OnGUI(){

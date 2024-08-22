@@ -118,15 +118,15 @@ public class CharacterBehavior : MonoBehaviour
         HandleShoot();
     }
 
-    private void HandleKnockback()
-    {
-
-    }
-
     private void HandleMove()
     {
-        bool aboveWalkSpeed = (velocity.magnitude > (walkSpeedMax + .05f));
+        bool aboveWalkSpeed = (velocity.magnitude > (walkSpeedMax+.05));
         if (!me) return;
+        if (hitStunTimer > 0f)
+        {
+            hitStunTimer -= Time.deltaTime;
+            return;
+        }
 
         /*
          * MOVEMENT SPEED
@@ -168,7 +168,7 @@ public class CharacterBehavior : MonoBehaviour
                     // TODO bugged- this is plummeting velocity
                 }
             } else {
-                if (biasDirection == Vector3.zero)
+                if (biasDirection == Vector3.zero && !runningHeld)
                     biasDirection = -velocity.normalized;
 
                 Vector3 newVelocity = velocity + (biasDirection * walkAcceleration * Time.deltaTime);
@@ -251,8 +251,7 @@ public class CharacterBehavior : MonoBehaviour
 
     public void TakeDamage(
         float damage,
-        Vector3 knockbackDirection,
-        float knockBackMagnitude,
+        Vector3 knockbackVector,
         float hitStunDuration
         )
     {
@@ -261,6 +260,7 @@ public class CharacterBehavior : MonoBehaviour
             Destroy(gameObject);
         } else {
             hitStunTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
+            velocity += knockbackVector;
 
         }
             

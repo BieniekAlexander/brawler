@@ -12,14 +12,21 @@ public class HurtBox : MonoBehaviour
 
     /* Knockback */
     [SerializeField] private float knockbackMagnitude = 1f;
-    [SerializeField] private Vector3 knockbackDirection;
-    [SerializeField] private String knockbackOrientation = "CENTERED"; // TODO name
+    [SerializeField] private Vector3 knockbackTransform;
+    [SerializeField] private String knockbackTransformType = "ANGULAR"; // TODO name
 
     // Collision
     [SerializeField] private Collider collider;
 
     // Visual Effects
     [SerializeField] private Transform explosionPrefab;
+
+    private Vector3 GetKnockBackVector(Vector3 targetPosition) {
+        Vector3 toTarget = targetPosition - transform.position;
+        Vector3 knockBackDirection = (knockbackTransformType == "ANGULAR") ? Quaternion.Euler(knockbackTransform) * toTarget : knockbackTransform;
+        knockBackDirection.y = 0f;
+        return knockBackDirection.normalized*knockbackMagnitude;
+    }
 
     public static Collider[] MyOverlap(Collider collider)
     {
@@ -65,7 +72,7 @@ public class HurtBox : MonoBehaviour
 
             if (cb)
             {
-                cb.TakeDamage(damage, knockbackDirection, 1f, .5f);
+                cb.TakeDamage(damage, GetKnockBackVector(cb.transform.position), .1f);
                 // TODO produce knockback
             }
         }

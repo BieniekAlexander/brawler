@@ -11,8 +11,7 @@ public class CharacterBehavior : MonoBehaviour
 
     /* Movement */
     private CharacterController cc;
-    private Vector3 direction = new Vector3();
-    private float currentSpeed = 0f;    
+    private Vector3 velocity = new Vector3();
     private Vector3 bounceDirection = new Vector3();
     private float hitStunTimer = 0f;
 
@@ -56,10 +55,6 @@ public class CharacterBehavior : MonoBehaviour
     private bool boltPressed = false;
     private bool runningHeld = false;
 
-    private Vector3 GetBiasedDirection(Vector3 currentPath, Vector3 bias) { // TODO name?
-        return (currentPath + bias).normalized;
-    }
-
     void CheckControls()
     {
         if (me) {
@@ -94,7 +89,7 @@ public class CharacterBehavior : MonoBehaviour
         /*
          * Trail Renderer
          */
-        tr.emitting = (currentSpeed > boltMaxSpeed / 2);
+        tr.emitting = (velocity.magnitude > boltMaxSpeed / 2);
     }
 
     private void Update()
@@ -130,7 +125,7 @@ public class CharacterBehavior : MonoBehaviour
 
     private void HandleMove()
     {
-        bool aboveWalkSpeed = (currentSpeed > (walkSpeedMax + .05f));
+        bool aboveWalkSpeed = (velocity.magnitude > (walkSpeedMax + .05f));
         if (!me) return;
 
         /*
@@ -140,12 +135,11 @@ public class CharacterBehavior : MonoBehaviour
         { // bolting - update speed and direction
             charges -= 1;
             chargeCooldown = chargeCooldownMax;
-            runSpeed = Mathf.Min(Mathf.Max(cc.velocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
-            currentSpeed = boltMaxSpeed;
+            runSpeed = Mathf.Min(Mathf.Max(velocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
             boltDuration = boltDurationMax;
             boltPressed = false;
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
-            direction = new Vector3(v.x, 0, v.z).normalized;
+            velocity = new Vector3(v.x, 0, v.z).normalized*boltMaxSpeed;
         }
         else
         { // not bolting
@@ -161,30 +155,28 @@ public class CharacterBehavior : MonoBehaviour
             if (aboveWalkSpeed) {
                 if (runningHeld || boltDuration > 0f) { // keeping up running speed - limit rotational control
                     if (boltDuration > 0f && boltDuration - Time.deltaTime > 0f)
-                        currentSpeed = boltMaxSpeed - ((boltDurationMax - boltDuration) / boltDurationMax) * (boltMaxSpeed - runSpeed);
+                        velocity = velocity.normalized * (boltMaxSpeed - ((boltDurationMax - boltDuration) / boltDurationMax) * (boltMaxSpeed - runSpeed));
                     else if (boltDuration > 0f)
-                        currentSpeed = runSpeed;
+                        velocity = velocity.normalized * runSpeed;
 
                     if (biasDirection != Vector3.zero)
-                        direction = GetBiasedDirection(cc.velocity, biasDirection * walkAcceleration * Time.deltaTime / 2);
+                        velocity = (velocity + biasDirection * walkAcceleration / 2 * Time.deltaTime).normalized * velocity.magnitude;
                 } else {  // running not held - drop speed and free up rotational control
-                    currentSpeed = Mathf.Max(currentSpeed - runDeceleration*Time.deltaTime, 0);
+                    velocity = velocity.normalized * Mathf.Max(velocity.magnitude - runDeceleration*Time.deltaTime, 0);
                     if (biasDirection != Vector3.zero)
-                        direction = Vector3.RotateTowards(cc.velocity, biasDirection, runRotationalSpeed * Time.deltaTime, 1).normalized;
+                        velocity = Vector3.RotateTowards(velocity, biasDirection, runRotationalSpeed * Time.deltaTime, 1).normalized*velocity.magnitude;
+                    // TODO bugged- this is plummeting velocity
                 }
             } else {
                 if (biasDirection == Vector3.zero)
-                    biasDirection = -cc.velocity.normalized;
+                    biasDirection = -velocity.normalized;
 
-                Vector3 newVelocity = (cc.velocity + (biasDirection * walkAcceleration * Time.deltaTime));
+                Vector3 newVelocity = velocity + (biasDirection * walkAcceleration * Time.deltaTime);
 
-                if (newVelocity.normalized == -cc.velocity.normalized)
-                    currentSpeed = 0;
+                if (newVelocity.normalized == -velocity.normalized)
+                    velocity.Set(0f, 0f, 0f);
                 else
-                {
-                    direction = newVelocity.normalized;
-                    currentSpeed = Mathf.Min(newVelocity.magnitude, walkSpeedMax);
-                }
+                    velocity = newVelocity.normalized * Mathf.Min(newVelocity.magnitude, walkSpeedMax);
             }
         }
 
@@ -194,24 +186,23 @@ public class CharacterBehavior : MonoBehaviour
         if (bounceDirection != Vector3.zero)
         {
             if (!aboveWalkSpeed)
-                currentSpeed = 0;
+                velocity.Set(0f, 0f, 0f);
 
-            direction = bounceDirection;
+            velocity = bounceDirection*velocity.magnitude;
             bounceDirection.Set(0f, 0f, 0f);
         }
 
         /*
          * FINALIZE
          */
-        cc.Move(direction * currentSpeed * Time.deltaTime);
-        //cc.SimpleMove(direction * currentSpeed * Time.deltaTime);
+        cc.Move(velocity*Time.deltaTime);
         boltDuration -= Time.deltaTime;
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-        bounceDirection = (cc.velocity - 2 * Vector3.Project(cc.velocity, mirror)).normalized;
+        bounceDirection = (velocity - 2 * Vector3.Project(velocity, mirror)).normalized;
         // TODO add something here:
         // - stop for some frames
     }
@@ -278,7 +269,7 @@ public class CharacterBehavior : MonoBehaviour
     void OnGUI(){
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20,40,80,20), cc.velocity.magnitude + "m/s");
+        GUI.Label(new Rect(20,40,80,20), velocity.magnitude + "m/s");
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+hp);
     }

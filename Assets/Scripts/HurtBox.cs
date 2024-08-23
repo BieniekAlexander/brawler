@@ -18,8 +18,9 @@ public class HurtBox : MonoBehaviour
     // Collision
     [SerializeField] private Collider collider;
 
-    // Visual Effects
-    [SerializeField] private Transform explosionPrefab;
+    // Visualization
+    private ParticleSystem ps;
+    private float animationDuration;
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         Vector3 toTarget = targetPosition - transform.position;
@@ -52,16 +53,16 @@ public class HurtBox : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        ps = GetComponent<ParticleSystem>();
+        animationDuration = ps.duration;
+    }
+
     public void Initialize(Vector3 _position, Quaternion _rotation)
     {
         position = _position;
         rotation = _rotation;
-
-        Instantiate(
-            explosionPrefab,
-            position, 
-            rotation
-        );
 
         collider.transform.position = position;
     
@@ -76,11 +77,5 @@ public class HurtBox : MonoBehaviour
                 // TODO produce knockback
             }
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Destroy(gameObject);
     }
 }

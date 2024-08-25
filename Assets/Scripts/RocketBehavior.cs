@@ -15,7 +15,7 @@ public class RocketBehavior : MonoBehaviour
     [SerializeField] float maxSpeed = 7.5f;
 
     /* Target */
-    [SerializeField] private HurtBox hurtBox;
+    [SerializeField] private Hit hurtBox;
 
     private void Start()
     {

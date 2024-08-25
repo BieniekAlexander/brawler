@@ -16,7 +16,7 @@ public class CharacterBehavior : MonoBehaviour
     
     // knockback
     private Vector3 knockBackVelocity = new Vector3();
-    private float knockBackDecceleration = 20f;
+    private float knockBackDecceleration = 50f;
     private float hitLagTimer = 0f;
 
     // Walking
@@ -135,8 +135,7 @@ public class CharacterBehavior : MonoBehaviour
         /*
          * MOVEMENT SPEED
          */
-        if (boltPressed && charges>0 && chargeCooldown<0)
-        { // bolting - update speed and direction
+        if (boltPressed && charges>0 && chargeCooldown<0) { // bolting - update speed and direction
             charges -= 1;
             chargeCooldown = chargeCooldownMax;
             runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
@@ -145,8 +144,7 @@ public class CharacterBehavior : MonoBehaviour
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
             moveVelocity = new Vector3(v.x, 0, v.z).normalized*boltMaxSpeed;
             knockBackVelocity.Set(0f, 0f, 0f);
-        }
-        else
+        } else
         { // not bolting
             // handle direction
             Vector3 biasDirection = new Vector3(0, 0, 0);
@@ -274,11 +272,14 @@ public class CharacterBehavior : MonoBehaviour
         if (hp < 0f) {
             Destroy(gameObject);
         } else {
-            hitLagTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
-            knockBackVelocity = knockbackVector;
-
-        }
-            
+            if (knockbackVector != Vector3.zero && hitLagTimer <= 0)
+            {
+                hitLagTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
+                knockBackVelocity = knockbackVector;
+                moveVelocity *= .5f;
+                boltDuration = 0f;
+            }
+        }   
     }
 
     void OnGUI(){

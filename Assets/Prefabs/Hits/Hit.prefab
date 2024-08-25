@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4017320443487140070}
   - component: {fileID: -4948553015199072174}
   m_Layer: 0
-  m_Name: HurtBox
+  m_Name: Hit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
-  knockbackMagnitude: 15
+  knockbackMagnitude: 25
   knockbackTransform: {x: 0, y: 0, z: 0}
   knockbackTransformType: ANGULAR
   collider: {fileID: 789189427479251447, guid: 188117d846dfe994eab020ac6429977c, type: 3}

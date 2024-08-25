@@ -1,11 +1,15 @@
 using System;
 using UnityEngine;
 
-public class HurtBox : MonoBehaviour
+[Serializable]
+public class Hit : MonoBehaviour
 {
     /* Position */
     private Vector3 position;
     private Quaternion rotation;
+    public Transform origin; // origin of the cast, allowing for movement during animation
+    [SerializeField] private Vector3[] trajectory;
+
        
     /* Damage */
     [SerializeField] private float damage = 40f;
@@ -16,7 +20,7 @@ public class HurtBox : MonoBehaviour
     [SerializeField] private String knockbackTransformType = "ANGULAR"; // TODO name
 
     // Collision
-    [SerializeField] private Collider collider;
+    [SerializeField] private Collider HitBox;
 
     // Visualization
     private ParticleSystem ps;
@@ -56,7 +60,7 @@ public class HurtBox : MonoBehaviour
     private void Awake()
     {
         ps = GetComponent<ParticleSystem>();
-        animationDuration = ps.duration;
+        animationDuration = ps.main.duration;
     }
 
     public void Initialize(Vector3 _position, Quaternion _rotation)
@@ -64,9 +68,9 @@ public class HurtBox : MonoBehaviour
         position = _position;
         rotation = _rotation;
 
-        collider.transform.position = position;
+        HitBox.transform.position = position;
     
-        foreach (Collider otherCollider in MyOverlap(collider))
+        foreach (Collider otherCollider in MyOverlap(HitBox))
         {
             GameObject go = otherCollider.gameObject;
             CharacterBehavior cb = go.GetComponent<CharacterBehavior>();

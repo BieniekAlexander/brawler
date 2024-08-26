@@ -10,12 +10,12 @@ public class RocketBehavior : MonoBehaviour
     /* Movement */
     private CharacterController _cc;
     private Vector3 velocity;
-    [SerializeField] public Transform transTarget;
+    public Transform transTarget;
     [SerializeField] float rotationalControl = 120f;
     [SerializeField] float maxSpeed = 7.5f;
 
     /* Target */
-    [SerializeField] private Hit hurtBox;
+    [SerializeField] private Hit hit;
 
     private void Start()
     {
@@ -56,11 +56,13 @@ public class RocketBehavior : MonoBehaviour
                 continue;
             
             Quaternion rotation = Quaternion.Euler(Vector3.zero);
-            Instantiate(
-                hurtBox,
+            Hit h = Instantiate(
+                hit,
                 transform.position,
                 rotation
-            ).Initialize(transform.position, rotation);
+            );
+
+            h.Initialize(null);
 
             Destroy(gameObject);
             break;

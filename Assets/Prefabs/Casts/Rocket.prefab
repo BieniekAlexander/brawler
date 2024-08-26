@@ -150,4 +150,4 @@ MonoBehaviour:
   transTarget: {fileID: 0}
   rotationalControl: 120
   maxSpeed: 7.5
-  hurtBox: {fileID: 1207272893519555139, guid: 00da8bf3cd59c434eb51c52c2a202ea7, type: 3}
+  hit: {fileID: 1207272893519555139, guid: d2667cab1b3004749a0b466d293c7d1c, type: 3}

@@ -1,29 +1,34 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class Hit : MonoBehaviour
 {
     /* Position */
-    private Vector3 position;
     private Quaternion rotation;
-    public Transform origin; // origin of the cast, allowing for movement during animation
-    [SerializeField] private Vector3[] trajectory;
+    private Transform origin = null; // origin of the cast, allowing for movement during animation
+    private Quaternion initialRotation;
+    [SerializeField] public Vector3 offset;
 
-       
-    /* Damage */
-    [SerializeField] private float damage = 40f;
+    /* Collision */
+    private Collider hitBox;
+    [SerializeField] private Vector3[] trajectory;
+    [SerializeField] private Vector3[] scaling;
+
+    /* Duration */
+    [SerializeField] public int duration = 3;
 
     /* Knockback */
     [SerializeField] private float knockbackMagnitude = 1f;
     [SerializeField] private Vector3 knockbackTransform;
     [SerializeField] private String knockbackTransformType = "ANGULAR"; // TODO name
 
-    // Collision
-    [SerializeField] private Collider HitBox;
+    /* Effects */
+    [SerializeField] private float damage = 40f;
 
     // Visualization
-    private ParticleSystem ps;
+    //private ParticleSystem ps;
     private float animationDuration;
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
@@ -57,20 +62,35 @@ public class Hit : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public void Initialize(Transform _origin)
     {
-        ps = GetComponent<ParticleSystem>();
-        animationDuration = ps.main.duration;
+        origin = _origin;
+        initialRotation = transform.rotation;
+        hitBox = GetComponent<Collider>();
     }
 
-    public void Initialize(Vector3 _position, Quaternion _rotation)
+    private void FixedUpdate()
     {
-        position = _position;
-        rotation = _rotation;
+        HandleMove();
+        HandleHitCollisions();
 
-        HitBox.transform.position = position;
-    
-        foreach (Collider otherCollider in MyOverlap(HitBox))
+        if (--duration <= 0)
+            Destroy(gameObject);
+    }
+
+    private void HandleMove()
+    {
+        if (origin != null){
+            transform.position = origin.position + origin.rotation * offset;
+            Debug.Log(origin.rotation);
+            Quaternion rotation = origin.rotation*initialRotation;
+            transform.rotation = rotation;
+        }
+    }
+
+    private void HandleHitCollisions()
+    {
+        foreach (Collider otherCollider in MyOverlap(hitBox))
         {
             GameObject go = otherCollider.gameObject;
             CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
@@ -78,7 +98,6 @@ public class Hit : MonoBehaviour
             if (cb)
             {
                 cb.TakeDamage(damage, GetKnockBackVector(cb.transform.position), .1f);
-                // TODO produce knockback
             }
         }
     }

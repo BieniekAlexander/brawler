@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 1207272893519555139}
   - component: {fileID: 4017320443487140070}
   - component: {fileID: -4948553015199072174}
+  - component: {fileID: -6023877708165195877}
   m_Layer: 0
-  m_Name: Hit
+  m_Name: HitRocket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,11 +47,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 2
+  offset: {x: 0, y: 0, z: 0}
+  trajectory: []
+  scaling: []
+  duration: 3
   knockbackMagnitude: 25
   knockbackTransform: {x: 0, y: 0, z: 0}
   knockbackTransformType: ANGULAR
-  collider: {fileID: 789189427479251447, guid: 188117d846dfe994eab020ac6429977c, type: 3}
+  damage: 2
 --- !u!198 &4017320443487140070
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -61,7 +65,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 0.25
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -4904,3 +4908,24 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!135 &-6023877708165195877
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4309640871662126163}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}

@@ -34,12 +34,13 @@ public class CharacterBehavior : MonoBehaviour
     private float boltMaxSpeed = 25f;
     private float boltSpeedBump = 2.5f;
 
-    /* Offense */
+    /* Abilities */
     // Shooting
     // TODO get these constants from the other file
-    private float reloadTimer = 0f;
-    private float reloadDuration = 1f;
+    private int reloadTimer = 0;
+    private int reloadDuration = 30;
     [SerializeField] private Projectile projectilePrefab;
+    [SerializeField] private Cast[] casts;
 
     /* Defense */
     private float hp = 100f;
@@ -59,13 +60,19 @@ public class CharacterBehavior : MonoBehaviour
     private bool boltPressed = false;
     private bool runningHeld = false;
 
-    void CheckControls()
+    void HandleControls()
     {
         if (me) {
+            // movement
             boltPressed |= (chargeCooldown <= 0) && Input.GetKeyDown(KeyCode.LeftShift);
             runningHeld = Input.GetKey(KeyCode.Space);
+
+            // aiming
+            Vector3 worldPosition = getCursorWorldPosition();
+            var playerPosition = cc.transform.position;
+            var direction = new Vector3(worldPosition.x - playerPosition.x, 0, worldPosition.z - playerPosition.z).normalized;
+            transform.rotation = Quaternion.FromToRotation(Vector3.forward, direction);
         }
-        
     }
 
     private void Start()
@@ -99,7 +106,7 @@ public class CharacterBehavior : MonoBehaviour
     private void Update()
     {
         // handle inputs
-        CheckControls();
+        HandleControls();
         HandleVisuals();
     }
 
@@ -224,24 +231,25 @@ public class CharacterBehavior : MonoBehaviour
     {
         if (!me) return;
 
-        if (Input.GetMouseButton(0) && (reloadTimer == 0))
-        {
+        if (Input.GetMouseButton(0) && (reloadTimer <= 0)) {
+            Debug.Log("got one");
             reloadTimer = reloadDuration;
 
-            // get trajectory
-            Vector3 worldPosition = getCursorWorldPosition();
-            var playerPosition = cc.transform.position;
-            var direction = new Vector3(worldPosition.x - playerPosition.x, 0, worldPosition.z - playerPosition.z).normalized;
-
             // position
-            var shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
-            var position = playerPosition + shotRadius * direction;
+            float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
+            Vector3 position = transform.position + transform.rotation*Vector3.forward * shotRadius;
+            Vector3 direction = transform.rotation * Vector3.forward;
 
             var projectile = Instantiate(projectilePrefab, position, transform.rotation);
             projectile.Fire(direction);
+        } else if (Input.GetMouseButton(1) && (reloadTimer <= 0)) {
+            Debug.Log("got two");
+            reloadTimer = reloadDuration;
+            Cast cast = Instantiate(casts[0]);
+            cast.Initialize(gameObject.transform);
         }
 
-        reloadTimer = math.max(reloadTimer - Time.deltaTime, 0);
+        reloadTimer--;
     }
 
     private static Vector3 getCursorWorldPosition()

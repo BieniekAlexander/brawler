@@ -63,6 +63,7 @@ public class RocketBehavior : MonoBehaviour
             );
 
             h.Initialize(null);
+            h.HandleHitCollisions();
 
             Destroy(gameObject);
             break;

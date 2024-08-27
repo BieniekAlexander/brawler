@@ -1,11 +1,14 @@
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
+using System.Collections.Generic;
+using System.Collections;
+using TreeEditor;
 
 [Serializable]
 public struct HitEvent
 {
-    public Hit hit;
+    public List<Hit> hits;
     public int startFrame;
 }
 
@@ -20,28 +23,30 @@ public class Cast : MonoBehaviour
     public void Initialize(Transform _origin)
     {
         origin = _origin;
-
         foreach (HitEvent hitEvent in hitEvents) {
-            Assert.IsNotNull(hitEvent.hit);
-            duration = Mathf.Max(duration, hitEvent.startFrame + hitEvent.hit.duration);
+            foreach (Hit hit in hitEvent.hits)
+            {
+                Assert.IsNotNull(hit);
+                duration = Mathf.Max(duration, hitEvent.startFrame + hit.duration);
+            }
         }
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         foreach (HitEvent hitEvent in hitEvents) {
             if (hitEvent.startFrame == frame) {
-                Hit hit = Instantiate(
-                    hitEvent.hit                    
-                );
-
-                hit.Initialize(origin);
-                hit.transform.position = origin.position + hitEvent.hit.offset;
+                foreach (Hit hit in hitEvent.hits)
+                {
+                    Hit h = Instantiate(hit);
+                    h.Initialize(origin);
+                    h.HandleMove();
+                    h.HandleHitCollisions();
+                }
             }
         }
 
-        if (frame++ == duration)
+        if (frame++ >= duration)
             Destroy(gameObject);
     }
 }

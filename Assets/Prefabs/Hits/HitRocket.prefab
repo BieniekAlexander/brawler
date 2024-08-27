@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 1207272893519555139}
   - component: {fileID: 4017320443487140070}
   - component: {fileID: -4948553015199072174}
-  - component: {fileID: -6023877708165195877}
-  m_Layer: 0
+  - component: {fileID: -7330007324543094842}
+  - component: {fileID: 4332431828880378665}
+  m_Layer: 8
   m_Name: HitRocket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,11 +30,11 @@ Transform:
   m_GameObject: {fileID: 4309640871662126163}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.775, y: 2.0250025, z: -2.27}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1207272893519555139
 MonoBehaviour:
@@ -4908,7 +4909,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!135 &-6023877708165195877
+--- !u!33 &-7330007324543094842
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4309640871662126163}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!135 &4332431828880378665
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4927,5 +4936,5 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}

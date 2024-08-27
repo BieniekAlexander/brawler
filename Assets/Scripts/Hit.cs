@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,6 +14,7 @@ public class Hit : MonoBehaviour
 
     /* Collision */
     private Collider hitBox;
+    public HashSet<CharacterBehavior> collisionIds = new HashSet<CharacterBehavior>();
     [SerializeField] private Vector3[] trajectory;
     [SerializeField] private Vector3[] scaling;
 
@@ -30,6 +32,22 @@ public class Hit : MonoBehaviour
     // Visualization
     //private ParticleSystem ps;
     private float animationDuration;
+
+    public void Awake()
+    {
+        hitBox = GetComponent<Collider>();
+        
+        // resize wireframe for vizualization
+        if (hitBox is CapsuleCollider) {
+            CapsuleCollider collider = hitBox as CapsuleCollider;
+            collider.transform.localScale = new Vector3(collider.radius, collider.height, collider.radius);
+        } else if (hitBox is SphereCollider) {
+            SphereCollider collider = hitBox as SphereCollider;
+            collider.transform.localScale = new Vector3(collider.radius, collider.radius, collider.radius);
+        } else {
+            throw new Exception("Unhandled wireframe resizing");
+        }
+    }
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         Vector3 toTarget = targetPosition - transform.position;
@@ -66,38 +84,41 @@ public class Hit : MonoBehaviour
     {
         origin = _origin;
         initialRotation = transform.rotation;
-        hitBox = GetComponent<Collider>();
     }
 
     private void FixedUpdate()
     {
         HandleMove();
-        HandleHitCollisions();
 
         if (--duration <= 0)
             Destroy(gameObject);
     }
 
-    private void HandleMove()
+    public void HandleMove()
     {
         if (origin != null){
             transform.position = origin.position + origin.rotation * offset;
-            Debug.Log(origin.rotation);
-            Quaternion rotation = origin.rotation*initialRotation;
-            transform.rotation = rotation;
+            transform.rotation = origin.rotation * initialRotation;
         }
     }
 
-    private void HandleHitCollisions()
+    public Collider[] GetColliders()
     {
-        foreach (Collider otherCollider in MyOverlap(hitBox))
+        return MyOverlap(hitBox);
+    }
+
+    public void HandleHitCollisions()
+    {
+        foreach (Collider otherCollider in GetColliders())
         {
             GameObject go = otherCollider.gameObject;
             CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
 
-            if (cb)
+            if (cb is not null && !collisionIds.Contains(cb))
             {
-                cb.TakeDamage(damage, GetKnockBackVector(cb.transform.position), .1f);
+                collisionIds.Add(cb);
+                Vector3 kb = GetKnockBackVector(cb.transform.position);
+                cb.TakeDamage(damage, kb, .1f);
             }
         }
     }

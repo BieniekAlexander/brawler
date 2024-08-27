@@ -232,7 +232,6 @@ public class CharacterBehavior : MonoBehaviour
         if (!me) return;
 
         if (Input.GetMouseButton(0) && (reloadTimer <= 0)) {
-            Debug.Log("got one");
             reloadTimer = reloadDuration;
 
             // position
@@ -243,7 +242,6 @@ public class CharacterBehavior : MonoBehaviour
             var projectile = Instantiate(projectilePrefab, position, transform.rotation);
             projectile.Fire(direction);
         } else if (Input.GetMouseButton(1) && (reloadTimer <= 0)) {
-            Debug.Log("got two");
             reloadTimer = reloadDuration;
             Cast cast = Instantiate(casts[0]);
             cast.Initialize(gameObject.transform);

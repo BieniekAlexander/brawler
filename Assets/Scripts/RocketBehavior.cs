@@ -56,14 +56,11 @@ public class RocketBehavior : MonoBehaviour
                 continue;
             
             Quaternion rotation = Quaternion.Euler(Vector3.zero);
-            Hit h = Instantiate(
+            Instantiate(
                 hit,
                 transform.position,
                 rotation
-            );
-
-            h.Initialize(null);
-            h.HandleHitCollisions();
+            ).Initialize(null);
 
             Destroy(gameObject);
             break;

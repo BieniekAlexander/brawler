@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [Serializable]
 public class Hit : MonoBehaviour
@@ -56,28 +57,10 @@ public class Hit : MonoBehaviour
         return knockBackDirection.normalized*knockbackMagnitude;
     }
 
-    public static Collider[] MyOverlap(Collider collider)
+    public static IEnumerable<Collider> GetOverlappingColliders(Collider collider)
     {
-        if (collider == null)
-            throw new ArgumentException("Collider is null.");
-        else if (collider is SphereCollider){
-            SphereCollider sc = (SphereCollider)collider;
-            return Physics.OverlapSphere(
-                sc.transform.position,
-                sc.radius);
-        } else if (collider is CapsuleCollider) {
-            CapsuleCollider cc = (CapsuleCollider)collider;
-            return new Collider[0]; // TODO
-            /*return Physics.OverlapCapsule(
-                cc.transform.position+cc.direction*cc.height,
-                cc.transform.position-cc.direction*cc.height,
-                cc.radius);
-            */
-        } else if (collider is BoxCollider) {
-            return new Collider[0]; // TODO
-        } else {
-            throw new ArgumentException("Unhandled collider type.");
-        }
+        Collider[] colliders = FindObjectsOfType<Collider>();
+        return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
     public void Initialize(Transform _origin)
@@ -89,6 +72,7 @@ public class Hit : MonoBehaviour
     private void FixedUpdate()
     {
         HandleMove();
+        HandleHitCollisions();
 
         if (--duration <= 0)
             Destroy(gameObject);
@@ -102,14 +86,9 @@ public class Hit : MonoBehaviour
         }
     }
 
-    public Collider[] GetColliders()
-    {
-        return MyOverlap(hitBox);
-    }
-
     public void HandleHitCollisions()
     {
-        foreach (Collider otherCollider in GetColliders())
+        foreach (Collider otherCollider in GetOverlappingColliders(hitBox))
         {
             GameObject go = otherCollider.gameObject;
             CharacterBehavior cb = go.GetComponent<CharacterBehavior>();

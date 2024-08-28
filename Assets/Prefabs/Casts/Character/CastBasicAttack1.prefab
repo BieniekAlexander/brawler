@@ -47,4 +47,4 @@ MonoBehaviour:
   hitEvents:
   - hits:
     - {fileID: 1883082655448118839, guid: 4568a4257cf491f40afff238c968b42d, type: 3}
-    startFrame: 30
+    startFrame: 10

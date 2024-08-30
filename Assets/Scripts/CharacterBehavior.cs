@@ -278,11 +278,6 @@ public class CharacterBehavior : MonoBehaviour
                 otherCharacter.moveVelocity = moveVelocity+dvNormal;
             }
         }
-        
-        /* 
-         * TODO change up the logic a bit if it's a character that you're running into
-         * Push the characters according to the faster velocity, and decelerate the faster velocity until it equals the lower "real velocity"
-         * */
     }
 
     private void HandleAbilities()

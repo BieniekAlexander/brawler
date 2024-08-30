@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static CharacterControls;
 
 public struct Ability {
     public Ability(int _cooldown) {
@@ -12,7 +14,7 @@ public struct Ability {
     public int timer;
 }
 
-public class CharacterBehavior : MonoBehaviour
+public class CharacterBehavior : MonoBehaviour, ICharacterActions
 {
     // is this me? TODO better way to do this
     [SerializeField] bool me;
@@ -45,7 +47,7 @@ public class CharacterBehavior : MonoBehaviour
 
     /* Abilities */
     // TODO [SerializeField]
-    private Ability[] abilities = {
+    private Ability[] abilitiesOld = {
         new Ability(60),
         new Ability(30)
     };
@@ -62,30 +64,77 @@ public class CharacterBehavior : MonoBehaviour
     TrailRenderer tr;
 
     /* Controls */
+    private CharacterControls characterControls;
+    private bool boost = false;
+    private bool running = false;
+    private bool shielding = false;
+
+    /* Resources */
     private int charges;
     private int maxCharges = 3;
     private float chargeCooldown = 0f;
     private float chargeCooldownMax = 1f;
     private float rechargeTimer = 0f;
     private float rechargeRate = 3f;
-    private bool boltPressed = false;
-    private bool runningHeld = false;
-    private int moveUp      = 0;
-    private int moveDown    = 0;
-    private int moveLeft    = 0;
-    private int moveRight   = 0;
+
+
+    private Vector3 movementDirection = new Vector3();
+    public InputAction shield;
+    public InputAction boostedShield;
+    public InputAction[] attacks = new InputAction[3];
+    public InputAction[] boostedAttacks = new InputAction[3];
+    public InputAction[] abilities = new InputAction[4];
+    public InputAction[] specialAbilities = new InputAction[2];
+    public InputAction ultimate;
+
+
+    
+
+    /*
+     * CONTROLS
+     */
+    public void OnMovement(InputAction.CallbackContext context){
+        var direction = context.ReadValue<Vector2>();
+        movementDirection.Set(direction.x, 0, direction.y);
+    }
+    public void OnRunning(InputAction.CallbackContext context) {
+        running = context.ReadValueAsButton();
+    }
+    public void OnBoost(InputAction.CallbackContext context){
+        Debug.Log("toggling boost");
+        boost = context.ReadValueAsButton();
+    }
+    public void OnAttack1(InputAction.CallbackContext context){}
+    public void OnAttack2(InputAction.CallbackContext context){}
+    public void OnAttack3(InputAction.CallbackContext context){}
+    public void OnBoostedAttack1(InputAction.CallbackContext context){}
+    public void OnBoostedAttack2(InputAction.CallbackContext context){}
+    public void OnBoostedAttack3(InputAction.CallbackContext context){}
+    public void OnShield(InputAction.CallbackContext context){
+        shielding = context.ReadValueAsButton();
+        Debug.Log("shielding: "+ shielding);
+        // TODO fix this - regardless of whether the modifier is pushed, OnBoostedShield is overriding this
+    }
+    public void OnBoostedShield(InputAction.CallbackContext context){
+        var boostedShielding = context.ReadValueAsButton();
+        Debug.Log("boostedShielding: "+boostedShielding);
+    }
+    public void OnThrow1(InputAction.CallbackContext context){}
+    public void OnThrow2(InputAction.CallbackContext context){}
+    public void OnBoostedThrow(InputAction.CallbackContext context){}
+    public void OnAbility1(InputAction.CallbackContext context){}
+    public void OnAbility2(InputAction.CallbackContext context){}
+    public void OnAbility3(InputAction.CallbackContext context){}
+    public void OnAbility4(InputAction.CallbackContext context){}
+    public void OnSpecial1(InputAction.CallbackContext context){}
+    public void OnSpecial2(InputAction.CallbackContext context){}
+    public void OnUltimate(InputAction.CallbackContext context){}
 
     void HandleControls()
     {
         if (me) {
             // movement
-            moveUp      = Input.GetKey(KeyCode.W) ? 1 : 0;
-            moveDown    = Input.GetKey(KeyCode.S) ? 1 : 0;
-            moveLeft    = Input.GetKey(KeyCode.D) ? 1 : 0;
-            moveRight   = Input.GetKey(KeyCode.A) ? 1 : 0;
-
-            boltPressed |= Input.GetKeyDown(KeyCode.LeftShift);
-            runningHeld = Input.GetKey(KeyCode.Space);
+            
 
             // aiming
             Vector3 worldPosition = getCursorWorldPosition();
@@ -94,17 +143,27 @@ public class CharacterBehavior : MonoBehaviour
             transform.rotation = Quaternion.FromToRotation(Vector3.forward, direction);
 
             // abilities
-            abilities[0].pressed = Input.GetMouseButton(0);
-            abilities[1].pressed = Input.GetMouseButton(1);
+            abilitiesOld[0].pressed = Input.GetMouseButton(0);
+            abilitiesOld[1].pressed = Input.GetMouseButton(1);
+        }
+    }
+
+    private void Awake()
+    {
+        cc = GetComponent<CharacterController>();
+        _material = GetComponent<Renderer>().material;
+        tr = GetComponent<TrailRenderer>();
+
+        if (me) // set up controls
+        {
+            characterControls = new CharacterControls();
+            characterControls.Enable(); // TODO do I need to disable this somewhere?
+            characterControls.character.SetCallbacks(this);
         }
     }
 
     private void Start()
     {
-        cc = GetComponent<CharacterController>();
-        _material = GetComponent<Renderer>().material;
-        tr = GetComponent<TrailRenderer>();
-        var f = GetComponent<Transform>();
         charges = maxCharges;
     }
 
@@ -167,12 +226,12 @@ public class CharacterBehavior : MonoBehaviour
         /*
          * MOVEMENT SPEED
          */
-        if (boltPressed && charges > 0 && chargeCooldown <= 0)
+        if (boost && charges > 0 && chargeCooldown <= 0)
         { // bolting - update speed and direction
             charges -= 1;
             chargeCooldown = chargeCooldownMax;
             runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
-            boltPressed = false;
+            boost = false;
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
             moveVelocity = new Vector3(v.x, 0, v.z).normalized * boltMaxSpeed;
             knockBackVelocity.Set(0f, 0f, 0f);
@@ -180,7 +239,7 @@ public class CharacterBehavior : MonoBehaviour
         else
         { // not bolting
             // handle direction
-            Vector3 biasDirection = new Vector3(moveLeft - moveRight, 0, moveUp - moveDown).normalized; // TODO check
+            Vector3 biasDirection = movementDirection.normalized; // TODO check
 
             // handle speed
             if (aboveWalkSpeed)
@@ -192,16 +251,16 @@ public class CharacterBehavior : MonoBehaviour
                 else
                 { // regular run
                     moveVelocity = Vector3.RotateTowards(
-                        Mathf.Max(moveVelocity.magnitude - (runningHeld ? 0 : (deceleration * Time.deltaTime)), 0) * moveVelocity.normalized, // update velocity
+                        Mathf.Max(moveVelocity.magnitude - (running ? 0 : (deceleration * Time.deltaTime)), 0) * moveVelocity.normalized, // update velocity
                         biasDirection != Vector3.zero ? biasDirection : moveVelocity, // update direction if it was supplied
-                        runRotationalSpeed * Time.deltaTime / (runningHeld ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
+                        runRotationalSpeed * Time.deltaTime / (running ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
                         0 // don't change specified speed
                     );
                 }
             }
             else
             {
-                if (biasDirection == Vector3.zero && !runningHeld)
+                if (biasDirection == Vector3.zero && !running)
                 {    // stop walking
                     moveVelocity += moveVelocity.normalized * Mathf.Min(Time.deltaTime * runDeceleration, -moveVelocity.magnitude);
                 }
@@ -257,10 +316,10 @@ public class CharacterBehavior : MonoBehaviour
         GameObject collisionObject = hit.collider.gameObject;
         
         if (collisionObject.layer == LayerMask.NameToLayer("Terrain")) {
-            if (runningHeld)
-            {
+            if (running) { // if you hit a 
                 Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
                 bounceDirection = (moveVelocity - 2 * Vector3.Project(moveVelocity, mirror)).normalized;
+                hitLagTimer = .03f;
                 // TODO add something here:
                 // - stop for some frames
             }
@@ -282,13 +341,13 @@ public class CharacterBehavior : MonoBehaviour
 
     private void HandleAbilities()
     {
-        if (abilities[0].pressed) {
+        if (abilitiesOld[0].pressed) {
             // TODO generalize
-            abilities[0].pressed = false;
+            abilitiesOld[0].pressed = false;
 
-            if (abilities[0].timer <= 0)
+            if (abilitiesOld[0].timer <= 0)
             {
-                abilities[0].timer = abilities[0].cooldown;
+                abilitiesOld[0].timer = abilitiesOld[0].cooldown;
                 // TODO generalize
                 float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
                 Vector3 position = transform.position + transform.rotation * Vector3.forward * shotRadius;
@@ -297,22 +356,22 @@ public class CharacterBehavior : MonoBehaviour
                 var projectile = Instantiate(projectilePrefab, position, transform.rotation);
                 projectile.Fire(direction);
             }
-        } else if (abilities[1].pressed)
+        } else if (abilitiesOld[1].pressed)
         {
             // TODO generalize
-            abilities[1].pressed = false;
+            abilitiesOld[1].pressed = false;
 
-            if (abilities[1].timer <= 0)
+            if (abilitiesOld[1].timer <= 0)
             {
-                abilities[1].timer = abilities[1].cooldown;
+                abilitiesOld[1].timer = abilitiesOld[1].cooldown;
                 // position
                 Cast cast = Instantiate(casts[0]);
                 cast.Initialize(gameObject.transform);
             }
         }
 
-        for (int i = 0; i < abilities.Length; i++)
-            abilities[i].timer--;
+        for (int i = 0; i < abilitiesOld.Length; i++)
+            abilitiesOld[i].timer--;
     }
 
     private static Vector3 getCursorWorldPosition()

@@ -52,7 +52,7 @@ MonoBehaviour:
   trajectory: []
   scaling: []
   duration: 3
-  knockbackMagnitude: 25
+  knockbackMagnitude: 10
   knockbackTransform: {x: 0, y: 0, z: 0}
   knockbackTransformType: ANGULAR
   damage: 2

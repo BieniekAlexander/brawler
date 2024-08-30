@@ -12,7 +12,7 @@ public class RocketBehavior : MonoBehaviour
     private Vector3 velocity;
     public Transform transTarget;
     [SerializeField] float rotationalControl = 120f;
-    [SerializeField] float maxSpeed = 7.5f;
+    [SerializeField] float maxSpeed = 15f;
 
     /* Target */
     [SerializeField] private Hit hit;

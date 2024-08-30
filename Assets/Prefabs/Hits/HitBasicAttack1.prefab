@@ -51,10 +51,10 @@ MonoBehaviour:
   trajectory: []
   scaling: []
   duration: 20
-  knockbackMagnitude: 50
-  knockbackTransform: {x: 0, y: 0, z: 0}
-  knockbackTransformType: ANGULAR
-  damage: 20
+  knockbackMagnitude: 15
+  knockbackTransform: {x: 0, y: 0, z: 1}
+  knockbackTransformType: LINEAR
+  damage: 2
 --- !u!23 &4679774870214111964
 MeshRenderer:
   m_ObjectHideFlags: 0

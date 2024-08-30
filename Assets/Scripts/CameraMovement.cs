@@ -5,7 +5,7 @@ using UnityEngine;
 public class Follow : MonoBehaviour
 {
     [SerializeField] Transform transTarget;
-    private static Vector3 relativePosition = new Vector3(0, 9.0f, -3.0f);
+    private static Vector3 relativePosition = new Vector3(0, 15.0f, -5.0f);
     private static Quaternion rotation = Quaternion.Euler(-Mathf.Atan(relativePosition.y/relativePosition.z)*Mathf.Rad2Deg, 0, 0);
     private int cameraLockFactor;
     void Start() {

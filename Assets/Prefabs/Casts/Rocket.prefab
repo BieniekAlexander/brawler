@@ -125,5 +125,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transTarget: {fileID: 0}
   rotationalControl: 120
-  maxSpeed: 7.5
+  maxSpeed: 15
   hit: {fileID: 1207272893519555139, guid: d2667cab1b3004749a0b466d293c7d1c, type: 3}

@@ -52,7 +52,11 @@ public class Hit : MonoBehaviour
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         Vector3 toTarget = targetPosition - transform.position;
-        Vector3 knockBackDirection = (knockbackTransformType == "ANGULAR") ? Quaternion.Euler(knockbackTransform) * toTarget : knockbackTransform;
+        Vector3 knockBackDirection =
+            (knockbackTransformType == "ANGULAR") ?
+            Quaternion.Euler(knockbackTransform) * toTarget :
+            origin.transform.rotation * knockbackTransform;
+
         knockBackDirection.y = 0f;
         return knockBackDirection.normalized*knockbackMagnitude;
     }

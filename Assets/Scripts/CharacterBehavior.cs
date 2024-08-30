@@ -20,6 +20,7 @@ public class CharacterBehavior : MonoBehaviour
     /* Movement */
     private CharacterController cc;
     public Vector3 moveVelocity = new Vector3();
+    private Vector3 collisionVelocity = new Vector3();
     private Vector3 bounceDirection = new Vector3();
     
     // knockback
@@ -28,7 +29,7 @@ public class CharacterBehavior : MonoBehaviour
     private float hitLagTimer = 0f;
 
     // Walking
-    private float walkAcceleration = 100f;
+    private float walkAcceleration = 50f;
     private float walkSpeedMax = 10f;
 
     // Running
@@ -37,10 +38,10 @@ public class CharacterBehavior : MonoBehaviour
     private float runRotationalSpeed = 5f;
 
     // Bolt
-    private int boltDuration = 0;
-    private int boltDurationMax = 15;
+    private bool bolting = false;
     private float boltMaxSpeed = 30f;
     private float boltSpeedBump = 2.5f;
+    private float boltDeceleration = 20f;
 
     /* Abilities */
     // TODO [SerializeField]
@@ -113,7 +114,7 @@ public class CharacterBehavior : MonoBehaviour
          * Bolt Indicator
          */
         // duration
-        if (boltDuration > 0)
+        if (moveVelocity.magnitude>runSpeed) // TODO maybe I need to store this in an actual bool?
             _material.color = Color.red;
         if (chargeCooldown < 0 && charges>0)
             _material.color = Color.green;
@@ -153,9 +154,9 @@ public class CharacterBehavior : MonoBehaviour
 
     private void HandleTransform()
     {
-        bool aboveWalkSpeed = (moveVelocity.magnitude > (walkSpeedMax+.05));
+        bool aboveWalkSpeed = isAboveWalkSpeed();
         float acceleration = aboveWalkSpeed ? 0 : walkAcceleration;
-        float deceleration = aboveWalkSpeed ? runDeceleration : walkAcceleration * 2;
+        float deceleration = aboveWalkSpeed ? runDeceleration : walkAcceleration * 4;
 
         if (hitLagTimer > 0f)
         {
@@ -166,40 +167,49 @@ public class CharacterBehavior : MonoBehaviour
         /*
          * MOVEMENT SPEED
          */
-        if (boltPressed && charges>0 && chargeCooldown<=0) { // bolting - update speed and direction
+        if (boltPressed && charges > 0 && chargeCooldown <= 0)
+        { // bolting - update speed and direction
             charges -= 1;
             chargeCooldown = chargeCooldownMax;
             runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
-            boltDuration = boltDurationMax;
             boltPressed = false;
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
-            moveVelocity = new Vector3(v.x, 0, v.z).normalized*boltMaxSpeed;
+            moveVelocity = new Vector3(v.x, 0, v.z).normalized * boltMaxSpeed;
             knockBackVelocity.Set(0f, 0f, 0f);
-        } else
+        }
+        else
         { // not bolting
             // handle direction
             Vector3 biasDirection = new Vector3(moveLeft - moveRight, 0, moveUp - moveDown).normalized; // TODO check
 
             // handle speed
-            if (aboveWalkSpeed) {
-                if (boltDuration >= 0) {
-                    moveVelocity = moveVelocity.normalized * (boltMaxSpeed - ((boltDurationMax - boltDuration) / boltDurationMax) * (boltMaxSpeed - runSpeed));
-                } else { // regular run
+            if (aboveWalkSpeed)
+            {
+                if (moveVelocity.magnitude > runSpeed)
+                {
+                    moveVelocity = moveVelocity.normalized * Mathf.Max(runSpeed, moveVelocity.magnitude - walkAcceleration*Time.deltaTime);
+                }
+                else
+                { // regular run
                     moveVelocity = Vector3.RotateTowards(
-                        Mathf.Max(moveVelocity.magnitude - (runningHeld?0:(deceleration * Time.deltaTime)), 0) * moveVelocity.normalized, // update velocity
+                        Mathf.Max(moveVelocity.magnitude - (runningHeld ? 0 : (deceleration * Time.deltaTime)), 0) * moveVelocity.normalized, // update velocity
                         biasDirection != Vector3.zero ? biasDirection : moveVelocity, // update direction if it was supplied
                         runRotationalSpeed * Time.deltaTime / (runningHeld ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
                         0 // don't change specified speed
                     );
-                }   
-            } else {
-                if (biasDirection == Vector3.zero && !runningHeld) {    // stop walking
+                }
+            }
+            else
+            {
+                if (biasDirection == Vector3.zero && !runningHeld)
+                {    // stop walking
                     moveVelocity += moveVelocity.normalized * Mathf.Min(Time.deltaTime * runDeceleration, -moveVelocity.magnitude);
-                } 
+                }
                 else
                 {
                     moveVelocity += (biasDirection * acceleration * Time.deltaTime);
-                    if (moveVelocity.magnitude > walkSpeedMax) {
+                    if (moveVelocity.magnitude > walkSpeedMax)
+                    {
                         moveVelocity = moveVelocity.normalized * walkSpeedMax;
                     }
                 }
@@ -211,10 +221,13 @@ public class CharacterBehavior : MonoBehaviour
          */
         if (bounceDirection != Vector3.zero)
         {
-            if (!aboveWalkSpeed) {
+            if (!aboveWalkSpeed)
+            {
                 moveVelocity.Set(0f, 0f, 0f);
                 knockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
-            } else {
+            }
+            else
+            {
                 moveVelocity = bounceDirection * moveVelocity.magnitude;
                 knockBackVelocity = bounceDirection * knockBackVelocity.magnitude;
             }
@@ -226,13 +239,17 @@ public class CharacterBehavior : MonoBehaviour
          * Knockback
          */
         Vector3 tansformVelocity = moveVelocity + knockBackVelocity;
-        knockBackVelocity = knockBackVelocity.normalized * Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
+        knockBackVelocity = knockBackVelocity.normalized * Mathf.Max(knockBackVelocity.magnitude - knockBackDecceleration * Time.deltaTime, 0);
 
         /*
          * FINALIZE
          */
         cc.Move(tansformVelocity * Time.deltaTime);
-        boltDuration--;
+    }
+
+    private bool isAboveWalkSpeed()
+    {
+        return (moveVelocity.magnitude > (walkSpeedMax + .05));
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
@@ -252,11 +269,14 @@ public class CharacterBehavior : MonoBehaviour
                 moveVelocity = Vector3.zero;
                 knockBackVelocity = Vector3.zero;
             }
-        } else if (collisionObject.layer == LayerMask.NameToLayer("Characters")) {
+        } else if (collisionObject.layer == LayerMask.NameToLayer("Characters") && isAboveWalkSpeed()) {
             CharacterBehavior otherCharacter = collisionObject.GetComponent<CharacterBehavior>();
-            Vector3 dvNormal = hit.normal * runDeceleration*20 * Time.deltaTime;
-            moveVelocity += dvNormal;
-            otherCharacter.moveVelocity += dvNormal;
+
+            if (otherCharacter.moveVelocity.magnitude < moveVelocity.magnitude){
+                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boltDeceleration*Time.deltaTime; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                moveVelocity -= dvNormal;
+                otherCharacter.moveVelocity = moveVelocity+dvNormal;
+            }
         }
         
         /* 
@@ -333,7 +353,6 @@ public class CharacterBehavior : MonoBehaviour
                 hitLagTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
                 knockBackVelocity = knockbackVector;
                 moveVelocity *= .5f;
-                boltDuration = -1;
             }
         }   
     }

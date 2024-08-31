@@ -1,14 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static CharacterControls;
 
+[Serializable]
 public struct Ability {
-    public Ability(int _cooldown) {
-        pressed = false;
-        cooldown = _cooldown;
-        timer = 0;
-    }
-
+    public Cast cast;
     public bool pressed;
     public int cooldown;
     public int timer;
@@ -21,12 +18,11 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
 
     /* Movement */
     private CharacterController cc;
-    public Vector3 moveVelocity = new Vector3();
-    private Vector3 collisionVelocity = new Vector3();
-    private Vector3 bounceDirection = new Vector3();
+    public Vector3 moveVelocity = new();
+    private Vector3 bounceDirection = new();
     
     // knockback
-    private Vector3 knockBackVelocity = new Vector3();
+    private Vector3 knockBackVelocity = new();
     private float knockBackDecceleration = 25f;
     private float hitLagTimer = 0f;
 
@@ -45,18 +41,8 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     private float boltSpeedBump = 2.5f;
     private float boltDeceleration = 20f;
 
-    /* Abilities */
-    // TODO [SerializeField]
-    private Ability[] abilitiesOld = {
-        new Ability(60),
-        new Ability(30)
-    };
     // TODO get these constants from the other file
-    [SerializeField] private Projectile projectilePrefab;
-    [SerializeField] private Cast[] casts;
-
-    /* Defense */
-    private float hp = 100f;
+    [SerializeField] private Projectile projectilePrefab;    
 
     /* Visuals */
     // Bolt Visualization
@@ -65,34 +51,34 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
 
     /* Controls */
     private CharacterControls characterControls;
+    private Vector3 movementDirection = new Vector3();
     private bool boost = false;
     private bool running = false;
     private bool shielding = false;
+    private bool boostedShielding = false;
+
+    /* Abilities */
+    [SerializeField] private Ability[] attacks = new Ability[3];
+    [SerializeField] private Ability[] boostedAttacks = new Ability[3];
+    [SerializeField] private Ability[] throws = new Ability[2];
+    [SerializeField] private Ability boostedThrow;
+    [SerializeField] private Ability[] abilities = new Ability[4];
+    [SerializeField] private Ability[] specials = new Ability[2];
+    [SerializeField] private Ability ultimate;
 
     /* Resources */
-    private int charges;
+    private float hp = 100f;
     private int maxCharges = 3;
-    private float chargeCooldown = 0f;
+    private int charges = 3;
     private float chargeCooldownMax = 1f;
-    private float rechargeTimer = 0f;
+    private float chargeCooldown = 0f;
     private float rechargeRate = 3f;
-
-
-    private Vector3 movementDirection = new Vector3();
-    public InputAction shield;
-    public InputAction boostedShield;
-    public InputAction[] attacks = new InputAction[3];
-    public InputAction[] boostedAttacks = new InputAction[3];
-    public InputAction[] abilities = new InputAction[4];
-    public InputAction[] specialAbilities = new InputAction[2];
-    public InputAction ultimate;
-
-
-    
+    private float rechargeTimer = 0f;
 
     /*
      * CONTROLS
      */
+    //movement
     public void OnMovement(InputAction.CallbackContext context){
         var direction = context.ReadValue<Vector2>();
         movementDirection.Set(direction.x, 0, direction.y);
@@ -100,52 +86,110 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     public void OnRunning(InputAction.CallbackContext context) {
         running = context.ReadValueAsButton();
     }
-    public void OnBoost(InputAction.CallbackContext context){
-        Debug.Log("toggling boost");
+    public void OnBoost(InputAction.CallbackContext context) {
         boost = context.ReadValueAsButton();
     }
-    public void OnAttack1(InputAction.CallbackContext context){}
-    public void OnAttack2(InputAction.CallbackContext context){}
-    public void OnAttack3(InputAction.CallbackContext context){}
-    public void OnBoostedAttack1(InputAction.CallbackContext context){}
-    public void OnBoostedAttack2(InputAction.CallbackContext context){}
-    public void OnBoostedAttack3(InputAction.CallbackContext context){}
+    
+    // attacks
+    public void OnAttack1(InputAction.CallbackContext context){
+        attacks[0].pressed = context.ReadValueAsButton();
+    }
+    public void OnAttack2(InputAction.CallbackContext context){
+        attacks[1].pressed = context.ReadValueAsButton();
+    }
+    public void OnAttack3(InputAction.CallbackContext context){
+        attacks[2].pressed = context.ReadValueAsButton();
+    }
+    public void OnBoostedAttack1(InputAction.CallbackContext context){
+        boostedAttacks[0].pressed = context.ReadValueAsButton();
+    }
+    public void OnBoostedAttack2(InputAction.CallbackContext context){
+        boostedAttacks[1].pressed = context.ReadValueAsButton();
+    }
+    public void OnBoostedAttack3(InputAction.CallbackContext context){
+        boostedAttacks[2].pressed = context.ReadValueAsButton();
+    }
+
+    // shields
     public void OnShield(InputAction.CallbackContext context){
         shielding = context.ReadValueAsButton();
-        Debug.Log("shielding: "+ shielding);
-        // TODO fix this - regardless of whether the modifier is pushed, OnBoostedShield is overriding this
     }
     public void OnBoostedShield(InputAction.CallbackContext context){
         var boostedShielding = context.ReadValueAsButton();
-        Debug.Log("boostedShielding: "+boostedShielding);
     }
-    public void OnThrow1(InputAction.CallbackContext context){}
-    public void OnThrow2(InputAction.CallbackContext context){}
-    public void OnBoostedThrow(InputAction.CallbackContext context){}
-    public void OnAbility1(InputAction.CallbackContext context){}
-    public void OnAbility2(InputAction.CallbackContext context){}
-    public void OnAbility3(InputAction.CallbackContext context){}
-    public void OnAbility4(InputAction.CallbackContext context){}
-    public void OnSpecial1(InputAction.CallbackContext context){}
-    public void OnSpecial2(InputAction.CallbackContext context){}
-    public void OnUltimate(InputAction.CallbackContext context){}
+
+    // throws
+    public void OnThrow1(InputAction.CallbackContext context){
+        throws[0].pressed = context.ReadValueAsButton();
+    }
+    public void OnThrow2(InputAction.CallbackContext context){
+        throws[1].pressed = context.ReadValueAsButton();
+    }
+    public void OnBoostedThrow(InputAction.CallbackContext context){
+        boostedThrow.pressed = context.ReadValueAsButton();
+    }
+
+    // abilities
+    public void OnAbility1(InputAction.CallbackContext context){
+        abilities[0].pressed = context.ReadValueAsButton();
+    }
+    public void OnAbility2(InputAction.CallbackContext context){
+        abilities[1].pressed = context.ReadValueAsButton();
+    }
+    public void OnAbility3(InputAction.CallbackContext context){
+        abilities[2].pressed = context.ReadValueAsButton();
+    }
+    public void OnAbility4(InputAction.CallbackContext context){
+        abilities[3].pressed = context.ReadValueAsButton();
+    }
+    public void OnSpecial1(InputAction.CallbackContext context){
+        specials[0].pressed = context.ReadValueAsButton();
+    }
+    public void OnSpecial2(InputAction.CallbackContext context){
+        specials[1].pressed = context.ReadValueAsButton();
+    }
+    public void OnUltimate(InputAction.CallbackContext context){
+        ultimate.pressed = context.ReadValueAsButton();
+    }
 
     void HandleControls()
     {
         if (me) {
-            // movement
-            
-
-            // aiming
+            // aiming TODO move to input manager
             Vector3 worldPosition = getCursorWorldPosition();
             var playerPosition = cc.transform.position;
             var direction = new Vector3(worldPosition.x - playerPosition.x, 0, worldPosition.z - playerPosition.z).normalized;
             transform.rotation = Quaternion.FromToRotation(Vector3.forward, direction);
-
-            // abilities
-            abilitiesOld[0].pressed = Input.GetMouseButton(0);
-            abilitiesOld[1].pressed = Input.GetMouseButton(1);
         }
+    }
+
+    void HandleAbilities()
+    {
+        // activate abilities, if applicable
+        if (attacks[0].pressed && abilities[0].timer <= 0)
+        {
+            abilities[0].timer = abilities[0].cooldown;
+            Cast cast = Instantiate(attacks[0].cast);
+            cast.Initialize(gameObject.transform);
+        }
+        else if (attacks[1].pressed && abilities[1].timer <= 0)
+        {
+            // TODO generalize
+            abilities[1].timer = abilities[0].cooldown;
+            float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
+            Vector3 position = transform.position + transform.rotation * Vector3.forward * shotRadius;
+            Vector3 direction = transform.rotation * Vector3.forward;
+            var projectile = Instantiate(projectilePrefab, position, transform.rotation);
+            projectile.Fire(direction);
+        }
+        else if (attacks[2].pressed)
+        {
+            Debug.Log("pressed attack 3");
+        }
+
+        // decrease cooldown on abilities
+        for (int i = 0; i < abilities.Length; i++)
+            abilities[i].timer--;
     }
 
     private void Awake()
@@ -160,11 +204,6 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
             characterControls.Enable(); // TODO do I need to disable this somewhere?
             characterControls.character.SetCallbacks(this);
         }
-    }
-
-    private void Start()
-    {
-        charges = maxCharges;
     }
 
     private void HandleVisuals()
@@ -231,7 +270,6 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
             charges -= 1;
             chargeCooldown = chargeCooldownMax;
             runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax) + boltSpeedBump, boltMaxSpeed);
-            boost = false;
             Vector3 v = (getCursorWorldPosition() - cc.transform.position);
             moveVelocity = new Vector3(v.x, 0, v.z).normalized * boltMaxSpeed;
             knockBackVelocity.Set(0f, 0f, 0f);
@@ -337,41 +375,6 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
                 otherCharacter.moveVelocity = moveVelocity+dvNormal;
             }
         }
-    }
-
-    private void HandleAbilities()
-    {
-        if (abilitiesOld[0].pressed) {
-            // TODO generalize
-            abilitiesOld[0].pressed = false;
-
-            if (abilitiesOld[0].timer <= 0)
-            {
-                abilitiesOld[0].timer = abilitiesOld[0].cooldown;
-                // TODO generalize
-                float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
-                Vector3 position = transform.position + transform.rotation * Vector3.forward * shotRadius;
-                Vector3 direction = transform.rotation * Vector3.forward;
-
-                var projectile = Instantiate(projectilePrefab, position, transform.rotation);
-                projectile.Fire(direction);
-            }
-        } else if (abilitiesOld[1].pressed)
-        {
-            // TODO generalize
-            abilitiesOld[1].pressed = false;
-
-            if (abilitiesOld[1].timer <= 0)
-            {
-                abilitiesOld[1].timer = abilitiesOld[1].cooldown;
-                // position
-                Cast cast = Instantiate(casts[0]);
-                cast.Initialize(gameObject.transform);
-            }
-        }
-
-        for (int i = 0; i < abilitiesOld.Length; i++)
-            abilitiesOld[i].timer--;
     }
 
     private static Vector3 getCursorWorldPosition()

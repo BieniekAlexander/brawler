@@ -56,7 +56,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""shield"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""6799233d-eda8-4a5c-a64d-cf710a687472"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -65,7 +65,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""boostedShield"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""43efeb36-47c0-4ffc-8969-7f7968afa0d4"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -472,9 +472,9 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""One Modifier"",
+                    ""name"": ""Button With One Modifier"",
                     ""id"": ""d06e8647-70af-4679-ab6b-88fedfd0d11d"",
-                    ""path"": ""OneModifier"",
+                    ""path"": ""ButtonWithOneModifier(overrideModifiersNeedToBePressedFirst=true)"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -483,7 +483,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""modifier"",
+                    ""name"": ""Modifier"",
                     ""id"": ""250e04b2-195c-4440-a97e-7826cb4bd674"",
                     ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
@@ -494,7 +494,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""binding"",
+                    ""name"": ""Button"",
                     ""id"": ""61c051ab-0ba7-4d6a-8830-5a5c70c960b0"",
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",

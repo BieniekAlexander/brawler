@@ -102,144 +102,63 @@ MonoBehaviour:
   moveVelocity: {x: 0, y: 0, z: 0}
   projectilePrefab: {fileID: 7050888011141724518, guid: 38548b188e6d02946b744967e8ac5951,
     type: 3}
-  casts:
-  - {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252, type: 3}
-  boost:
-    m_Name: Boost
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 15ad9e7b-ef60-4add-b8aa-279fef1b6c8f
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  shield:
-    m_Name: Shield
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 7eccf922-b1a7-41e1-a0f8-1b17d420c89f
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  boostedShield:
-    m_Name: Boosted Shield
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: d73d9ff7-9de0-466a-9dc0-7e52508f159b
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
   attacks:
-  - m_Name: Element 0
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 817e7ffd-610c-4a5d-b2f6-4e0506d8ea15
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: Element 1
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 6553955b-9738-4029-9d6e-39df74524383
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: Element 2
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: d38207cf-52b8-4f9d-80f0-c19a4408b429
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  - cast: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252, type: 3}
+    pressed: 0
+    cooldown: 30
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
   boostedAttacks:
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
   abilities:
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  specialAbilities:
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  - m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
-  ultimate:
-    m_Name: Ultimate
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 7bdba3fe-a31e-443e-b64d-af1acbfb61e0
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+  - cast: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252, type: 3}
+    pressed: 0
+    cooldown: 20
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  specials:
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  - cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
+  special:
+    cast: {fileID: 0}
+    pressed: 0
+    cooldown: 0
+    timer: 0
 --- !u!143 &4584570722456235046
 CharacterController:
   m_ObjectHideFlags: 0

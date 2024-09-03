@@ -18,12 +18,30 @@ public class Cast : MonoBehaviour
     [SerializeField] public HitEvent[] hitEvents;
     private int frame = 0;
     private int duration = -1;
+
     private Transform origin = null;
+    private Vector3 initialPosition = new();
+    private Quaternion initialRotation = new();
 
     public void Initialize(Transform _origin)
     {
         origin = _origin;
         foreach (HitEvent hitEvent in hitEvents) {
+            foreach (Hit hit in hitEvent.hits)
+            {
+                Assert.IsNotNull(hit);
+                duration = Mathf.Max(duration, hitEvent.startFrame + hit.duration);
+            }
+        }
+    }
+
+    public void Initialize(Vector3 _initialPosition, Quaternion _initialRotation)
+    {
+        initialPosition = _initialPosition;
+        initialRotation = _initialRotation;
+
+        foreach (HitEvent hitEvent in hitEvents)
+        {
             foreach (Hit hit in hitEvent.hits)
             {
                 Assert.IsNotNull(hit);
@@ -39,7 +57,13 @@ public class Cast : MonoBehaviour
                 foreach (Hit hit in hitEvent.hits)
                 {
                     Hit h = Instantiate(hit);
-                    h.Initialize(origin);
+
+                    if (origin != null) {
+                        h.Initialize(origin);
+                    } else {
+                        h.Initialize(initialPosition, initialRotation);
+                    }
+
                     h.HandleMove();
                     h.HandleHitCollisions();
                 }

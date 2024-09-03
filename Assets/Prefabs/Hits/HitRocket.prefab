@@ -55,7 +55,7 @@ MonoBehaviour:
   knockbackMagnitude: 10
   knockbackTransform: {x: 0, y: 0, z: 0}
   knockbackTransformType: ANGULAR
-  damage: 2
+  damage: 50
 --- !u!198 &4017320443487140070
 ParticleSystem:
   m_ObjectHideFlags: 0

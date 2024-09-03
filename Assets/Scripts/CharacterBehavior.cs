@@ -24,7 +24,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     // knockback
     private Vector3 knockBackVelocity = new();
     private float knockBackDecceleration = 25f;
-    private float hitLagTimer = 0f;
+    private float hitLagTimer = 0;
 
     // Walking
     private float walkAcceleration = 50f;
@@ -67,13 +67,15 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     [SerializeField] private Ability ultimate;
 
     /* Resources */
-    private float hp = 100f;
+    private int hp = 1000;
     private int maxCharges = 3;
     private int charges = 3;
-    private float chargeCooldownMax = 1f;
-    private float chargeCooldown = 0f;
-    private float rechargeRate = 3f;
-    private float rechargeTimer = 0f;
+    private int chargeCooldownMax = 60;
+    private int chargeCooldown = 0;
+    private int rechargeRate = 180;
+    private int rechargeTimer = 0;
+    private int shieldDuration = -1;
+    private int parryWindow = 30;
 
     /*
      * CONTROLS
@@ -84,6 +86,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
         movementDirection.Set(direction.x, 0, direction.y);
     }
     public void OnRunning(InputAction.CallbackContext context) {
+        // TODO fix tihs - shielding sets running to false
         running = context.ReadValueAsButton();
     }
     public void OnBoost(InputAction.CallbackContext context) {
@@ -212,9 +215,9 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
          * Bolt Indicator
          */
         // duration
-        if (moveVelocity.magnitude>runSpeed) // TODO maybe I need to store this in an actual bool?
-            _material.color = Color.red;
-        if (chargeCooldown < 0 && charges>0)
+        if (shielding)
+            _material.color = Color.blue;
+        else if (chargeCooldown < 0 && charges > 0)
             _material.color = Color.green;
         else
             _material.color = Color.gray;
@@ -234,31 +237,42 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
 
     private void HandleCharges()
     {
-        rechargeTimer = (charges >= maxCharges) ? rechargeRate: rechargeTimer-Time.deltaTime;
-        if (rechargeTimer <= 0f) {
+        rechargeTimer = (charges >= maxCharges) ? rechargeRate: rechargeTimer-1;
+        if (rechargeTimer <= 0) {
             charges += 1;
             rechargeTimer = rechargeRate;
         }
 
-        chargeCooldown -= Time.deltaTime;
+        chargeCooldown--;
     }
 
     void FixedUpdate()
     {
         HandleCharges();
+        HandleShield();
         HandleTransform();
         HandleAbilities();
+    }
+
+    private void HandleShield()
+    {
+        if (shielding) {
+            shieldDuration++;
+        } else {
+            shieldDuration = -1;
+        }
     }
 
     private void HandleTransform()
     {
         bool aboveWalkSpeed = isAboveWalkSpeed();
         float acceleration = aboveWalkSpeed ? 0 : walkAcceleration;
-        float deceleration = aboveWalkSpeed ? runDeceleration : walkAcceleration * 4;
+        float deceleration = (aboveWalkSpeed ? runDeceleration : walkAcceleration * 4) * (shielding ? 2 : 1);
+        running &= !shielding;
 
-        if (hitLagTimer > 0f)
+        if (hitLagTimer > 0)
         {
-            hitLagTimer -= Time.deltaTime;
+            hitLagTimer--;
             return;
         }
 
@@ -277,7 +291,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
         else
         { // not bolting
             // handle direction
-            Vector3 biasDirection = movementDirection.normalized; // TODO check
+            Vector3 biasDirection = shielding ? Vector3.zero : movementDirection.normalized;
 
             // handle speed
             if (aboveWalkSpeed)
@@ -396,16 +410,26 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     }
 
     public void TakeDamage(
-        float damage,
+        int damage,
         Vector3 knockbackVector,
-        float hitStunDuration
+        int hitStunDuration,
+        int damageTier = 0
         )
     {
-        hp -= damage;
+        if (shieldDuration >= 0 && shieldDuration < parryWindow) {
+            hp += damage;
+        }
+        
+        else if (!shielding) {
+            hp -= damage;
+        }
+
         if (hp < 0f) {
             Destroy(gameObject);
         } else {
-            if (knockbackVector != Vector3.zero && hitLagTimer <= 0)
+            if (shielding && damageTier==0){
+                ;
+            } else if (knockbackVector != Vector3.zero && hitLagTimer <= 0)
             {
                 hitLagTimer = hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
                 knockBackVelocity = knockbackVector;

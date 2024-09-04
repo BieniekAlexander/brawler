@@ -10,12 +10,10 @@ using UnityEngine.Assertions;
 public class Hit : MonoBehaviour
 {
     enum CoordinateSystem { Polar, Cartesian };
-    enum KnockbackOrigin { Origin, HitBox };
 
     /* Position */
-    private Transform origin = null; // origin of the cast, allowing for movement during animation
-    private Vector3 initialPosition;
-    private Quaternion initialRotation;
+    private CharacterBehavior caster;
+    private Transform origin; // origin of the cast, allowing for movement during animation
     [SerializeField] private CoordinateSystem coordinateSystem;
     [SerializeField] private Vector3[] positions;
     [SerializeField] private Quaternion[] rotations;
@@ -23,7 +21,7 @@ public class Hit : MonoBehaviour
 
     /* Collision */
     private Collider hitBox;
-    public HashSet<CharacterBehavior> collisionIds = new HashSet<CharacterBehavior>();
+    public HashSet<CharacterBehavior> collisionIds = new();
 
     /* Duration */
     [SerializeField] public int duration;
@@ -31,7 +29,6 @@ public class Hit : MonoBehaviour
 
     /* Knockback */
     [SerializeField] private float knockbackMagnitude = 1f;
-    [SerializeField] private KnockbackOrigin knockbackOrigin;
     [SerializeField] private Vector3 knockbackTransform;
 
     /* Effects */
@@ -64,12 +61,8 @@ public class Hit : MonoBehaviour
         }
     }
 
-    public Vector3 GetOriginPosition() {
-        return (origin != null) ? origin.position : initialPosition;
-    }
-
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
-        Vector3 toTarget = -((knockbackOrigin == KnockbackOrigin.HitBox) ? transform.position : GetOriginPosition()) + targetPosition;
+        Vector3 toTarget = targetPosition - origin.position;
 
         Vector3 knockBackDirection = Quaternion.Euler(0, knockbackTransform.x, 0) * toTarget;
         knockBackDirection.y = 0f;
@@ -82,19 +75,19 @@ public class Hit : MonoBehaviour
         return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
-    public void Initialize(Transform _origin)
-    {
-        origin = _origin;
-        transform.rotation = rotations[0];
-        transform.position = origin.position + positions[0];
-    }
+    public void Initialize(CharacterBehavior _caster, Transform _origin) {
+        caster = _caster;
 
-    public void Initialize(Vector3 _initialPosition, Quaternion _initialRotation)
-    {
-        initialPosition = _initialPosition;
-        initialRotation = _initialRotation;
-        transform.rotation = initialRotation * rotations[0];
-        transform.position = initialPosition + positions[0];
+        if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
+            origin = new GameObject().transform;
+            origin.position = transform.position;
+            origin.rotation = transform.rotation;
+        } else {
+            origin = _origin;
+        }
+
+        transform.rotation = origin.rotation * rotations[0];
+        transform.position = origin.position + positions[0];
     }
 
     private void FixedUpdate()
@@ -122,8 +115,8 @@ public class Hit : MonoBehaviour
             : Quaternion.Euler(0, positions[positionFrame].x, 0);
 
         // TODO make sure that the calculations without an origin are correct
-        transform.position = ((origin!=null)?origin.position:initialPosition) + origin.rotation * offset;
-        transform.rotation = ((origin!=null)?origin.rotation:initialRotation) * orientation * rotations[rotationFrame];
+        transform.position = origin.position + origin.rotation * offset;
+        transform.rotation = origin.rotation * orientation * rotations[rotationFrame];
     }
 
     public void HandleHitCollisions()
@@ -133,7 +126,7 @@ public class Hit : MonoBehaviour
             GameObject go = otherCollider.gameObject;
             CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
 
-            if (cb is not null && !collisionIds.Contains(cb))
+            if (cb is not null && cb!=caster && !collisionIds.Contains(cb))
             {
                 collisionIds.Add(cb);
                 Vector3 kb = GetKnockBackVector(cb.transform.position);
@@ -150,6 +143,13 @@ public class Hit : MonoBehaviour
         } else if (hitBox is SphereCollider) {
             SphereCollider sc = hitBox as SphereCollider;
             sc.radius = scale.x;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (caster is null) {
+            Destroy(origin.gameObject);
         }
     }
 }

@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class RocketGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject rocketPrefab;
-    [SerializeField] Transform transTarget;
+    [SerializeField] private ProjectileBehavior rocketPrefab;
+    [SerializeField] Transform target;
     private float timer;
     private float reloadTime = 5f;
     
@@ -24,14 +24,12 @@ public class RocketGenerator : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0)
         {
-            if (transTarget != null)
+            if (target != null)
             {
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
-                Vector3 initialPosition = new Vector3(randX, transTarget.position.y+.1f, randZ);
-                GameObject go = Instantiate(rocketPrefab, initialPosition, Quaternion.Euler(new Vector3(0, 0, 0)));
-                RocketBehavior rocket = go.GetComponent<RocketBehavior>();
-                rocket.transTarget = transTarget;
+                Vector3 initialPosition = new Vector3(randX, target.position.y+.1f, randZ);
+                Instantiate(rocketPrefab, initialPosition, Quaternion.LookRotation(target.position - initialPosition)).Initialize(null, target);
             }
             
             timer = reloadTime;

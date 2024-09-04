@@ -49,19 +49,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coordinateSystem: 0
   positions:
-  - {x: -90, y: 0, z: 1.5}
-  - {x: -45, y: 0, z: 1.5}
+  - {x: -20, y: 0, z: 1.5}
+  - {x: -10, y: 0, z: 1.5}
   - {x: 0, y: 0, z: 1.5}
-  - {x: 45, y: 0, z: 1.5}
-  - {x: 90, y: 0, z: 1.5}
+  - {x: 10, y: 0, z: 1.5}
+  - {x: 20, y: 0, z: 1.5}
   rotations:
   - {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
   dimensions:
   - {x: 0.25, y: 0.5, z: 0}
   duration: 5
   knockbackMagnitude: 15
+  knockbackOrigin: 0
   knockbackTransform: {x: 0, y: 0, z: 1}
-  knockbackTransformType: LINEAR
   damage: 2
 --- !u!23 &4679774870214111964
 MeshRenderer:

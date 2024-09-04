@@ -77,6 +77,11 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     private int shieldDuration = -1;
     private int parryWindow = 30;
 
+    /* Temp */
+    [SerializeField] private ProjectileBehavior missilePrefab;
+    private ProjectileBehavior p = null;
+    private Transform pTarget;
+
     /*
      * CONTROLS
      */
@@ -169,14 +174,11 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
     void HandleAbilities()
     {
         // activate abilities, if applicable
-        if (attacks[0].pressed && abilities[0].timer <= 0)
-        {
+        if (attacks[0].pressed && abilities[0].timer <= 0) {
             abilities[0].timer = abilities[0].cooldown;
             Cast cast = Instantiate(attacks[0].cast);
-            cast.Initialize(gameObject.transform);
-        }
-        else if (attacks[1].pressed && abilities[1].timer <= 0)
-        {
+            cast.Initialize(this);
+        } else if (attacks[1].pressed && abilities[1].timer <= 0) {
             // TODO generalize
             abilities[1].timer = abilities[0].cooldown;
             float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
@@ -184,11 +186,29 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions
             Vector3 direction = transform.rotation * Vector3.forward;
             var projectile = Instantiate(projectilePrefab, position, transform.rotation);
             projectile.Fire(direction);
-        }
-        else if (attacks[2].pressed)
-        {
+        } else if (attacks[2].pressed) {    
             Debug.Log("pressed attack 3");
+        } else if (abilities[0].pressed)
+        {
+            // NOTE - if CD is ready but a rocket is still up, it'll just redirect rocket
+            if (p == null)
+            {
+                if (abilities[0].timer <= 0)
+                {
+                    float shotRadius = cc.GetComponent<CharacterController>().radius * 1.5f;
+                    Vector3 position = transform.position + transform.rotation * Vector3.forward * shotRadius;
+                    Transform target = new GameObject().transform;
+                    target.position = getCursorWorldPosition();
+
+                    p = Instantiate(missilePrefab, position, transform.rotation);
+                    p.Initialize(this, target);
+                    abilities[0].timer = abilities[0].cooldown;
+                }
+            } else { 
+                p.UpdateTarget(getCursorWorldPosition());
+            }
         }
+
 
         // decrease cooldown on abilities
         for (int i = 0; i < abilities.Length; i++)

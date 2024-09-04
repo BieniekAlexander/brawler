@@ -48,13 +48,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0, z: 0}
-  trajectory: []
-  scaling: []
-  duration: 3
-  knockbackMagnitude: 10
+  coordinateSystem: 0
+  positions:
+  - {x: 0, y: 0, z: 0}
+  rotations:
+  - {x: 0, y: 0, z: 0, w: 0}
+  dimensions:
+  - {x: 1, y: 0, z: 0}
+  duration: 10
+  knockbackMagnitude: 20
   knockbackTransform: {x: 0, y: 0, z: 0}
-  knockbackTransformType: ANGULAR
   damage: 50
 --- !u!198 &4017320443487140070
 ParticleSystem:
@@ -4936,5 +4939,5 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}

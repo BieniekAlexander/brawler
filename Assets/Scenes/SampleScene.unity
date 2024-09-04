@@ -147,14 +147,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267608524}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa22380c2b0deea49bbdfedcfe2812a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rocketPrefab: {fileID: 4880851765240599429, guid: 50f0460e03f2fb441add661fd333069c,
     type: 3}
-  transTarget: {fileID: 1869139036}
+  target: {fileID: 0}
 --- !u!4 &267608526
 Transform:
   m_ObjectHideFlags: 0
@@ -1327,6 +1327,12 @@ PrefabInstance:
       propertyPath: boost.m_Name
       value: Boost
       objectReference: {fileID: 0}
+    - target: {fileID: 6518117242977656221, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
+        type: 3}
+      propertyPath: missilePrefab
+      value: 
+      objectReference: {fileID: 1370712460824804173, guid: 50f0460e03f2fb441add661fd333069c,
+        type: 3}
     - target: {fileID: 6518117242977656221, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: shield.m_Name

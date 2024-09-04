@@ -16,16 +16,17 @@ public class Cast : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] public HitEvent[] hitEvents;
+    // [SerializeField] public MonoBehaviour CastBehavior;
     private int frame = 0;
     private int duration = -1;
 
-    private Transform origin = null;
+    private CharacterBehavior caster;
     private Vector3 initialPosition = new();
     private Quaternion initialRotation = new();
 
-    public void Initialize(Transform _origin)
+    public void Initialize(CharacterBehavior _caster)
     {
-        origin = _origin;
+        caster = _caster;
         foreach (HitEvent hitEvent in hitEvents) {
             foreach (Hit hit in hitEvent.hits)
             {
@@ -56,12 +57,10 @@ public class Cast : MonoBehaviour
             if (hitEvent.startFrame == frame) {
                 foreach (Hit hit in hitEvent.hits)
                 {
-                    Hit h = Instantiate(hit);
+                    Hit h = Instantiate(hit, initialPosition, initialRotation);
 
-                    if (origin != null) {
-                        h.Initialize(origin);
-                    } else {
-                        h.Initialize(initialPosition, initialRotation);
+                    if (caster != null) {
+                        h.Initialize(caster, caster.transform);
                     }
 
                     h.HandleMove();

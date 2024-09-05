@@ -41,7 +41,8 @@ public class ProjectileBehavior : MonoBehaviour
             transform.rotation
         ).Initialize(
             caster,
-            t
+            t,
+            false // TODO mirror this at some point? idk
         );
 
         Destroy(gameObject);
@@ -71,7 +72,7 @@ public class ProjectileBehavior : MonoBehaviour
             Resolve();
         }
     }
-
+    
     private void handleCollisions()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, transform.localScale.x);

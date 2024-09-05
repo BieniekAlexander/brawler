@@ -17,6 +17,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
 
     /* Movement */
     private CharacterController cc;
+    private bool rotatingClockwise = false;
     public Vector3 moveVelocity = new();
     private Vector3 bounceDirection = new();
 
@@ -160,10 +161,21 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
     void HandleControls() {
         if (me) {
             // aiming TODO move to input manager
-            Vector3 worldPosition = getCursorWorldPosition();
+            Vector3 cursorWorldPosition = getCursorWorldPosition();
             var playerPosition = cc.transform.position;
-            var direction = new Vector3(worldPosition.x-playerPosition.x, 0, worldPosition.z-playerPosition.z).normalized;
-            transform.rotation=Quaternion.FromToRotation(Vector3.forward, direction);
+            var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
+            Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
+            float yRotationDiff = newRotation.y - transform.rotation.y;
+            
+            if (yRotationDiff != 0) {
+                rotatingClockwise = (yRotationDiff>0);
+                // TODO somewhere in Q3, the yRotation goes from positive to negative, and I don't know why,
+                // but it's producing an issue where for about 10% of the circle, rotation direction is incorrect
+                // Debug.Log("old"+transform.rotation.y+" new "+newRotation.y);
+                // Debug.Log("yRotationDiff "+yRotationDiff +" RotatingClockwise "+rotatingClockwise);
+            }
+            
+            transform.rotation = newRotation;       
         }
     }
 
@@ -171,8 +183,8 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         // activate abilities, if applicable
         if (attacks[0].pressed&&attacks[0].timer<=0) { // Basic 1
             attacks[0].timer = attacks[0].cooldown;
-            Cast cast = Instantiate(attacks[0].cast);   
-            cast.Initialize(this);
+            Cast cast = Instantiate(attacks[0].cast);
+            cast.Initialize(this, rotatingClockwise);
         } else if (attacks[1].pressed&&attacks[1].timer<=0) { // Basic 2
             // TODO generalize
             float shotRadius = cc.GetComponent<CharacterController>().radius*1.5f;
@@ -185,7 +197,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         } else if ((boostedAttacks[0].pressed)&&(boostedAttacks[0].timer<=0)&&(charges>0)) { // Boosted 1
             boostedAttacks[0].timer=boostedAttacks[0].cooldown;
             Cast cast = Instantiate(boostedAttacks[0].cast);
-            cast.Initialize(this);
+            cast.Initialize(this, rotatingClockwise);
             charges--;
         } else if (abilities[0].pressed) {
             // NOTE - if CD is ready but a rocket is still up, it'll just redirect rocket

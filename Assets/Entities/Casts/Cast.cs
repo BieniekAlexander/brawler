@@ -16,14 +16,16 @@ public class Cast : MonoBehaviour {
     [SerializeField] public HitEvent[] hitEvents;
     // [SerializeField] public MonoBehaviour CastBehavior;
     private int frame = 0;
+    private bool rotatingClockwise = true;
     [SerializeField] private int duration;
 
     private CharacterBehavior caster;
     private Vector3 initialPosition = new();
     private Quaternion initialRotation = new();
 
-    public void Initialize(CharacterBehavior _caster) {
-        caster=_caster;
+    public void Initialize(CharacterBehavior _caster, bool _rotatingClockwise) {
+        caster =_caster;
+        rotatingClockwise = _rotatingClockwise;
         foreach (HitEvent hitEvent in hitEvents) {
             foreach (Hit hit in hitEvent.hits) {
                 Assert.IsNotNull(hit);
@@ -50,7 +52,7 @@ public class Cast : MonoBehaviour {
                     Hit h = Instantiate(hit, initialPosition, initialRotation);
 
                     if (caster!=null) {
-                        h.Initialize(caster, caster.transform);
+                        h.Initialize(caster, caster.transform, !rotatingClockwise);
                     }
 
                     h.HandleMove();

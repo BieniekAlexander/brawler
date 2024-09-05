@@ -51,7 +51,7 @@ MonoBehaviour:
   positions:
   - {x: -20, y: 0, z: 1}
   - {x: -10, y: 0, z: 1}
-  - {x: 0, y: 0, z: 1}
+  - {x: -0, y: 0, z: 1}
   - {x: 10, y: 0, z: 1}
   - {x: 20, y: 0, z: 1}
   rotations:

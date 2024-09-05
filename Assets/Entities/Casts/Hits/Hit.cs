@@ -13,6 +13,7 @@ public class Hit : MonoBehaviour {
     /* Position */
     private CharacterBehavior caster;
     private Transform origin; // origin of the cast, allowing for movement during animation
+    private bool mirror = false;
     [SerializeField] private CoordinateSystem coordinateSystem;
     [SerializeField] private Vector3[] positions;
     [SerializeField] private Quaternion[] rotations;
@@ -74,8 +75,9 @@ public class Hit : MonoBehaviour {
         return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
-    public void Initialize(CharacterBehavior _caster, Transform _origin) {
+    public void Initialize(CharacterBehavior _caster, Transform _origin, bool _mirror) {
         caster=_caster;
+        mirror = _mirror;
 
         if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
             origin=new GameObject().transform;
@@ -112,6 +114,11 @@ public class Hit : MonoBehaviour {
             : Quaternion.Euler(0, positions[positionFrame].x, 0);
 
         // TODO make sure that the calculations without an origin are correct
+        if (mirror) {
+            offset.x *= -1;
+            orientation.y *= -1;
+        }
+
         transform.position=origin.position+origin.rotation*offset;
         transform.rotation=origin.rotation*orientation*rotations[rotationFrame];
     }

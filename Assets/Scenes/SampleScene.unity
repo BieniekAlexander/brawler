@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &267608525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa22380c2b0deea49bbdfedcfe2812a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rocketPrefab: {fileID: 4880851765240599429, guid: 50f0460e03f2fb441add661fd333069c,
+  rocketPrefab: {fileID: 1370712460824804173, guid: 50f0460e03f2fb441add661fd333069c,
     type: 3}
   target: {fileID: 0}
 --- !u!4 &267608526

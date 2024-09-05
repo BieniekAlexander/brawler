@@ -205,7 +205,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
                 if (abilities[0].timer<=0) {
                     float shotRadius = cc.GetComponent<CharacterController>().radius*1.5f;
                     Vector3 position = transform.position+transform.rotation*Vector3.forward*shotRadius;
-                    Transform target = new GameObject().transform;
+                    Transform target = new GameObject("Rocket Target").transform;
                     target.position=getCursorWorldPosition();
 
                     p=Instantiate(missilePrefab, position, transform.rotation);

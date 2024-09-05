@@ -148,7 +148,7 @@ public class Hit : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        if (caster is null) {
+        if (origin.GetComponent<CharacterBehavior>() is null) {
             Destroy(origin.gameObject);
         }
     }

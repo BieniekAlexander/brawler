@@ -32,7 +32,7 @@ public class ProjectileBehavior : MonoBehaviour
 
     private void Resolve()
     {
-        Transform t = new GameObject().transform;
+        Transform t = new GameObject("HitBox Origin").transform;
         t.position = transform.position;
 
         Instantiate(
@@ -84,7 +84,6 @@ public class ProjectileBehavior : MonoBehaviour
             if (c.gameObject.layer == LayerMask.NameToLayer("Terrain"))
                 continue;
 
-            Debug.Log(c.name);
             Resolve();
             break;
         }
@@ -95,8 +94,8 @@ public class ProjectileBehavior : MonoBehaviour
     }
 
     private void OnDestroy() {
-        if (target!=null && target.GetComponent<CharacterBehavior>() == null) {
-            Destroy(target.gameObject); // TODO is this actually destroying the target?
+        if (target!=null && target.GetComponent<CharacterBehavior>() is null) {
+            Destroy(target.gameObject);
         }
     }
 }

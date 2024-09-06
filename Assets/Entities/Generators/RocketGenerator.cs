@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RocketGenerator : MonoBehaviour
 {
-    [SerializeField] private ProjectileBehavior rocketPrefab;
+    [SerializeField] private Projectile rocketPrefab;
     [SerializeField] Transform target;
     private float timer;
     private float reloadTime = 5f;

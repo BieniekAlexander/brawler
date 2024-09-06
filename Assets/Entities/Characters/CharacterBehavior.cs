@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static CharacterControls;
@@ -62,6 +63,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
     [SerializeField] private Ability[] abilities = new Ability[4];
     [SerializeField] private Ability[] specials = new Ability[2];
     [SerializeField] private Ability ultimate;
+    private Ability nullAbility = new();
 
     /* Resources */
     private int hp = 1000;
@@ -75,9 +77,9 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
     private int parryWindow = 30;
 
     /* Temp */
-    [SerializeField] private ProjectileBehavior missilePrefab;
-    [SerializeField] private ProjectileBehavior bulletPrefab;
-    private ProjectileBehavior p = null;
+    [SerializeField] private Projectile missilePrefab;
+    [SerializeField] private Projectile bulletPrefab;
+    private Projectile p = null;
     private Transform pTarget;
 
     /*
@@ -179,12 +181,59 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         }
     }
 
+    /// <summary>
+    /// Returns a reference to the ability that the user is pressing
+    /// I can't find a prettier way to do this in C# :(
+    /// </summary>
+    /// <returns></returns>
+    private ref Ability getActivatedAbility() {
+        // TODO edge-cases:
+        // - what if the user is pressing multiple abilities?
+        // - what if the selected ability is on cooldown, or the user doesn't have the resources for it?
+        //   - keep in mind that some abilities will need to be recasted for effect, even if the main ability is still on cooldown
+        
+        for (int i = 0; i < boostedAttacks.Length; i++) {
+            if (boostedAttacks[i].pressed) return ref boostedAttacks[i];
+        }
+        for (int i = 0; i < throws.Length; i++) {
+            if (throws[i].pressed) return ref throws[i];
+        }
+        if (boostedThrow.pressed) return ref boostedThrow;
+        for (int i = 0; i < abilities.Length; i++) {
+            if (abilities[i].pressed) return ref abilities[i];
+        }
+        for (int i = 0; i < specials.Length; i++) {
+            if (specials[i].pressed) return ref specials[i];
+        }
+        if (ultimate.pressed) return ref ultimate;
+
+        return ref nullAbility;
+    }
+
     void HandleAbilities() {
+        Ability activatedAbility = getActivatedAbility();
+        ref Ability refNullAbility = ref nullAbility;
+
+        for (int i = 0; i < attacks.Length; i++) {
+            if (attacks[i].pressed && attacks[i].timer<=0) {
+                attacks[i].timer = attacks[i].cooldown;
+                Instantiate(attacks[i].cast).Initialize(this, rotatingClockwise);
+                return;
+            }
+        }
+
+        for (int i = 0; i < boostedAttacks.Length; i++) {
+            if (boostedAttacks[i].pressed && boostedAttacks[i].timer<=0 && charges>0) {
+                boostedAttacks[i].timer = attacks[i].cooldown;
+                Instantiate(boostedAttacks[i].cast).Initialize(this, rotatingClockwise);
+                charges--;
+                return;
+            }
+        }
+
         // activate abilities, if applicable
         if (attacks[0].pressed&&attacks[0].timer<=0) { // Basic 1
-            attacks[0].timer = attacks[0].cooldown;
-            Cast cast = Instantiate(attacks[0].cast);
-            cast.Initialize(this, rotatingClockwise);
+            
         } else if (attacks[1].pressed&&attacks[1].timer<=0) { // Basic 2
             // TODO generalize
             float shotRadius = cc.GetComponent<CharacterController>().radius*1.5f;
@@ -194,11 +243,6 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
             attacks[1].timer = attacks[1].cooldown;
         } else if (attacks[2].pressed) { // Basic 3
             Debug.Log("pressed attack 3");
-        } else if ((boostedAttacks[0].pressed)&&(boostedAttacks[0].timer<=0)&&(charges>0)) { // Boosted 1
-            boostedAttacks[0].timer=boostedAttacks[0].cooldown;
-            Cast cast = Instantiate(boostedAttacks[0].cast);
-            cast.Initialize(this, rotatingClockwise);
-            charges--;
         } else if (abilities[0].pressed) {
             // NOTE - if CD is ready but a rocket is still up, it'll just redirect rocket
             if (p==null) {
@@ -394,7 +438,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         }
     }
 
-    private static Vector3 getCursorWorldPosition() {
+    public Vector3 getCursorWorldPosition() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitData;
 

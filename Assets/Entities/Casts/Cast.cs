@@ -4,6 +4,7 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using System.Collections;
 using TreeEditor;
+using static UnityEngine.GraphicsBuffer;
 
 [Serializable]
 public struct HitEvent {
@@ -11,10 +12,18 @@ public struct HitEvent {
     public int startFrame;
 }
 
+[Serializable]
+public struct ProjectileEvent {
+    public List<Projectile> projectiles;
+    public int startFrame;
+    public float initialOffset;
+}
+
 public class Cast : MonoBehaviour {
     // Start is called before the first frame update
     [SerializeField] public HitEvent[] hitEvents;
-    // [SerializeField] public MonoBehaviour CastBehavior;
+    [SerializeField] public ProjectileEvent[] projectileEvents;
+    
     private int frame = 0;
     private bool rotatingClockwise = true;
     [SerializeField] private int duration;
@@ -40,7 +49,6 @@ public class Cast : MonoBehaviour {
         foreach (HitEvent hitEvent in hitEvents) {
             foreach (Hit hit in hitEvent.hits) {
                 Assert.IsNotNull(hit);
-                duration=Mathf.Max(duration, hitEvent.startFrame+hit.duration);
             }
         }
     }
@@ -50,13 +58,18 @@ public class Cast : MonoBehaviour {
             if (hitEvent.startFrame==frame) {
                 foreach (Hit hit in hitEvent.hits) {
                     Hit h = Instantiate(hit, initialPosition, initialRotation);
+                    h.Initialize(caster, caster.transform, !rotatingClockwise);
+                }
+            }
+        }
 
-                    if (caster!=null) {
-                        h.Initialize(caster, caster.transform, !rotatingClockwise);
-                    }
-
-                    h.HandleMove();
-                    h.HandleHitCollisions();
+        foreach (ProjectileEvent projectileEvent in projectileEvents) {
+            if (projectileEvent.startFrame==frame) {
+                foreach (Projectile projectile in projectileEvent.projectiles) {
+                    Vector3 projectilePosition = caster.transform.position+caster.transform.rotation*Vector3.forward*projectileEvent.initialOffset;
+                    Transform target = new GameObject().transform;
+                    target.position = caster.getCursorWorldPosition();
+                    Instantiate(projectile, projectilePosition, caster.transform.rotation).Initialize(caster, null);
                 }
             }
         }

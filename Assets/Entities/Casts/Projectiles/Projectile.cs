@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.UIElements;
 
-public class ProjectileBehavior : MonoBehaviour
+public class Projectile : MonoBehaviour
 {
     /* Movement */
     private CharacterController _cc;
@@ -89,7 +89,7 @@ public class ProjectileBehavior : MonoBehaviour
         }
     }
 
-    public void UpdateTarget(Vector3 position) {
+    public void UpdateTarget(Vector3 position) { 
         target.position = position;
     }
 

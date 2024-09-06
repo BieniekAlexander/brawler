@@ -76,7 +76,7 @@ public class Hit : MonoBehaviour {
     }
 
     public void Initialize(CharacterBehavior _caster, Transform _origin, bool _mirror) {
-        caster=_caster;
+        caster = _caster;
         mirror = _mirror;
 
         if (_origin is null) { // if the constructor didn't supply an origin to follow, make one

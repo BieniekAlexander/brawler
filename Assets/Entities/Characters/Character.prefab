@@ -105,7 +105,7 @@ MonoBehaviour:
     pressed: 0
     cooldown: 30
     timer: 0
-  - cast: {fileID: 0}
+  - cast: {fileID: 5634063031192742342, guid: 272d6e6311b0ade41bea50a21c5f39d7, type: 3}
     pressed: 0
     cooldown: 20
     timer: 0

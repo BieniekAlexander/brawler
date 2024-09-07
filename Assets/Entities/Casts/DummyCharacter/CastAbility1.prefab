@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4309640871662126163
+--- !u!1 &3059344016903470191
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,50 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7553774615858584141}
-  - component: {fileID: 1207272893519555139}
+  - component: {fileID: 1635544872617382815}
+  - component: {fileID: 4816246695473929763}
   m_Layer: 0
-  m_Name: HitBase
+  m_Name: CastAbility1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7553774615858584141
+--- !u!4 &1635544872617382815
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4309640871662126163}
+  m_GameObject: {fileID: 3059344016903470191}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.775, y: 2.0250025, z: -2.27}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1207272893519555139
+--- !u!114 &4816246695473929763
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4309640871662126163}
+  m_GameObject: {fileID: 3059344016903470191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
+  m_Script: {fileID: 11500000, guid: c790ce187734424448243be20128a1a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  origin: {fileID: 0}
-  offset: {x: 0, y: 0, z: 0}
-  trajectory: []
-  scaling: []
-  duration: 3
-  damage: 2
-  knockbackMagnitude: 25
-  knockbackTransform: {x: 0, y: 0, z: 0}
-  knockbackTransformType: ANGULAR
-  HitBox: {fileID: 0}
+  hitEvents: []
+  projectileEvents:
+  - projectiles:
+    - {fileID: 1370712460824804173, guid: 50f0460e03f2fb441add661fd333069c, type: 3}
+    startFrame: 10
+    range: 1.5
+    positioning: 0
+  duration: 610
+  castPositioning: 0
+  hits: []
+  projectiles: []

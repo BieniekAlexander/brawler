@@ -1,18 +1,63 @@
 using System;
-using System.Collections;
+using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static CharacterControls;
 
+
+
 [Serializable]
-public struct Ability {
-    public Cast cast;
-    public bool pressed;
+public class CastSlot {
+    public CastSlot(string _name) {
+        name = _name;
+        castPrefab = null;
+        cooldown = -1;
+    }
+
+    public string name;
+    public CastBase castPrefab;
     public int cooldown;
-    public int timer;
 }
 
-public class CharacterBehavior : MonoBehaviour, ICharacterActions {
+public struct CastContainer {
+    public CastContainer(CastSlot _castSlot) {
+        castPrefab = _castSlot.castPrefab;
+        cast = null;
+        cooldown = _castSlot.cooldown;
+        timer = 0;
+        activated = false;
+    }
+
+    public CastBase castPrefab;
+    public CastBase cast;
+    public int cooldown;
+    public int timer;
+    public bool activated;
+}
+
+public enum CastId {
+    Attack1 = 0,
+    Attack2 = 1,
+    Attack3 = 2,
+    BoostedAttack1 = 3,
+    BoostedAttack2 = 4,
+    BoostedAttack3 = 5,
+    Throw1 = 6,
+    Throw2 = 7,
+    BoostedThrow = 8,
+    Ability1 = 9,
+    Ability2 = 10,
+    Ability3 = 11,
+    Ability4 = 12,
+    Special1 = 13,
+    Special2 = 14,
+    Ultimate = 15
+}
+
+public class Character : MonoBehaviour, ICharacterActions {
     // is this me? TODO better way to do this
     [SerializeField] bool me;
 
@@ -56,14 +101,11 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
     private bool boostedShielding = false;
 
     /* Abilities */
-    [SerializeField] private Ability[] attacks = new Ability[3];
-    [SerializeField] private Ability[] boostedAttacks = new Ability[3];
-    [SerializeField] private Ability[] throws = new Ability[2];
-    [SerializeField] private Ability boostedThrow;
-    [SerializeField] private Ability[] abilities = new Ability[4];
-    [SerializeField] private Ability[] specials = new Ability[2];
-    [SerializeField] private Ability ultimate;
-    private Ability nullAbility = new();
+    
+    [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
+    private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
+    public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
+    public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
 
     /* Resources */
     private int hp = 1000;
@@ -75,12 +117,8 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
     private int rechargeTimer = 0;
     private int shieldDuration = -1;
     private int parryWindow = 30;
-
-    /* Temp */
-    [SerializeField] private Projectile missilePrefab;
-    [SerializeField] private Projectile bulletPrefab;
-    private Projectile p = null;
-    private Transform pTarget;
+    private int energy = 100;
+    private int maxEnergy = 100;
 
     /*
      * CONTROLS
@@ -100,22 +138,22 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
 
     // attacks
     public void OnAttack1(InputAction.CallbackContext context) {
-        attacks[0].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Attack1].activated=context.ReadValueAsButton();
     }
     public void OnAttack2(InputAction.CallbackContext context) {
-        attacks[1].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Attack2].activated=context.ReadValueAsButton();
     }
     public void OnAttack3(InputAction.CallbackContext context) {
-        attacks[2].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Attack3].activated=context.ReadValueAsButton();
     }
     public void OnBoostedAttack1(InputAction.CallbackContext context) {
-        boostedAttacks[0].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.BoostedAttack1].activated=context.ReadValueAsButton();
     }
     public void OnBoostedAttack2(InputAction.CallbackContext context) {
-        boostedAttacks[1].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.BoostedAttack2].activated=context.ReadValueAsButton();
     }
     public void OnBoostedAttack3(InputAction.CallbackContext context) {
-        boostedAttacks[2].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.BoostedAttack3].activated=context.ReadValueAsButton();
     }
 
     // shields
@@ -128,36 +166,36 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
 
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
-        throws[0].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Throw1].activated=context.ReadValueAsButton();
     }
     public void OnThrow2(InputAction.CallbackContext context) {
-        throws[1].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Throw2].activated=context.ReadValueAsButton();
     }
     public void OnBoostedThrow(InputAction.CallbackContext context) {
-        boostedThrow.pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.BoostedThrow].activated=context.ReadValueAsButton();
     }
 
     // abilities
     public void OnAbility1(InputAction.CallbackContext context) {
-        abilities[0].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Ability1].activated=context.ReadValueAsButton();
     }
     public void OnAbility2(InputAction.CallbackContext context) {
-        abilities[1].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Ability2].activated=context.ReadValueAsButton();
     }
     public void OnAbility3(InputAction.CallbackContext context) {
-        abilities[2].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Ability3].activated=context.ReadValueAsButton();
     }
     public void OnAbility4(InputAction.CallbackContext context) {
-        abilities[3].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Ability4].activated=context.ReadValueAsButton();
     }
     public void OnSpecial1(InputAction.CallbackContext context) {
-        specials[0].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Special1].activated=context.ReadValueAsButton();
     }
     public void OnSpecial2(InputAction.CallbackContext context) {
-        specials[1].pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Special2].activated=context.ReadValueAsButton();
     }
     public void OnUltimate(InputAction.CallbackContext context) {
-        ultimate.pressed=context.ReadValueAsButton();
+        castContainers[(int)CastId.Ultimate].activated=context.ReadValueAsButton();
     }
 
     void HandleControls() {
@@ -181,94 +219,45 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         }
     }
 
-    /// <summary>
-    /// Returns a reference to the ability that the user is pressing
-    /// I can't find a prettier way to do this in C# :(
-    /// </summary>
-    /// <returns></returns>
-    private ref Ability getActivatedAbility() {
-        // TODO edge-cases:
-        // - what if the user is pressing multiple abilities?
-        // - what if the selected ability is on cooldown, or the user doesn't have the resources for it?
-        //   - keep in mind that some abilities will need to be recasted for effect, even if the main ability is still on cooldown
-        
-        for (int i = 0; i < boostedAttacks.Length; i++) {
-            if (boostedAttacks[i].pressed) return ref boostedAttacks[i];
-        }
-        for (int i = 0; i < throws.Length; i++) {
-            if (throws[i].pressed) return ref throws[i];
-        }
-        if (boostedThrow.pressed) return ref boostedThrow;
-        for (int i = 0; i < abilities.Length; i++) {
-            if (abilities[i].pressed) return ref abilities[i];
-        }
-        for (int i = 0; i < specials.Length; i++) {
-            if (specials[i].pressed) return ref specials[i];
-        }
-        if (ultimate.pressed) return ref ultimate;
-
-        return ref nullAbility;
-    }
-
     void HandleAbilities() {
-        Ability activatedAbility = getActivatedAbility();
-        ref Ability refNullAbility = ref nullAbility;
-
-        for (int i = 0; i < attacks.Length; i++) {
-            if (attacks[i].pressed && attacks[i].timer<=0) {
-                attacks[i].timer = attacks[i].cooldown;
-                Instantiate(attacks[i].cast).Initialize(this, rotatingClockwise);
-                return;
-            }
-        }
-
-        for (int i = 0; i < boostedAttacks.Length; i++) {
-            if (boostedAttacks[i].pressed && boostedAttacks[i].timer<=0 && charges>0) {
-                boostedAttacks[i].timer = attacks[i].cooldown;
-                Instantiate(boostedAttacks[i].cast).Initialize(this, rotatingClockwise);
-                charges--;
-                return;
-            }
-        }
-
-        // activate abilities, if applicable
-        if (attacks[0].pressed&&attacks[0].timer<=0) { // Basic 1
-            
-        } else if (attacks[1].pressed&&attacks[1].timer<=0) { // Basic 2
-            // TODO generalize
-            float shotRadius = cc.GetComponent<CharacterController>().radius*1.5f;
-            Vector3 position = transform.position+transform.rotation*Vector3.forward*shotRadius;
-            Vector3 direction = transform.rotation*Vector3.forward;
-            Instantiate(bulletPrefab, position, transform.rotation).Initialize(this, null);
-            attacks[1].timer = attacks[1].cooldown;
-        } else if (attacks[2].pressed) { // Basic 3
-            Debug.Log("pressed attack 3");
-        } else if (abilities[0].pressed) {
-            // NOTE - if CD is ready but a rocket is still up, it'll just redirect rocket
-            if (p==null) {
-                if (abilities[0].timer<=0) {
-                    float shotRadius = cc.GetComponent<CharacterController>().radius*1.5f;
-                    Vector3 position = transform.position+transform.rotation*Vector3.forward*shotRadius;
-                    Transform target = new GameObject("Rocket Target").transform;
-                    target.position=getCursorWorldPosition();
-
-                    p=Instantiate(missilePrefab, position, transform.rotation);
-                    p.Initialize(this, target);
-                    abilities[0].timer=abilities[0].cooldown;
+        for (int i = 0; i < castContainers.Length; i++) {
+            if (castContainers[i].activated) {
+                if (castContainers[i].castPrefab == null) {
+                    Debug.Log("No cast supplied for cast"+i);
+                    return;
                 }
-            } else {
-                p.UpdateTarget(getCursorWorldPosition());
+
+                if (castContainers[i].cast is not null) { // recast
+                    castContainers[i].cast.UpdateCast(getCursorWorldPosition());
+                } else if (castContainers[i].timer<=0) { // cooldown fresh
+                    if (
+                        (charges>0 || !boostedIds.Contains(i))
+                        && (energy >= 50 || !specialIds.Contains(i))
+                    ) {
+                        if (boostedIds.Contains(i)) {
+                            charges--;
+                        } else if (specialIds.Contains(i)) {
+                            energy -= 50;
+                        }
+
+                        castContainers[i].cast = Instantiate(castContainers[i].castPrefab);
+                        castContainers[i].cast.Initialize(this, rotatingClockwise);
+                        castContainers[i].timer = castContainers[i].cooldown;
+                        return;
+                    }
+                }
             }
         }
 
+        // resolve cooldowns and cast expirations
+        for (int i = 0; i<castContainers.Length; i++) {
+            castContainers[i].timer--;
 
-        // decrease cooldown on abilities
-        for (int i = 0; i<abilities.Length; i++)
-            abilities[i].timer--;
-        for (int i = 0; i<attacks.Length; i++)
-            attacks[i].timer--;
-        for (int i = 0; i<boostedAttacks.Length; i++)
-            boostedAttacks[i].timer--;
+            if (castContainers[i].cast == null) {
+                castContainers[i].cast = null;
+            } 
+        }
+            
     }
 
     private void Awake() {
@@ -281,6 +270,10 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
             characterControls=new CharacterControls();
             characterControls.Enable(); // TODO do I need to disable this somewhere?
             characterControls.character.SetCallbacks(this);
+        }
+
+        for ( int i = 0; i<castSlots.Length; i++) {
+            castContainers[i] = new CastContainer(castSlots[i]);
         }
     }
 
@@ -428,7 +421,7 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
                 knockBackVelocity=Vector3.zero;
             }
         } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&isAboveWalkSpeed()) {
-            CharacterBehavior otherCharacter = collisionObject.GetComponent<CharacterBehavior>();
+            Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.moveVelocity.magnitude<moveVelocity.magnitude) {
                 Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boltDeceleration*Time.deltaTime; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
@@ -494,5 +487,6 @@ public class CharacterBehavior : MonoBehaviour, ICharacterActions {
         GUI.Label(new Rect(20, 40, 80, 20), moveVelocity.magnitude+"m/s");
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+hp);
+        GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);
     }
 }

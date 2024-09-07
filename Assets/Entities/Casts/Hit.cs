@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.Assertions;
 
 
@@ -11,7 +12,7 @@ public class Hit : MonoBehaviour {
     enum CoordinateSystem { Polar, Cartesian };
 
     /* Position */
-    private CharacterBehavior caster;
+    private Character caster;
     private Transform origin; // origin of the cast, allowing for movement during animation
     private bool mirror = false;
     [SerializeField] private CoordinateSystem coordinateSystem;
@@ -21,7 +22,7 @@ public class Hit : MonoBehaviour {
 
     /* Collision */
     private Collider hitBox;
-    public HashSet<CharacterBehavior> collisionIds = new();
+    public HashSet<Character> collisionIds = new();
 
     /* Duration */
     [SerializeField] public int duration;
@@ -37,7 +38,6 @@ public class Hit : MonoBehaviour {
     [SerializeField] private int hitStunDuration;
 
     // Visualization
-    //private ParticleSystem ps;
     private float animationDuration;
 
     public void Awake() {
@@ -47,10 +47,13 @@ public class Hit : MonoBehaviour {
         Assert.IsTrue(1<=dimensions.Length&&dimensions.Length<=duration);
 
 
-        // resize wireframe for vizualization
         hitBox=GetComponent<Collider>();
-        SetHitboxDImensions(dimensions[0]);
+        SetHitboxDImensions(dimensions[0]); // TODO call this on every frame that the hitbox dimensions update
 
+        // TODO generally the hitbox dimension calculations seem incorrect - fix
+        // https://discussions.unity.com/t/collider-size-and-transform-scale/386407/2
+
+        // resize wireframe for vizualization
         if (hitBox is CapsuleCollider) {
             CapsuleCollider collider = hitBox as CapsuleCollider;
             collider.transform.localScale=new Vector3(collider.radius, collider.height, collider.radius);
@@ -75,7 +78,7 @@ public class Hit : MonoBehaviour {
         return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
-    public void Initialize(CharacterBehavior _caster, Transform _origin, bool _mirror) {
+    public void Initialize(Character _caster, Transform _origin, bool _mirror) {
         caster = _caster;
         mirror = _mirror;
 
@@ -126,7 +129,7 @@ public class Hit : MonoBehaviour {
     public void HandleHitCollisions() {
         foreach (Collider otherCollider in GetOverlappingColliders(hitBox)) {
             GameObject go = otherCollider.gameObject;
-            CharacterBehavior cb = go.GetComponent<CharacterBehavior>();
+            Character cb = go.GetComponent<Character>();
 
             if (cb is not null&&cb!=caster&&!collisionIds.Contains(cb)) {
                 collisionIds.Add(cb);
@@ -137,6 +140,7 @@ public class Hit : MonoBehaviour {
     }
 
     private void SetHitboxDImensions(Vector3 scale) {
+        transform.localScale = scale;
         if (hitBox is CapsuleCollider) {
             CapsuleCollider cc = hitBox as CapsuleCollider;
             cc.radius=scale.x;
@@ -148,7 +152,7 @@ public class Hit : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        if (origin.GetComponent<CharacterBehavior>() is null) {
+        if (origin.GetComponent<Character>() is null) {
             Destroy(origin.gameObject);
         }
     }

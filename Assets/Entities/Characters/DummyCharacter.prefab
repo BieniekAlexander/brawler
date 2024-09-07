@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 3714925749414027555}
   - component: {fileID: 2849847753845790583}
   - component: {fileID: 8132188160890251787}
-  - component: {fileID: 6518117242977656221}
   - component: {fileID: 4584570722456235046}
   - component: {fileID: 8359697329656048070}
+  - component: {fileID: 4559761375588025615}
   m_Layer: 6
-  m_Name: Character
+  m_Name: DummyCharacter
   m_TagString: Character
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 967517793056741292}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.2070026, y: 5.8254147, z: -7.0281515}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -86,95 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6518117242977656221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 967517793056741292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b52b633278fbe1340941d01608129799, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  me: 0
-  moveVelocity: {x: 0, y: 0, z: 0}
-  attacks:
-  - cast: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252, type: 3}
-    pressed: 0
-    cooldown: 30
-    timer: 0
-  - cast: {fileID: 5634063031192742342, guid: 272d6e6311b0ade41bea50a21c5f39d7, type: 3}
-    pressed: 0
-    cooldown: 20
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  boostedAttacks:
-  - cast: {fileID: 5634063031192742342, guid: 723f2a6ea9a0aad4781f50fb690ec170, type: 3}
-    pressed: 0
-    cooldown: 60
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  throws:
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  boostedThrow:
-    cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  abilities:
-  - cast: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252, type: 3}
-    pressed: 0
-    cooldown: 20
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  specials:
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  - cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  ultimate:
-    cast: {fileID: 0}
-    pressed: 0
-    cooldown: 0
-    timer: 0
-  missilePrefab: {fileID: 1370712460824804173, guid: 50f0460e03f2fb441add661fd333069c,
-    type: 3}
-  bulletPrefab: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
-    type: 3}
 --- !u!143 &4584570722456235046
 CharacterController:
   m_ObjectHideFlags: 0
@@ -314,3 +225,72 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &4559761375588025615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967517793056741292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff29245a97187da4b80e22df503139dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  me: 0
+  moveVelocity: {x: 0, y: 0, z: 0}
+  castSlots:
+  - name: Attack1
+    castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
+      type: 3}
+    cooldown: 60
+  - name: Attack2
+    castPrefab: {fileID: 5634063031192742342, guid: 272d6e6311b0ade41bea50a21c5f39d7,
+      type: 3}
+    cooldown: 30
+  - name: Attack3
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: BoostedAttack1
+    castPrefab: {fileID: 5634063031192742342, guid: 723f2a6ea9a0aad4781f50fb690ec170,
+      type: 3}
+    cooldown: 60
+  - name: BoostedAttack2
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: BoostedAttack3
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Throw1
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Throw2
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: BoostedThrow
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Ability1
+    castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
+      type: 3}
+    cooldown: 600
+  - name: Ability2
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Ability3
+    castPrefab: {fileID: 4816246695473929763, guid: 57724b4e35580ab4f8526e68169ffc33,
+      type: 3}
+    cooldown: 900
+  - name: Ability4
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Special1
+    castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
+      type: 3}
+    cooldown: 600
+  - name: Special2
+    castPrefab: {fileID: 0}
+    cooldown: -1
+  - name: Ultimate
+    castPrefab: {fileID: 0}
+    cooldown: -1

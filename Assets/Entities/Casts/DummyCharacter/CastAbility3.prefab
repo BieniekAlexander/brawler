@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 5634063031192742342}
+  - component: {fileID: 4816246695473929763}
   m_Layer: 0
-  m_Name: CastBasicAttack2
+  m_Name: CastAbility3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5634063031192742342
+--- !u!114 &4816246695473929763
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,13 +41,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 3059344016903470191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
+  m_Script: {fileID: 11500000, guid: c790ce187734424448243be20128a1a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   hitEvents: []
   projectileEvents:
   - projectiles:
-    - {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951, type: 3}
-    startFrame: 0
-    initialOffset: 1.2
-  duration: 30
+    - {fileID: -6148597624710322689, guid: d01c1a282085eb243865e5c7a7fc0ac5, type: 3}
+    startFrame: 60
+    range: 30
+    positioning: 1
+  duration: 60
+  hits: []
+  projectiles: []

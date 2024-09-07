@@ -5,8 +5,14 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.Assertions;
+using UnityEngine.UIElements;
 
 
+/// <summary>
+/// Object that represents a Hitbox, which collides with entities in the game to heal, damage, afflict, etc.
+/// NOTE: I can't get the collider properties to comport with its visualization for the life of me when 
+///     I update its properties from default values, so any changes to the size will only be to transform.localScale
+/// </summary>
 [Serializable]
 public class Hit : MonoBehaviour {
     enum CoordinateSystem { Polar, Cartesian };
@@ -46,23 +52,8 @@ public class Hit : MonoBehaviour {
         Assert.IsTrue(1<=rotations.Length&&rotations.Length<=duration);
         Assert.IsTrue(1<=dimensions.Length&&dimensions.Length<=duration);
 
-
         hitBox=GetComponent<Collider>();
-        SetHitboxDImensions(dimensions[0]); // TODO call this on every frame that the hitbox dimensions update
-
-        // TODO generally the hitbox dimension calculations seem incorrect - fix
-        // https://discussions.unity.com/t/collider-size-and-transform-scale/386407/2
-
-        // resize wireframe for vizualization
-        if (hitBox is CapsuleCollider) {
-            CapsuleCollider collider = hitBox as CapsuleCollider;
-            collider.transform.localScale=new Vector3(collider.radius, collider.height, collider.radius);
-        } else if (hitBox is SphereCollider) {
-            SphereCollider collider = hitBox as SphereCollider;
-            collider.transform.localScale=new Vector3(collider.radius, collider.radius, collider.radius);
-        } else {
-            throw new Exception("Unhandled wireframe resizing");
-        }
+        transform.localScale = dimensions[0];
     }
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
@@ -122,8 +113,9 @@ public class Hit : MonoBehaviour {
             orientation.y *= -1;
         }
 
-        transform.position=origin.position+origin.rotation*offset;
-        transform.rotation=origin.rotation*orientation*rotations[rotationFrame];
+        transform.localScale = dimensions[dimensionFrame];
+        transform.position = origin.position+origin.rotation*offset;
+        transform.rotation = origin.rotation*orientation*rotations[rotationFrame];
     }
 
     public void HandleHitCollisions() {
@@ -136,18 +128,6 @@ public class Hit : MonoBehaviour {
                 Vector3 kb = GetKnockBackVector(cb.transform.position);
                 cb.TakeDamage(damage, kb, hitStunDuration, hitTier);
             }
-        }
-    }
-
-    private void SetHitboxDImensions(Vector3 scale) {
-        transform.localScale = scale;
-        if (hitBox is CapsuleCollider) {
-            CapsuleCollider cc = hitBox as CapsuleCollider;
-            cc.radius=scale.x;
-            cc.height=scale.y;
-        } else if (hitBox is SphereCollider) {
-            SphereCollider sc = hitBox as SphereCollider;
-            sc.radius=scale.x;
         }
     }
 

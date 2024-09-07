@@ -57,7 +57,7 @@ MonoBehaviour:
   rotations:
   - {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
   dimensions:
-  - {x: 0.5, y: 1, z: 0}
+  - {x: 1, y: 1, z: 0}
   duration: 5
   knockbackMagnitude: 0
   knockbackTransform: {x: 0, y: 0, z: 1}
@@ -133,7 +133,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 100
-  m_Height: 100
+  m_Radius: 1
+  m_Height: 1
   m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}

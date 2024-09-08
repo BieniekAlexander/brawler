@@ -65,12 +65,11 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CharacterController cc;
     private bool rotatingClockwise = false;
     public Vector3 moveVelocity = new();
-    private Vector3 bounceDirection = new();
 
     // knockback
     private Vector3 knockBackVelocity = new();
     private float knockBackDecceleration = 25f;
-    private float hitLagTimer = 0;
+    private int hitLagTimer = 0;
 
     // Walking
     private float walkAcceleration = 50f;
@@ -82,10 +81,11 @@ public class Character : MonoBehaviour, ICharacterActions {
     private float runRotationalSpeed = 5f;
 
     // Bolt
-    private bool bolting = false;
-    private float boltMaxSpeed = 30f;
-    private float boltSpeedBump = 2.5f;
-    private float boltDeceleration = 20f;
+    private int boostTimer = 0;
+    private int boostMaxDuration = 30;
+    private float boostMaxSpeed = 30f;
+    private float boostSpeedBump = 2.5f;
+    private float boostDV;
 
     /* Visuals */
     // Bolt Visualization
@@ -94,14 +94,14 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Controls */
     private CharacterControls characterControls;
-    private Vector3 movementDirection = new Vector3();
+    private Vector3 movementDirection = new();
     private bool boost = false;
     private bool running = false;
     private bool shielding = false;
     private bool boostedShielding = false;
 
     /* Abilities */
-    
+
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
@@ -206,7 +206,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
             float yRotationDiff = newRotation.y - transform.rotation.y;
-            
+
             if (yRotationDiff != 0) {
                 rotatingClockwise = (yRotationDiff>0);
                 // TODO somewhere in Q3, the yRotation goes from positive to negative, and I don't know why,
@@ -214,8 +214,8 @@ public class Character : MonoBehaviour, ICharacterActions {
                 // Debug.Log("old"+transform.rotation.y+" new "+newRotation.y);
                 // Debug.Log("yRotationDiff "+yRotationDiff +" RotatingClockwise "+rotatingClockwise);
             }
-            
-            transform.rotation = newRotation;       
+
+            transform.rotation = newRotation;
         }
     }
 
@@ -255,9 +255,9 @@ public class Character : MonoBehaviour, ICharacterActions {
 
             if (castContainers[i].cast == null) {
                 castContainers[i].cast = null;
-            } 
+            }
         }
-            
+
     }
 
     private void Awake() {
@@ -272,7 +272,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             characterControls.character.SetCallbacks(this);
         }
 
-        for ( int i = 0; i<castSlots.Length; i++) {
+        for (int i = 0; i<castSlots.Length; i++) {
             castContainers[i] = new CastContainer(castSlots[i]);
         }
     }
@@ -292,7 +292,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         /*
          * Trail Renderer
          */
-        tr.emitting=(moveVelocity.magnitude>boltMaxSpeed/2);
+        tr.emitting=(moveVelocity.magnitude>boostMaxSpeed/2);
     }
 
     private void Update() {
@@ -326,84 +326,71 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    private void HandleTransform() {
-        bool aboveWalkSpeed = isAboveWalkSpeed();
-        float acceleration = aboveWalkSpeed ? 0 : walkAcceleration;
-        float deceleration = (aboveWalkSpeed ? runDeceleration : walkAcceleration*4)*(shielding ? 2 : 1);
-        running&=!shielding;
+    // Movement evaluations
+    private bool CanTurn() {
+        return (boostTimer <= 0);
+    }
 
+    /// <summary>
+    /// Boost
+    /// </summary>
+    private void Boost() {
+        charges--;
+        chargeCooldown=chargeCooldownMax;
+        boostTimer = boostMaxDuration;
+        runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax)+boostSpeedBump, boostMaxSpeed);
+        boostDV = (boostMaxSpeed-runSpeed)/boostMaxDuration;
+        Vector3 v = (getCursorWorldPosition()-cc.transform.position);
+        moveVelocity = new Vector3(v.x, 0, v.z).normalized*boostMaxSpeed;
+        knockBackVelocity.Set(0f, 0f, 0f);
+    }
+    private void HandleTransform() {
         if (hitLagTimer>0) {
             hitLagTimer--;
             return;
         }
 
-        /*
-         * MOVEMENT SPEED
-         */
-        if (boost&&charges>0&&chargeCooldown<=0) { // bolting - update speed and direction
-            charges--;
-            chargeCooldown=chargeCooldownMax;
-            runSpeed=Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax)+boltSpeedBump, boltMaxSpeed);
-            Vector3 v = (getCursorWorldPosition()-cc.transform.position);
-            moveVelocity=new Vector3(v.x, 0, v.z).normalized*boltMaxSpeed;
-            knockBackVelocity.Set(0f, 0f, 0f);
-        } else { // not bolting
-            // handle direction
-            Vector3 biasDirection = shielding ? Vector3.zero : movementDirection.normalized;
-
-            // handle speed
-            if (aboveWalkSpeed) {
-                if (moveVelocity.magnitude>runSpeed) {
-                    moveVelocity=moveVelocity.normalized*Mathf.Max(runSpeed, moveVelocity.magnitude-walkAcceleration*Time.deltaTime);
-                } else { // regular run
-                    moveVelocity=Vector3.RotateTowards(
-                        Mathf.Max(moveVelocity.magnitude-(running ? 0 : (deceleration*Time.deltaTime)), 0)*moveVelocity.normalized, // update velocity
-                        biasDirection!=Vector3.zero ? biasDirection : moveVelocity, // update direction if it was supplied
-                        runRotationalSpeed*Time.deltaTime/(running ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
-                        0 // don't change specified speed
-                    );
-                }
-            } else {
-                if (biasDirection==Vector3.zero&&!running) {    // stop walking
-                    moveVelocity+=moveVelocity.normalized*Mathf.Min(Time.deltaTime*runDeceleration, -moveVelocity.magnitude);
-                } else {
-                    moveVelocity+=(biasDirection*acceleration*Time.deltaTime);
-                    if (moveVelocity.magnitude>walkSpeedMax) {
-                        moveVelocity=moveVelocity.normalized*walkSpeedMax;
-                    }
-                }
-            }
+        if (boost&&charges>0&&chargeCooldown<=0) {
+            Boost();
         }
 
-        /* 
-         * BOUNCE
-         */
-        if (bounceDirection!=Vector3.zero) {
-            if (!aboveWalkSpeed) {
-                moveVelocity.Set(0f, 0f, 0f);
-                knockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
-            } else {
-                moveVelocity=bounceDirection*moveVelocity.magnitude;
-                knockBackVelocity=bounceDirection*knockBackVelocity.magnitude;
+        bool aboveWalkSpeed = IsAboveWalkSpeed();
+        // TODO:
+        // - casting?
+        // - shielding?
+
+        if (!aboveWalkSpeed) { // walking
+            if (movementDirection==Vector3.zero && !running) {
+                moveVelocity += (-moveVelocity.normalized) * Mathf.Min(walkAcceleration*4*Time.deltaTime, moveVelocity.magnitude);
+            } else if (movementDirection!=Vector3.zero) {
+                moveVelocity += movementDirection.normalized * walkAcceleration*Time.deltaTime;
+                
+                if (moveVelocity.magnitude > walkSpeedMax) {
+                    moveVelocity = moveVelocity.normalized* walkSpeedMax;
+                }
             }
-
-            bounceDirection.Set(0f, 0f, 0f);
+        } else if (boostTimer > 0) { // boosting
+            moveVelocity -= moveVelocity.normalized*boostDV;
+            boostTimer--;
+        } else { // running
+            moveVelocity=Vector3.RotateTowards(
+                Mathf.Max(moveVelocity.magnitude-(running ? 0 : (runDeceleration*Time.deltaTime)), 0)*moveVelocity.normalized, // update velocity
+                movementDirection!=Vector3.zero ? movementDirection : moveVelocity, // update direction if it was supplied
+                runRotationalSpeed*Time.deltaTime/(running ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
+                0 // don't change specified speed
+            );
         }
-
-        /* 
-         * Knockback
-         */
-        Vector3 tansformVelocity = moveVelocity+knockBackVelocity;
-        knockBackVelocity=knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
 
         /*
          * FINALIZE
          */
-        cc.Move(tansformVelocity*Time.deltaTime);
+        knockBackVelocity=knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
+        Vector3 transformVelocity = moveVelocity+knockBackVelocity;
+        cc.Move(transformVelocity*Time.deltaTime);
     }
 
-    private bool isAboveWalkSpeed() {
-        return (moveVelocity.magnitude>(walkSpeedMax+.05));
+    private bool IsAboveWalkSpeed() {
+        return (moveVelocity.magnitude>(walkSpeedMax+.25));
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
@@ -411,20 +398,27 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         if (collisionObject.layer==LayerMask.NameToLayer("Terrain")) {
             if (running) { // if you hit a 
-                Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-                bounceDirection=(moveVelocity-2*Vector3.Project(moveVelocity, mirror)).normalized;
-                hitLagTimer=.03f;
+                if (IsAboveWalkSpeed()) {
+                    Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
+                    Vector3 bounceDirection = (moveVelocity-2*Vector3.Project(moveVelocity, mirror)).normalized;
+                    moveVelocity = bounceDirection*moveVelocity.magnitude;
+                    knockBackVelocity = bounceDirection*knockBackVelocity.magnitude; // TODO is this right?
+                } else {
+                    moveVelocity.Set(0f, 0f, 0f);
+                    knockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
+                }
+                hitLagTimer = 2;
                 // TODO add something here:
                 // - stop for some frames
             } else {
                 moveVelocity=Vector3.zero;
                 knockBackVelocity=Vector3.zero;
             }
-        } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&isAboveWalkSpeed()) {
+        } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.moveVelocity.magnitude<moveVelocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boltDeceleration*Time.deltaTime; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boostDV*Time.deltaTime; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 moveVelocity-=dvNormal;
                 otherCharacter.moveVelocity=moveVelocity+dvNormal;
             }
@@ -457,7 +451,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         // - evaluate damage according to whether I'm shielding and such
         // - evaluate changes according to hit level
 
-        if (isAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
+        if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
             damageTier++;
 
         if (hp<=0) {

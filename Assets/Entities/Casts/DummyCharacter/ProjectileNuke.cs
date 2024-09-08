@@ -5,7 +5,7 @@ public class ProjectileNuke : Projectile
 {
     private Material _material;
     
-    public void Start()
+    new public void Start()
     {
         base.Start();
         _material = GetComponent<Renderer>().material;

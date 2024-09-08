@@ -71,7 +71,7 @@ public class CastBase : MonoBehaviour {
                     projectilePosition = caster.transform.position + distance*castVector.normalized;
                 }
 
-                Transform target = new GameObject().transform;
+                Transform target = new GameObject("Projectile Target").transform;
                 target.position = caster.getCursorWorldPosition();
                 Projectile p = Instantiate(projectileEvent.projectile, projectilePosition, caster.transform.rotation*projectileEvent.radialOffset);
                 p.Initialize(caster, target);

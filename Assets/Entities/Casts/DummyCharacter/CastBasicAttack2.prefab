@@ -46,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitEvents: []
   projectileEvents:
-  - projectiles:
-    - {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951, type: 3}
+  - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
+      type: 3}
     startFrame: 0
     range: 1.5
     positioning: 0
+    radialOffset: {x: 0, y: 0, z: 0, w: 1}
   duration: 30
-  castPositioning: 0
   hits: []
   projectiles: []

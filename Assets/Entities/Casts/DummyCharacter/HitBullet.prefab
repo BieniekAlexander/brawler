@@ -54,7 +54,7 @@ MonoBehaviour:
   rotations:
   - {x: 0, y: 0, z: 0, w: 0}
   dimensions:
-  - {x: 0.5, y: 0, z: 0}
+  - {x: 0.05, y: 0, z: 0}
   duration: 1
   knockbackMagnitude: 0
   knockbackTransform: {x: 0, y: 0, z: 0}

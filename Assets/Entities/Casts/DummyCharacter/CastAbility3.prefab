@@ -13,7 +13,7 @@ GameObject:
   m_Layer: 0
   m_Name: CastAbility3
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -46,11 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitEvents: []
   projectileEvents:
-  - projectiles:
-    - {fileID: -6148597624710322689, guid: d01c1a282085eb243865e5c7a7fc0ac5, type: 3}
+  - projectile: {fileID: -6148597624710322689, guid: d01c1a282085eb243865e5c7a7fc0ac5,
+      type: 3}
     startFrame: 60
     range: 30
     positioning: 1
+    radialOffset: {x: 0, y: 0, z: 0, w: 0}
   duration: 60
   hits: []
   projectiles: []

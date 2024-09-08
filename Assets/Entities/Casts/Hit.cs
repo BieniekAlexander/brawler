@@ -53,7 +53,10 @@ public class Hit : MonoBehaviour {
         Assert.IsTrue(1<=dimensions.Length&&dimensions.Length<=duration);
 
         hitBox=GetComponent<Collider>();
-        transform.localScale = dimensions[0];
+    }
+
+    public void Start() {
+        HandleMove();
     }
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {

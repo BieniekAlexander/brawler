@@ -249,15 +249,17 @@ MonoBehaviour:
       type: 3}
     cooldown: 30
   - name: Attack3
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: 5634063031192742342, guid: a894861c04cb65d4592baf061c4755c2,
+      type: 3}
+    cooldown: 60
   - name: BoostedAttack1
     castPrefab: {fileID: 5634063031192742342, guid: 723f2a6ea9a0aad4781f50fb690ec170,
       type: 3}
     cooldown: 60
   - name: BoostedAttack2
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: 5634063031192742342, guid: 41097bacf106c6e4c85bd1c88867de2b,
+      type: 3}
+    cooldown: 60
   - name: BoostedAttack3
     castPrefab: {fileID: 0}
     cooldown: -1

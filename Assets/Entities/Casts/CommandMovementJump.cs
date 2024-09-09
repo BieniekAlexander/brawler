@@ -8,12 +8,10 @@ public class CommandMovementJump : CommandMovementBase
         base.Initialize(_destination, initialPosition);
         velocity = path*Time.fixedDeltaTime*(60f/duration);
         velocity.y = gravity*(duration-2)*Time.fixedDeltaTime/2;
-        // TODO stupid hack where I decreasted the duration in the calculation to make sure the final position is lower than the initial position
-        // fix this caculation, and otherwise make sure that they return to initial y position
     }
 
     public override void FixedUpdate() {
-        base.FixedUpdate();
         velocity.y -= gravity * Time.deltaTime;
+        base.FixedUpdate();
     }
 }

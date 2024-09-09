@@ -66,6 +66,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private bool rotatingClockwise = false;
     public Vector3 moveVelocity = new();
     private CommandMovementBase commandMovement = null;
+    private float standingY;
 
     // knockback
     private Vector3 knockBackVelocity = new();
@@ -84,7 +85,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     // Bolt
     private int boostTimer = 0;
     private int boostMaxDuration = 20;
-    private float boostMaxSpeed = 30f;
+    private float boostMaxSpeed = 25f;
     private float boostSpeedBump = 2.5f;
     private float boostDV;
 
@@ -115,7 +116,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int charges = 3;
     private int chargeCooldownMax = 60;
     private int chargeCooldown = 0;
-    private int rechargeRate = 180;
+    private int rechargeRate = 300;
     private int rechargeTimer = 0;
     private int shieldDuration = -1;
     private int parryWindow = 30;
@@ -292,6 +293,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         cc=GetComponent<CharacterController>();
         _material=GetComponent<Renderer>().material;
         tr=GetComponent<TrailRenderer>();
+        standingY = transform.position.y;
 
         if (me) // set up controls
         {
@@ -352,6 +354,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             cc.Move(commandMovement.GetDPosition());
         } else {
             cc.Move(GetDPosition());
+            transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
         }
     }
 
@@ -423,7 +426,8 @@ public class Character : MonoBehaviour, ICharacterActions {
          * FINALIZE
          */
         knockBackVelocity = knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
-        return (moveVelocity + knockBackVelocity) * Time.deltaTime;
+        Vector3 finalVelocity = moveVelocity + knockBackVelocity;
+        return finalVelocity * Time.deltaTime;
     }
 
     private bool IsAboveWalkSpeed() {
@@ -455,9 +459,10 @@ public class Character : MonoBehaviour, ICharacterActions {
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.moveVelocity.magnitude<moveVelocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boostDV*Time.deltaTime; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boostDV*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                dvNormal.y = 0f;
                 moveVelocity-=dvNormal;
-                otherCharacter.moveVelocity=moveVelocity+dvNormal;
+                otherCharacter.knockBackVelocity=moveVelocity+dvNormal;
             }
         }
     }

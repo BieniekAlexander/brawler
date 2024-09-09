@@ -284,8 +284,9 @@ MonoBehaviour:
       type: 3}
     cooldown: 900
   - name: Ability4
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: -328604978404938118, guid: 3d6db9bf9addc304e81152b7b4508401,
+      type: 3}
+    cooldown: 180
   - name: Special1
     castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
       type: 3}

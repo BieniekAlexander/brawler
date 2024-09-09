@@ -65,6 +65,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CharacterController cc;
     private bool rotatingClockwise = false;
     public Vector3 moveVelocity = new();
+    private CommandMovementBase commandMovement = null;
 
     // knockback
     private Vector3 knockBackVelocity = new();
@@ -106,6 +107,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
+    private int currentCastId;
 
     /* Resources */
     private int hp = 1000;
@@ -219,36 +221,11 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    void HandleAbilities() {
-        for (int i = 0; i < castContainers.Length; i++) {
-            if (castContainers[i].activated) {
-                if (castContainers[i].castPrefab == null) {
-                    Debug.Log("No cast supplied for cast"+i);
-                    return;
-                }
-
-                if (castContainers[i].cast is not null) { // recast
-                    castContainers[i].cast.UpdateCast(getCursorWorldPosition());
-                } else if (castContainers[i].timer<=0) { // cooldown fresh
-                    if (
-                        (charges>0 || !boostedIds.Contains(i))
-                        && (energy >= 50 || !specialIds.Contains(i))
-                    ) {
-                        if (boostedIds.Contains(i)) {
-                            charges--;
-                        } else if (specialIds.Contains(i)) {
-                            energy -= 50;
-                        }
-
-                        castContainers[i].cast = Instantiate(castContainers[i].castPrefab);
-                        castContainers[i].cast.Initialize(this, rotatingClockwise);
-                        castContainers[i].timer = castContainers[i].cooldown;
-                        return;
-                    }
-                }
-            }
-        }
-
+    /// <summary>
+    /// Reduces all cooldowns, attempts to cast an ability, and returns the index of the ability if it's being actively casted
+    /// </summary>
+    /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
+    int HandleCasts() {
         // resolve cooldowns and cast expirations
         for (int i = 0; i<castContainers.Length; i++) {
             castContainers[i].timer--;
@@ -258,6 +235,49 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
 
+        currentCastId = (currentCastId>=0)?(castContainers[currentCastId].cast == null?-1:currentCastId):-1;
+
+        if (currentCastId==-1) {
+            for (int i = 0; i < castContainers.Length; i++) {
+                if (castContainers[i].activated) {
+                    if (castContainers[i].castPrefab == null) {
+                        Debug.Log("No cast supplied for cast"+i);
+                        return -1;
+                    }
+
+                    Vector3 cursorWorldPosition = getCursorWorldPosition();
+
+                    if (castContainers[i].cast is not null) { // recast
+                        castContainers[i].cast.UpdateCast(cursorWorldPosition);
+                    } else if (castContainers[i].timer<=0) { // cooldown fresh
+                        if (
+                            (charges>0 || !boostedIds.Contains(i))
+                            && (energy >= 50 || !specialIds.Contains(i))
+                        ) {
+                            if (boostedIds.Contains(i)) {
+                                charges--;
+                            } else if (specialIds.Contains(i)) {
+                                energy -= 50;
+                            }
+
+                            castContainers[i].cast = Instantiate(castContainers[i].castPrefab);
+                            castContainers[i].cast.Initialize(this, rotatingClockwise);
+                            castContainers[i].timer = castContainers[i].cooldown;
+                            
+                            if (castContainers[i].castPrefab.commandMovementPrefab != null) {
+                                commandMovement = Instantiate(castContainers[i].castPrefab.commandMovementPrefab);
+                                commandMovement.Initialize(cursorWorldPosition, transform.position);
+                                moveVelocity = (cursorWorldPosition-transform.position).normalized * moveVelocity.magnitude;
+                            } 
+
+                            return i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
     }
 
     private void Awake() {
@@ -284,6 +304,8 @@ public class Character : MonoBehaviour, ICharacterActions {
         // duration
         if (shielding)
             _material.color=Color.blue;
+        else if (currentCastId >= 0)
+            _material.color=Color.magenta;
         else if (chargeCooldown<0&&charges>0)
             _material.color=Color.green;
         else
@@ -312,10 +334,17 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     void FixedUpdate() {
+        // Handle Casts
         HandleCharges();
         HandleShield();
-        HandleTransform();
-        HandleAbilities();
+        currentCastId = HandleCasts();
+
+        // Update Position
+        if (commandMovement != null) {
+            cc.Move(commandMovement.GetDPosition());
+        } else {
+            cc.Move(GetDPosition());
+        }
     }
 
     private void HandleShield() {
@@ -344,10 +373,10 @@ public class Character : MonoBehaviour, ICharacterActions {
         moveVelocity = new Vector3(v.x, 0, v.z).normalized*boostMaxSpeed;
         knockBackVelocity.Set(0f, 0f, 0f);
     }
-    private void HandleTransform() {
+    private Vector3 GetDPosition() {
         if (hitLagTimer>0) {
             hitLagTimer--;
-            return;
+            return Vector3.zero;
         }
 
         if (boost&&charges>0&&chargeCooldown<=0) {
@@ -384,9 +413,8 @@ public class Character : MonoBehaviour, ICharacterActions {
         /*
          * FINALIZE
          */
-        knockBackVelocity=knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
-        Vector3 transformVelocity = moveVelocity+knockBackVelocity;
-        cc.Move(transformVelocity*Time.deltaTime);
+        knockBackVelocity = knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
+        return (moveVelocity + knockBackVelocity) * Time.deltaTime;
     }
 
     private bool IsAboveWalkSpeed() {
@@ -434,7 +462,9 @@ public class Character : MonoBehaviour, ICharacterActions {
              * NOTE: the cast is hitting the floor and the bullet is floating over that point
              * Maybe what I should do is add an invisible plane in the gamespace? have the raycast hit that
              */
-            return hitData.point;
+            Vector3 cursorWorldPosition = hitData.point;
+            cursorWorldPosition.y = transform.position.y;
+            return cursorWorldPosition;
         } else {
             return new Vector3(); // TODO maybe return null? I don't know how to handle this in C# yet though
         }

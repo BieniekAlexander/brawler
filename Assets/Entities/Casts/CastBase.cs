@@ -33,6 +33,7 @@ public class CastBase : MonoBehaviour {
     // Start is called before the first frame update
     [SerializeField] public HitEvent[] hitEvents;
     [SerializeField] public ProjectileEvent[] projectileEvents;
+    [SerializeField] public CommandMovementBase commandMovementPrefab;
 
     private int frame = 0;
     private bool rotatingClockwise = true;

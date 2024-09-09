@@ -51,7 +51,9 @@ MonoBehaviour:
     startFrame: 10
     range: 1.5
     positioning: 0
-    radialOffset: {x: 0, y: 0, z: 0, w: 0}
+    radialOffset: {x: 0, y: 0, z: 0, w: 1}
+  commandMovementPrefab: {fileID: 0}
+  startupTime: 30
   duration: 610
   hits: []
   projectiles: []

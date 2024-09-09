@@ -83,7 +83,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Bolt
     private int boostTimer = 0;
-    private int boostMaxDuration = 30;
+    private int boostMaxDuration = 20;
     private float boostMaxSpeed = 30f;
     private float boostSpeedBump = 2.5f;
     private float boostDV;
@@ -107,7 +107,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
-    private int currentCastId;
+    private int activeCastId = -1;
 
     /* Resources */
     private int hp = 1000;
@@ -234,10 +234,18 @@ public class Character : MonoBehaviour, ICharacterActions {
                 castContainers[i].cast = null;
             }
         }
+        // resolve cast startup
+        if (activeCastId >= 0) { // if an active cast is designated
+            if (castContainers[activeCastId].cast == null) {
+                activeCastId = -1;
+            } else if (castContainers[activeCastId].cast.Frame >= castContainers[activeCastId].cast.startupTime) { // if startup time has elapsed
+                activeCastId = -1;
+            }
+        } else {
 
-        currentCastId = (currentCastId>=0)?(castContainers[currentCastId].cast == null?-1:currentCastId):-1;
+        }
 
-        if (currentCastId==-1) {
+        if (activeCastId==-1) {
             for (int i = 0; i < castContainers.Length; i++) {
                 if (castContainers[i].activated) {
                     if (castContainers[i].castPrefab == null) {
@@ -277,7 +285,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
 
-        return -1;
+        return activeCastId;
     }
 
     private void Awake() {
@@ -304,7 +312,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         // duration
         if (shielding)
             _material.color=Color.blue;
-        else if (currentCastId >= 0)
+        else if (activeCastId >= 0)
             _material.color=Color.magenta;
         else if (chargeCooldown<0&&charges>0)
             _material.color=Color.green;
@@ -337,7 +345,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         // Handle Casts
         HandleCharges();
         HandleShield();
-        currentCastId = HandleCasts();
+        activeCastId = HandleCasts();
 
         // Update Position
         if (commandMovement != null) {
@@ -384,15 +392,16 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         bool aboveWalkSpeed = IsAboveWalkSpeed();
+        Vector3 changeInDirection = (activeCastId>=0)?Vector3.zero:movementDirection;
         // TODO:
         // - casting?
         // - shielding?
 
         if (!aboveWalkSpeed) { // walking
-            if (movementDirection==Vector3.zero && !running) {
+            if (changeInDirection==Vector3.zero && !running) {
                 moveVelocity += (-moveVelocity.normalized) * Mathf.Min(walkAcceleration*4*Time.deltaTime, moveVelocity.magnitude);
-            } else if (movementDirection!=Vector3.zero) {
-                moveVelocity += movementDirection.normalized * walkAcceleration*Time.deltaTime;
+            } else if (changeInDirection!=Vector3.zero) {
+                moveVelocity += changeInDirection.normalized * walkAcceleration*Time.deltaTime;
                 
                 if (moveVelocity.magnitude > walkSpeedMax) {
                     moveVelocity = moveVelocity.normalized* walkSpeedMax;
@@ -404,7 +413,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else { // running
             moveVelocity=Vector3.RotateTowards(
                 Mathf.Max(moveVelocity.magnitude-(running ? 0 : (runDeceleration*Time.deltaTime)), 0)*moveVelocity.normalized, // update velocity
-                movementDirection!=Vector3.zero ? movementDirection : moveVelocity, // update direction if it was supplied
+                changeInDirection!=Vector3.zero ? changeInDirection : moveVelocity, // update direction if it was supplied
                 runRotationalSpeed*Time.deltaTime/(running ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
                 0 // don't change specified speed
             );

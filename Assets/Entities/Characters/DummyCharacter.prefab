@@ -247,7 +247,7 @@ MonoBehaviour:
   - name: Attack2
     castPrefab: {fileID: 5634063031192742342, guid: 272d6e6311b0ade41bea50a21c5f39d7,
       type: 3}
-    cooldown: 30
+    cooldown: 60
   - name: Attack3
     castPrefab: {fileID: 5634063031192742342, guid: a894861c04cb65d4592baf061c4755c2,
       type: 3}

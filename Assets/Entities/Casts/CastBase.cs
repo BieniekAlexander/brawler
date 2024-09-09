@@ -36,8 +36,12 @@ public class CastBase : MonoBehaviour {
     [SerializeField] public CommandMovementBase commandMovementPrefab;
 
     private int frame = 0;
+    public int Frame { get { return frame; } }
+
     private bool rotatingClockwise = true;
+    [SerializeField] public int startupTime = 0;
     [SerializeField] public int duration;
+
 
     private Character caster;
     public List<Hit> hits;
@@ -46,6 +50,7 @@ public class CastBase : MonoBehaviour {
     public void Initialize(Character _caster, bool _rotatingClockwise) {
         caster =_caster;
         rotatingClockwise = _rotatingClockwise;
+        
         foreach (HitEvent hitEvent in hitEvents) {
             Assert.IsNotNull(hitEvent.hit);
         }
@@ -63,6 +68,7 @@ public class CastBase : MonoBehaviour {
         foreach (ProjectileEvent projectileEvent in projectileEvents) {
             if (projectileEvent.startFrame==frame) {
                 Vector3 projectilePosition;
+
                 if (projectileEvent.positioning==Positioning.Directional) {
                     projectilePosition = caster.transform.position+(caster.transform.rotation*projectileEvent.radialOffset)*Vector3.forward*projectileEvent.range;
                 } else {
@@ -85,6 +91,6 @@ public class CastBase : MonoBehaviour {
     }
 
     public virtual void UpdateCast(Vector3 worldPosition) {
-
+        ;
     }
 }

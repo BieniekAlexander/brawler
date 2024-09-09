@@ -8,7 +8,6 @@ public class CommandMovementBase : MonoBehaviour {
     [SerializeField] public float range;
 
     public virtual void Initialize(Vector3 _destination, Vector3 initialPosition) {
-        Debug.Log("woah");
         path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);
     }
 

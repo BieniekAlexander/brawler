@@ -261,8 +261,9 @@ MonoBehaviour:
       type: 3}
     cooldown: 60
   - name: BoostedAttack3
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: 5634063031192742342, guid: 0a3bdfc065a4e1a4cbd5f6cff3e8d368,
+      type: 3}
+    cooldown: 60
   - name: Throw1
     castPrefab: {fileID: 0}
     cooldown: -1

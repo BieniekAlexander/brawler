@@ -2,17 +2,19 @@ using UnityEngine;
 
 public class CommandMovementJump : CommandMovementBase
 {
-    [SerializeField] private float gravity;
+    private float gravity = .5f;
 
-    private void Awake() {
-        
+    public override void Initialize(Vector3 _destination, Vector3 initialPosition) {
+        base.Initialize(_destination, initialPosition);
+        velocity = path*Time.fixedDeltaTime*(60f/duration);
+        velocity.y = gravity*(duration-2)*Time.fixedDeltaTime/2;
+        Debug.Log(velocity);
+        // TODO stupid hack where I decreasted the duration in the calculation to make sure the final position is lower than the initial position
+        // fix this caculation, and otherwise make sure that they return to initial y position
     }
 
-    public override Vector3 GetDPosition() {
-        /*
-        velocity -= new Vector3(0f, gravity*Time.deltaTime, 0f);
-        return velocity*Time.deltaTime;
-        */
-        return Vector3.left;
+    public override void FixedUpdate() {
+        base.FixedUpdate();
+        velocity.y -= gravity * Time.deltaTime;
     }
 }

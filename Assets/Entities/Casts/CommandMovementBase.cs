@@ -4,10 +4,11 @@ public class CommandMovementBase : MonoBehaviour {
     public Vector3 path;
     public Vector3 velocity;
     public int frame = 0;
-    public int duration;
+    [SerializeField] public int duration;
     [SerializeField] public float range;
 
     public virtual void Initialize(Vector3 _destination, Vector3 initialPosition) {
+        Debug.Log("woah");
         path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);
     }
 

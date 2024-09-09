@@ -7,7 +7,5 @@ public class CommandMovementDash: CommandMovementBase {
         base.Initialize(_destination, initialPosition);
         velocity = path.normalized*speed*Time.deltaTime;
         duration = Mathf.FloorToInt((path.magnitude/speed)/Time.fixedDeltaTime);
-        Debug.Log(velocity);
-        Debug.Log(duration);
     }
 }

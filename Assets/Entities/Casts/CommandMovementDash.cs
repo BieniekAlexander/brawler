@@ -1,18 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CommandMovement : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+public class CommandMovementDash: CommandMovementBase {
+    [SerializeField] public float speed;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public override void Initialize(Vector3 _destination, Vector3 initialPosition) {
+        base.Initialize(_destination, initialPosition);
+        velocity = path.normalized*speed*Time.deltaTime;
+        duration = Mathf.FloorToInt((path.magnitude/speed)/Time.fixedDeltaTime);
+        Debug.Log(velocity);
+        Debug.Log(duration);
     }
 }

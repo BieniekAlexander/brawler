@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitEvents: []
   projectileEvents: []
-  commandMovementPrefab: {fileID: 8242124769542815833, guid: b8e43f27a6c6c1844bc4ee1bb95c148b,
+  commandMovementPrefab: {fileID: -6070660620648995026, guid: b8e43f27a6c6c1844bc4ee1bb95c148b,
     type: 3}
   duration: 0
   hits: []

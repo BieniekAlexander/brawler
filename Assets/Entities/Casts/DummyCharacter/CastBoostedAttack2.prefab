@@ -49,33 +49,35 @@ MonoBehaviour:
   - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
       type: 3}
     startFrame: 0
-    range: 1.5
+    range: 0.7
     positioning: 0
     radialOffset: {x: 0, y: -0.17364818, z: 0, w: 0.9848077}
   - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
       type: 3}
     startFrame: 0
-    range: 1.5
+    range: 0.7
     positioning: 0
     radialOffset: {x: 0, y: 0.08715588, z: 0, w: -0.99619466}
   - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
       type: 3}
     startFrame: 0
-    range: 1.5
+    range: 0.7
     positioning: 0
     radialOffset: {x: 0, y: 0, z: 0, w: 1}
   - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
       type: 3}
     startFrame: 0
-    range: 1.5
+    range: 0.7
     positioning: 0
     radialOffset: {x: 0, y: 0.08715574, z: 0, w: 0.9961947}
   - projectile: {fileID: -7326832939788124787, guid: 38548b188e6d02946b744967e8ac5951,
       type: 3}
     startFrame: 0
-    range: 1.5
+    range: 0.7
     positioning: 0
     radialOffset: {x: 0, y: 0.17364818, z: 0, w: 0.9848077}
+  commandMovementPrefab: {fileID: 0}
+  startupTime: 0
   duration: 40
   hits: []
   projectiles: []

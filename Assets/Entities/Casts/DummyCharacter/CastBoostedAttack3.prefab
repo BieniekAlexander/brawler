@@ -50,7 +50,7 @@ MonoBehaviour:
   projectileEvents: []
   commandMovementPrefab: {fileID: -2805268986922234853, guid: 9aa0cef161c48dd4d863fb36afc2ea32,
     type: 3}
-  startupTime: 0
+  startupTime: 40
   duration: 40
   hits: []
   projectiles: []

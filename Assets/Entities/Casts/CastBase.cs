@@ -43,7 +43,8 @@ public class CastBase : MonoBehaviour {
     [SerializeField] public int duration;
 
 
-    private Character caster;
+    public Character caster;
+    public Character Caster { get { return caster; }}
     public List<Hit> hits;
     public List<Projectile> projectiles;
 

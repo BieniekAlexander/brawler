@@ -110,6 +110,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
+    public CastContainer[] CastContainers { get { return castContainers; } }
     public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     private int activeCastId = -1;
@@ -276,6 +277,8 @@ public class Character : MonoBehaviour, ICharacterActions {
                                 charges--;
                             } else if (specialIds.Contains(i)) {
                                 energy -= 50;
+                            } else if (i == (int)CastId.Ultimate) {
+                                energy -= 100;
                             }
 
                             castContainers[i].cast = Instantiate(castContainers[i].castPrefab);

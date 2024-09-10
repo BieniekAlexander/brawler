@@ -299,7 +299,7 @@ MonoBehaviour:
   - name: Ability4
     castPrefab: {fileID: -328604978404938118, guid: 3d6db9bf9addc304e81152b7b4508401,
       type: 3}
-    cooldown: 180
+    cooldown: 300
     defaultChargeCount: 1
   - name: Special1
     castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
@@ -311,6 +311,7 @@ MonoBehaviour:
     cooldown: -1
     defaultChargeCount: 1
   - name: Ultimate
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: -6026143148467057615, guid: c5d199e5a8378c54aa851ddb0368ec7e,
+      type: 3}
+    cooldown: 300
     defaultChargeCount: 1

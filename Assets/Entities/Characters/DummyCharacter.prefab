@@ -244,57 +244,73 @@ MonoBehaviour:
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: Attack2
     castPrefab: {fileID: 5634063031192742342, guid: 272d6e6311b0ade41bea50a21c5f39d7,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: Attack3
     castPrefab: {fileID: 5634063031192742342, guid: a894861c04cb65d4592baf061c4755c2,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: BoostedAttack1
     castPrefab: {fileID: 5634063031192742342, guid: 723f2a6ea9a0aad4781f50fb690ec170,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: BoostedAttack2
     castPrefab: {fileID: 5634063031192742342, guid: 41097bacf106c6e4c85bd1c88867de2b,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: BoostedAttack3
     castPrefab: {fileID: 5634063031192742342, guid: 0a3bdfc065a4e1a4cbd5f6cff3e8d368,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
   - name: Throw1
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1
   - name: Throw2
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1
   - name: BoostedThrow
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1
   - name: Ability1
     castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
       type: 3}
     cooldown: 600
+    defaultChargeCount: 1
   - name: Ability2
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1
   - name: Ability3
-    castPrefab: {fileID: 4816246695473929763, guid: 57724b4e35580ab4f8526e68169ffc33,
+    castPrefab: {fileID: 6001912378579413820, guid: 57724b4e35580ab4f8526e68169ffc33,
       type: 3}
-    cooldown: 900
+    cooldown: 180
+    defaultChargeCount: 1
   - name: Ability4
     castPrefab: {fileID: -328604978404938118, guid: 3d6db9bf9addc304e81152b7b4508401,
       type: 3}
     cooldown: 180
+    defaultChargeCount: 1
   - name: Special1
     castPrefab: {fileID: 4816246695473929763, guid: 3172db4826907e146822f90ef9c47ba1,
       type: 3}
     cooldown: 600
+    defaultChargeCount: 1
   - name: Special2
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1
   - name: Ultimate
     castPrefab: {fileID: 0}
     cooldown: -1
+    defaultChargeCount: 1

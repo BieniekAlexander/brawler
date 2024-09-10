@@ -15,11 +15,13 @@ public class CastSlot {
         name = _name;
         castPrefab = null;
         cooldown = -1;
+        defaultChargeCount = 1;
     }
 
     public string name;
     public CastBase castPrefab;
     public int cooldown;
+    public int defaultChargeCount; 
 }
 
 public struct CastContainer {
@@ -29,6 +31,7 @@ public struct CastContainer {
         cooldown = _castSlot.cooldown;
         timer = 0;
         activated = false;
+        charges = _castSlot.defaultChargeCount;
     }
 
     public CastBase castPrefab;
@@ -36,6 +39,7 @@ public struct CastContainer {
     public int cooldown;
     public int timer;
     public bool activated;
+    public int charges;
 }
 
 public enum CastId {
@@ -229,7 +233,12 @@ public class Character : MonoBehaviour, ICharacterActions {
     int HandleCasts() {
         // resolve cooldowns and cast expirations
         for (int i = 0; i<castContainers.Length; i++) {
-            castContainers[i].timer--;
+            if (castContainers[i].charges < castSlots[i].defaultChargeCount) {
+                if (--castContainers[i].timer<=0) {
+                    castContainers[i].charges++;
+                    castContainers[i].timer = castSlots[i].cooldown;
+                }
+            }
 
             if (castContainers[i].cast == null) {
                 castContainers[i].cast = null;
@@ -258,7 +267,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
                     if (castContainers[i].cast is not null) { // recast
                         castContainers[i].cast.UpdateCast(cursorWorldPosition);
-                    } else if (castContainers[i].timer<=0) { // cooldown fresh
+                    } else if (castContainers[i].charges>0) { // cooldown fresh
                         if (
                             (charges>0 || !boostedIds.Contains(i))
                             && (energy >= 50 || !specialIds.Contains(i))
@@ -271,6 +280,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
                             castContainers[i].cast = Instantiate(castContainers[i].castPrefab);
                             castContainers[i].cast.Initialize(this, rotatingClockwise);
+                            castContainers[i].charges--;
                             castContainers[i].timer = castContainers[i].cooldown;
                             
                             if (castContainers[i].castPrefab.commandMovementPrefab != null) {

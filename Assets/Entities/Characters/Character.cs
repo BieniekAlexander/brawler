@@ -116,7 +116,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int activeCastId = -1;
 
     /* Resources */
-    private int hp = 1000;
+    private int hp = 1000; public int HP { get { return hp; } }
     private int maxCharges = 3;
     private int charges = 3;
     private int chargeCooldownMax = 60;

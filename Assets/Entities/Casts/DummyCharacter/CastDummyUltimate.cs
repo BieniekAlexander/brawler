@@ -5,8 +5,6 @@ using UnityEngine;
 public class CastDummyUltimate : CastBase
 {
     private void Start() {
-        Debug.Log(Caster);
-        Debug.Log(Caster.CastContainers);
         Caster.CastContainers[(int)CastId.Ability4].charges = 5;
     }
     override public void UpdateCast(Vector3 worldPosition) {

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Interface/HPBar.uss?fileID=7433441132597879392&amp;guid=231fa7d0dbee64a4487feac59a9b6755&amp;type=3#HPBar" />
+    <ui:VisualElement name="Container" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:ProgressBar value="1000" name="HPBar" high-value="1000" focusable="false" style="-unity-background-image-tint-color: rgb(48, 72, 217); background-color: rgb(183, 0, 67); -unity-background-scale-mode: stretch-to-fill; -unity-slice-scale: 100px; width: 40px; height: 2px;" />
+    </ui:VisualElement>
+</ui:UXML>

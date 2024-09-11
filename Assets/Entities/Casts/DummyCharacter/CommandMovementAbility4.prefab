@@ -44,9 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ced22230589ddd439f9089b85ffe5cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  duration: 0
+  range: 10
+  statusEffectPrefabs:
+  - {fileID: -8206380172614511167, guid: 3ae41647f5d1df741be0e0ed56e69266, type: 3}
   path: {x: 0, y: 0, z: 0}
   velocity: {x: 0, y: 0, z: 0}
   frame: 0
-  duration: 0
-  range: 10
+  effects: []
   speed: 40

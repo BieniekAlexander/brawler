@@ -9,10 +9,10 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Terrain
+  - Characters
   - Water
   - UI
-  - Characters
+  - Immaterial
   - Projectiles
   - HitBoxes
   - Casts

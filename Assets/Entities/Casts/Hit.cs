@@ -26,6 +26,7 @@ public class Hit : MonoBehaviour {
     /* Collision */
     private Collider hitBox;
     public HashSet<Character> collisionIds = new();
+    public List<StatusEffectBase> effects = new();
 
     /* Duration */
     [SerializeField] public int duration;
@@ -127,12 +128,17 @@ public class Hit : MonoBehaviour {
                 collisionIds.Add(cb);
                 Vector3 kb = GetKnockBackVector(cb.transform.position);
                 cb.TakeDamage(damage, kb, hitStunDuration, hitTier);
+
+                for (int i = 0; i < effects.Count; i++) {
+                    StatusEffectBase effect = Instantiate(effects[i]);
+                    effect.Initialize(cb);
+                }
             }
         }
     }
 
     private void OnDestroy() {
-        if (origin.GetComponent<Character>() is null) {
+        if (origin.GetComponent<Character>() == null) {
             Destroy(origin.gameObject);
         }
     }

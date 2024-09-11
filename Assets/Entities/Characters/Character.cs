@@ -6,8 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static CharacterControls;
-
-
+using System.Collections.Generic;
 
 [Serializable]
 public class CastSlot {
@@ -128,6 +127,10 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int energy = 100;
     private int maxEnergy = 100;
 
+    /* Status Effects */
+    private List<StatusEffectBase> statusEffects = new();
+    private bool invincible = false;
+
     /*
      * CONTROLS
      */
@@ -209,7 +212,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     void HandleControls() {
         if (me) {
             // aiming TODO move to input manager
-            Vector3 cursorWorldPosition = getCursorWorldPosition();
+            Vector3 cursorWorldPosition = GetCursorWorldPosition();
             var playerPosition = cc.transform.position;
             var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
@@ -264,7 +267,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                         return -1;
                     }
 
-                    Vector3 cursorWorldPosition = getCursorWorldPosition();
+                    Vector3 cursorWorldPosition = GetCursorWorldPosition();
 
                     if (castContainers[i].cast is not null) { // recast
                         castContainers[i].cast.UpdateCast(cursorWorldPosition);
@@ -285,13 +288,6 @@ public class Character : MonoBehaviour, ICharacterActions {
                             castContainers[i].cast.Initialize(this, rotatingClockwise);
                             castContainers[i].charges--;
                             castContainers[i].timer = castContainers[i].cooldown;
-                            
-                            if (castContainers[i].castPrefab.commandMovementPrefab != null) {
-                                commandMovement = Instantiate(castContainers[i].castPrefab.commandMovementPrefab);
-                                commandMovement.Initialize(cursorWorldPosition, transform.position);
-                                moveVelocity = (cursorWorldPosition-transform.position).normalized * moveVelocity.magnitude;
-                            } 
-
                             return i;
                         }
                     }
@@ -369,6 +365,13 @@ public class Character : MonoBehaviour, ICharacterActions {
             cc.Move(GetDPosition());
             transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
         }
+
+        // apply statusEffects
+        for (int i = 0; i < statusEffects.Count; i++) {
+            statusEffects[i].Tick();
+        }
+
+        statusEffects.RemoveAll((StatusEffectBase effect) => { return (effect == null); });
     }
 
     private void HandleShield() {
@@ -393,10 +396,16 @@ public class Character : MonoBehaviour, ICharacterActions {
         boostTimer = boostMaxDuration;
         runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax)+boostSpeedBump, boostMaxSpeed);
         boostDV = (boostMaxSpeed-runSpeed)/boostMaxDuration;
-        Vector3 v = (getCursorWorldPosition()-cc.transform.position);
+        Vector3 v = (GetCursorWorldPosition()-cc.transform.position);
         moveVelocity = new Vector3(v.x, 0, v.z).normalized*boostMaxSpeed;
         knockBackVelocity.Set(0f, 0f, 0f);
     }
+
+    public void SetCommandMovement(CommandMovementBase _commandMovement) {
+        commandMovement = _commandMovement;
+        moveVelocity = commandMovement.velocity.normalized * moveVelocity.magnitude; // TODO maybe not the best spot to do this
+    }
+
     private Vector3 GetDPosition() {
         if (hitLagTimer>0) {
             hitLagTimer--;
@@ -449,8 +458,9 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
+        Debug.Log("bump");
 
-        if (collisionObject.layer==LayerMask.NameToLayer("Terrain")) {
+        if (collisionObject.layer==LayerMask.NameToLayer("Default")) {
             if (running) { // if you hit a 
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
@@ -469,6 +479,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                 knockBackVelocity=Vector3.zero;
             }
         } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
+
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.moveVelocity.magnitude<moveVelocity.magnitude) {
@@ -480,7 +491,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    public Vector3 getCursorWorldPosition() {
+    public Vector3 GetCursorWorldPosition() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hitData;
 
@@ -507,6 +518,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         // - evaluate knockback diff
         // - evaluate damage according to whether I'm shielding and such
         // - evaluate changes according to hit level
+        if (invincible) return;
 
         if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
             damageTier++;

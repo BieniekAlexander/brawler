@@ -21,8 +21,9 @@ public class HealthBarUI : MonoBehaviour {
     }
 
     public void SetPosition() {
+        Vector3 offset = new(0, 1, 2);
         Vector2 newPosition = RuntimePanelUtils.CameraTransformWorldToPanel(
-            m_progressBar.panel, TransformToFollow.position, m_MainCamera);
+            m_progressBar.panel, TransformToFollow.position+offset, m_MainCamera);
 
         m_progressBar.transform.position = new Vector3(newPosition.x -m_progressBar.layout.width / 2, newPosition.y, 0);
     }

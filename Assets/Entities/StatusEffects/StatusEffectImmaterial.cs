@@ -12,6 +12,8 @@ public class StatusEffectImmaterial: StatusEffectBase {
     public override void Tick() {;}
 
     public override void Expire() {
-        target.gameObject.layer = LayerMask.NameToLayer("Characters");
+        if (target != null){
+            target.gameObject.layer = LayerMask.NameToLayer("Characters");
+        }
     }
 }

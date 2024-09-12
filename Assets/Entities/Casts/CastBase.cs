@@ -37,7 +37,7 @@ public interface ICastMessage : IEventSystemHandler {
 /// </summary>
 public class CastBase : MonoBehaviour, ICastMessage {
     // Start is called before the first frame update
-    [SerializeField] HitEvent[] hitEvents;
+    [SerializeField] public HitEvent[] hitEvents;
     [SerializeField] ProjectileEvent[] projectileEvents;
     [SerializeField] List<StatusEffectBase> statusEffectPefabs;
     [SerializeField] public CommandMovementBase commandMovementPrefab;
@@ -119,13 +119,11 @@ public class CastBase : MonoBehaviour, ICastMessage {
 
     public void FinishCast() {
         for (int i = 0; i < hits.Count; i++) {
-            Destroy(hits[i].gameObject);
+            hits[i].duration = 0;
         }
 
         for (int i = 0; i < statusEffects.Count; i++) {
-            Destroy(statusEffects[i].gameObject);
+            statusEffects[i].duration = 0;
         }
-
-        Destroy(gameObject);
     }
 }

@@ -48,12 +48,15 @@ MonoBehaviour:
   projectileEvents:
   - projectile: {fileID: -6148597624710322689, guid: d01c1a282085eb243865e5c7a7fc0ac5,
       type: 3}
-    startFrame: 30
+    startFrame: 29
     range: 30
     positioning: 1
     radialOffset: {x: 0, y: 0, z: 0, w: 0}
+  statusEffectPefabs: []
   commandMovementPrefab: {fileID: 0}
   startupTime: 30
   duration: 30
+  caster: {fileID: 0}
   hits: []
   projectiles: []
+  statusEffects: []

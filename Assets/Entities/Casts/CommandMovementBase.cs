@@ -5,7 +5,6 @@ using UnityEngine;
 public abstract class CommandMovementBase : MonoBehaviour {
     [SerializeField] public int duration;
     [SerializeField] public float range;
-    [SerializeField] public List<StatusEffectBase> statusEffectPrefabs;
 
     public Vector3 path;
     public Vector3 velocity;
@@ -15,12 +14,6 @@ public abstract class CommandMovementBase : MonoBehaviour {
 
     public virtual void Initialize(Character mover,  Vector3 _destination, Vector3 initialPosition) {
         path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);
-
-        for (int i = 0; i < statusEffectPrefabs.Count; i++) {
-            StatusEffectBase effect = Instantiate(statusEffectPrefabs[i]);
-            effect.Initialize(mover);
-            effects.Add(effect);
-        }
     }
 
     public virtual Vector3 GetDPosition() {

@@ -26,7 +26,7 @@ public class Hit : MonoBehaviour {
     /* Collision */
     private Collider hitBox;
     public HashSet<Character> collisionIds = new();
-    public List<StatusEffectBase> effects = new();
+    [SerializeField] public List<StatusEffectBase> effects = new();
 
     /* Duration */
     [SerializeField] public int duration;
@@ -130,6 +130,9 @@ public class Hit : MonoBehaviour {
                 cb.TakeDamage(damage, kb, hitStunDuration, hitTier);
 
                 for (int i = 0; i < effects.Count; i++) {
+                    // TODO what if I don't want the status effect to stack?
+                    // maybe check if an effect of the same type is active, and if so, do some sort of resolution
+                    // e.g. if two slows are applied, refresh slow
                     StatusEffectBase effect = Instantiate(effects[i]);
                     effect.Initialize(cb);
                 }

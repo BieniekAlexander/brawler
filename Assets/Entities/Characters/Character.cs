@@ -78,7 +78,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Walking
     private float walkAcceleration = 50f;
-    private float walkSpeedMax = 10f;
+    public float walkSpeedMax = 10f;
 
     // Running
     private float runSpeed = 0f;
@@ -275,6 +275,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                         if (
                             (charges>0 || !boostedIds.Contains(i))
                             && (energy >= 50 || !specialIds.Contains(i))
+                            && (energy >= 100 || i!=(int)CastId.Ultimate)
                         ) {
                             if (boostedIds.Contains(i)) {
                                 charges--;
@@ -458,7 +459,6 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
-        Debug.Log("bump");
 
         if (collisionObject.layer==LayerMask.NameToLayer("Default")) {
             if (running) { // if you hit a 
@@ -523,16 +523,12 @@ public class Character : MonoBehaviour, ICharacterActions {
         if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
             damageTier++;
 
-        if (hp<=0) {
-            Destroy(gameObject);
-        } else {
-            if (shielding&&damageTier<=2) {
-                damage=0;
-            } else { // not shielding
-                if (knockbackVector!=Vector3.zero) {
-                    hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
-                    knockBackVelocity=knockbackVector;
-                }
+        if (shielding&&damageTier<=2) {
+            damage=0;
+        } else { // not shielding
+            if (knockbackVector!=Vector3.zero) {
+                hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
+                knockBackVelocity=knockbackVector;
             }
         }
 
@@ -542,6 +538,10 @@ public class Character : MonoBehaviour, ICharacterActions {
 
 
         hp-=damage;
+        
+        if (hp<=0) {
+            Destroy(gameObject);
+        }
     }
 
     void OnGUI() {

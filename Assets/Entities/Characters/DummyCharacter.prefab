@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 4584570722456235046}
   - component: {fileID: 8359697329656048070}
   - component: {fileID: 4559761375588025615}
+  - component: {fileID: 5413040667262462244}
+  - component: {fileID: -4819305413993335677}
   m_Layer: 3
   m_Name: DummyCharacter
   m_TagString: Character
@@ -322,3 +324,33 @@ MonoBehaviour:
       type: 3}
     cooldown: 300
     defaultChargeCount: 1
+--- !u!114 &5413040667262462244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967517793056741292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d588db6ee04e2bf4aae41dab556bc1f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransformToFollow: {fileID: 3714925749414027555}
+--- !u!114 &-4819305413993335677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967517793056741292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 775c0743245eef644bed7bef72499fd0, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 75f2d8cb5cba33c4cb012cb6b9e4e926,
+    type: 3}
+  m_SortingOrder: 0

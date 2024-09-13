@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -29,7 +28,6 @@ public struct CastContainer {
         cast = null;
         cooldown = _castSlot.cooldown;
         timer = 0;
-        activated = false;
         charges = _castSlot.defaultChargeCount;
     }
 
@@ -37,7 +35,6 @@ public struct CastContainer {
     public CastBase cast;
     public int cooldown;
     public int timer;
-    public bool activated;
     public int charges;
 }
 
@@ -66,14 +63,16 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Movement */
     private CharacterController cc;
-    private bool rotatingClockwise = false;
-    public Vector3 moveVelocity = new();
-    private CommandMovementBase commandMovement = null;
+    public Shield Shield { get; private set; }
+    public bool RotatingClockwise { get; private set; } = false;
+    public Vector3 MoveVelocity { get; private set; } = new();
+    public CommandMovementBase CommandMovement { get; private set; } = null;
+    public bool Stunned { get; set; } = false;
     private float standingY;
 
     // knockback
-    private Vector3 knockBackVelocity = new();
-    private float knockBackDecceleration = 25f;
+    public Vector3 KnockBackVelocity { get; private set; } = new();
+    public float KnockBackDecceleration { get; private set; } = 25f;
     private int hitLagTimer = 0;
 
     // Walking
@@ -94,7 +93,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Visuals */
     // Bolt Visualization
-    private Material _material;
+    public Material Material {  get; private set; }
     TrailRenderer tr;
 
     /* Controls */
@@ -108,11 +107,11 @@ public class Character : MonoBehaviour, ICharacterActions {
     /* Abilities */
 
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
-    private CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
-    public CastContainer[] CastContainers { get { return castContainers; } }
+    public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     private int activeCastId = -1;
+    private int inputCastId = -1;
 
     /* Resources */
     private int hp = 1000; public int HP { get { return hp; } }
@@ -149,27 +148,35 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // attacks
     public void OnAttack1(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Attack1].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Attack1;
     }
     public void OnAttack2(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Attack2].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Attack2;
     }
     public void OnAttack3(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Attack3].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Attack3;
     }
     public void OnBoostedAttack1(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.BoostedAttack1].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.BoostedAttack1;
     }
     public void OnBoostedAttack2(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.BoostedAttack2].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.BoostedAttack2;
     }
     public void OnBoostedAttack3(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.BoostedAttack3].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.BoostedAttack3;
     }
 
     // shields
     public void OnShield(InputAction.CallbackContext context) {
-        shielding=context.ReadValueAsButton();
+        if (me) {
+            Shield.gameObject.SetActive(context.ReadValueAsButton());
+        }
     }
     public void OnBoostedShield(InputAction.CallbackContext context) {
         var boostedShielding = context.ReadValueAsButton();
@@ -177,36 +184,46 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Throw1].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Throw1;
     }
     public void OnThrow2(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Throw2].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Throw2;
     }
     public void OnBoostedThrow(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.BoostedThrow].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.BoostedThrow;
     }
 
     // abilities
     public void OnAbility1(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Ability1].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Ability1;
     }
     public void OnAbility2(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Ability2].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Ability2;
     }
     public void OnAbility3(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Ability3].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Ability3;
     }
     public void OnAbility4(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Ability4].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Ability4;
     }
     public void OnSpecial1(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Special1].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Special1;
     }
     public void OnSpecial2(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Special2].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Special2;
     }
     public void OnUltimate(InputAction.CallbackContext context) {
-        castContainers[(int)CastId.Ultimate].activated=context.ReadValueAsButton();
+        if (context.ReadValueAsButton())
+            inputCastId = (int)CastId.Ultimate;
     }
 
     void HandleControls() {
@@ -219,7 +236,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             float yRotationDiff = newRotation.y - transform.rotation.y;
 
             if (yRotationDiff != 0) {
-                rotatingClockwise = (yRotationDiff>0);
+                RotatingClockwise = (yRotationDiff>0);
                 // TODO somewhere in Q3, the yRotation goes from positive to negative, and I don't know why,
                 // but it's producing an issue where for about 10% of the circle, rotation direction is incorrect
                 // Debug.Log("old"+transform.rotation.y+" new "+newRotation.y);
@@ -230,11 +247,54 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
+    private int StartCast(int castId) {
+        ref CastContainer castContainer = ref castContainers[castId];
+
+        if (castContainer.cast is not null) {
+            // we're updating another cast - allowed
+            Vector3 cursorWorldPosition = GetCursorWorldPosition();
+            castContainer.cast.UpdateCast(cursorWorldPosition);
+            return activeCastId;
+        } else if (activeCastId==-1) {
+            // nothing is being casted, so start this new one
+            if (castContainer.castPrefab == null) {
+                Debug.Log("No cast supplied for cast"+(int) castId);
+                return -1;
+            }
+            if (
+                castContainer.charges>0
+                && (charges>0 || !boostedIds.Contains(castId))
+                && (energy >= 50 || !specialIds.Contains(castId))
+                && (energy >= 100 || castId!=(int)CastId.Ultimate)
+            ) {
+                if (boostedIds.Contains(castId)) {
+                    charges--;
+                } else if (specialIds.Contains(castId)) {
+                    energy -= 50;
+                } else if (castId == (int)CastId.Ultimate) {
+                    energy -= 100;
+                }
+
+                castContainer.cast = Instantiate(castContainer.castPrefab);
+                castContainer.cast.Initialize(this, RotatingClockwise);
+                castContainer.charges--;
+                castContainer.timer = castContainer.cooldown;
+                return castId;
+            } else {
+                return -1;
+            }
+        } else {
+            // there's something being actively casted - return that
+            return activeCastId;
+            
+        }
+    }
+
     /// <summary>
-    /// Reduces all cooldowns, attempts to cast an ability, and returns the index of the ability if it's being actively casted
+    /// Reduces all cooldowns and evalutes cast completions
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
-    int HandleCasts() {
+    void TickCasts() {
         // resolve cooldowns and cast expirations
         for (int i = 0; i<castContainers.Length; i++) {
             if (castContainers[i].charges < castSlots[i].defaultChargeCount) {
@@ -249,60 +309,23 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
         // resolve cast startup
-        if (activeCastId >= 0) { // if an active cast is designated
-            if (castContainers[activeCastId].cast == null) {
+        int j = (int)activeCastId;
+        if (j >= 0) { // if an active cast is designated
+            if (castContainers[j].cast == null) {
                 activeCastId = -1;
-            } else if (castContainers[activeCastId].cast.Frame >= castContainers[activeCastId].cast.startupTime) { // if startup time has elapsed
+            } else if (castContainers[j].cast.Frame >= castContainers[j].cast.startupTime) { // if startup time has elapsed
                 activeCastId = -1;
             }
-        } else {
-
         }
-
-        if (activeCastId==-1) {
-            for (int i = 0; i < castContainers.Length; i++) {
-                if (castContainers[i].activated) {
-                    if (castContainers[i].castPrefab == null) {
-                        Debug.Log("No cast supplied for cast"+i);
-                        return -1;
-                    }
-
-                    Vector3 cursorWorldPosition = GetCursorWorldPosition();
-
-                    if (castContainers[i].cast is not null) { // recast
-                        castContainers[i].cast.UpdateCast(cursorWorldPosition);
-                    } else if (castContainers[i].charges>0) { // cooldown fresh
-                        if (
-                            (charges>0 || !boostedIds.Contains(i))
-                            && (energy >= 50 || !specialIds.Contains(i))
-                            && (energy >= 100 || i!=(int)CastId.Ultimate)
-                        ) {
-                            if (boostedIds.Contains(i)) {
-                                charges--;
-                            } else if (specialIds.Contains(i)) {
-                                energy -= 50;
-                            } else if (i == (int)CastId.Ultimate) {
-                                energy -= 100;
-                            }
-
-                            castContainers[i].cast = Instantiate(castContainers[i].castPrefab);
-                            castContainers[i].cast.Initialize(this, rotatingClockwise);
-                            castContainers[i].charges--;
-                            castContainers[i].timer = castContainers[i].cooldown;
-                            return i;
-                        }
-                    }
-                }
-            }
-        }
-
-        return activeCastId;
     }
 
     private void Awake() {
         cc=GetComponent<CharacterController>();
-        _material=GetComponent<Renderer>().material;
+        Shield = GetComponentInChildren<Shield>();
+        Shield.gameObject.SetActive(false);
+        Material=GetComponent<Renderer>().material;
         tr=GetComponent<TrailRenderer>();
+        
         standingY = transform.position.y;
 
         if (me) // set up controls
@@ -323,18 +346,18 @@ public class Character : MonoBehaviour, ICharacterActions {
          */
         // duration
         if (shielding)
-            _material.color=Color.blue;
+            Material.color=Color.blue;
         else if (activeCastId >= 0)
-            _material.color=Color.magenta;
+            Material.color=Color.magenta;
         else if (chargeCooldown<0&&charges>0)
-            _material.color=Color.green;
+            Material.color=Color.green;
         else
-            _material.color=Color.gray;
+            Material.color=Color.gray;
 
         /*
          * Trail Renderer
          */
-        tr.emitting=(moveVelocity.magnitude>boostMaxSpeed/2);
+        tr.emitting=(MoveVelocity.magnitude>boostMaxSpeed/2);
     }
 
     private void Update() {
@@ -357,11 +380,15 @@ public class Character : MonoBehaviour, ICharacterActions {
         // Handle Casts
         HandleCharges();
         HandleShield();
-        activeCastId = HandleCasts();
+        if (inputCastId >= 0) {
+            activeCastId = StartCast(inputCastId);
+            inputCastId = -1;
+        }
+        TickCasts();
 
         // Update Position
-        if (commandMovement != null) {
-            cc.Move(commandMovement.GetDPosition());
+        if (CommandMovement != null) {
+            cc.Move(CommandMovement.GetDPosition());
         } else {
             cc.Move(GetDPosition());
             transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
@@ -395,16 +422,16 @@ public class Character : MonoBehaviour, ICharacterActions {
         charges--;
         chargeCooldown=chargeCooldownMax;
         boostTimer = boostMaxDuration;
-        runSpeed = Mathf.Min(Mathf.Max(moveVelocity.magnitude, walkSpeedMax)+boostSpeedBump, boostMaxSpeed);
+        runSpeed = Mathf.Min(Mathf.Max(MoveVelocity.magnitude, walkSpeedMax)+boostSpeedBump, boostMaxSpeed);
         boostDV = (boostMaxSpeed-runSpeed)/boostMaxDuration;
         Vector3 v = (GetCursorWorldPosition()-cc.transform.position);
-        moveVelocity = new Vector3(v.x, 0, v.z).normalized*boostMaxSpeed;
-        knockBackVelocity.Set(0f, 0f, 0f);
+        MoveVelocity = new Vector3(v.x, 0, v.z).normalized*boostMaxSpeed;
+        KnockBackVelocity.Set(0f, 0f, 0f);
     }
 
     public void SetCommandMovement(CommandMovementBase _commandMovement) {
-        commandMovement = _commandMovement;
-        moveVelocity = commandMovement.velocity.normalized * moveVelocity.magnitude; // TODO maybe not the best spot to do this
+        CommandMovement = _commandMovement;
+        MoveVelocity = CommandMovement.velocity.normalized * MoveVelocity.magnitude; // TODO maybe not the best spot to do this
     }
 
     private Vector3 GetDPosition() {
@@ -419,28 +446,30 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         bool aboveWalkSpeed = IsAboveWalkSpeed();
         Vector3 changeInDirection = (activeCastId>=0)?Vector3.zero:movementDirection;
+        bool isRunning = running && !Stunned; // really ugly implementation of stun behavior updates - TODO make better
+        if (Stunned) changeInDirection = Vector3.zero;
         // TODO:
         // - casting?
         // - shielding?
 
         if (!aboveWalkSpeed) { // walking
-            if (changeInDirection==Vector3.zero && !running) {
-                moveVelocity += (-moveVelocity.normalized) * Mathf.Min(walkAcceleration*4*Time.deltaTime, moveVelocity.magnitude);
+            if (changeInDirection==Vector3.zero && !isRunning) {
+                MoveVelocity += (-MoveVelocity.normalized) * Mathf.Min(walkAcceleration*4*Time.deltaTime, MoveVelocity.magnitude);
             } else if (changeInDirection!=Vector3.zero) {
-                moveVelocity += changeInDirection.normalized * walkAcceleration*Time.deltaTime;
+                MoveVelocity += changeInDirection.normalized * walkAcceleration*Time.deltaTime;
                 
-                if (moveVelocity.magnitude > walkSpeedMax) {
-                    moveVelocity = moveVelocity.normalized* walkSpeedMax;
+                if (MoveVelocity.magnitude > walkSpeedMax) {
+                    MoveVelocity = MoveVelocity.normalized* walkSpeedMax;
                 }
             }
         } else if (boostTimer > 0) { // boosting
-            moveVelocity -= moveVelocity.normalized*boostDV;
+            MoveVelocity -= MoveVelocity.normalized*boostDV;
             boostTimer--;
         } else { // running
-            moveVelocity=Vector3.RotateTowards(
-                Mathf.Max(moveVelocity.magnitude-(running ? 0 : (runDeceleration*Time.deltaTime)), 0)*moveVelocity.normalized, // update velocity
-                changeInDirection!=Vector3.zero ? changeInDirection : moveVelocity, // update direction if it was supplied
-                runRotationalSpeed*Time.deltaTime/(running ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
+            MoveVelocity=Vector3.RotateTowards(
+                Mathf.Max(MoveVelocity.magnitude-(isRunning ? 0 : (runDeceleration*Time.deltaTime)), 0)*MoveVelocity.normalized, // update velocity
+                changeInDirection!=Vector3.zero ? changeInDirection : MoveVelocity, // update direction if it was supplied
+                runRotationalSpeed*Time.deltaTime/(isRunning ? 2 : 1), // rotate at speed according to whether we're running TODO tune rotation scaling
                 0 // don't change specified speed
             );
         }
@@ -448,13 +477,13 @@ public class Character : MonoBehaviour, ICharacterActions {
         /*
          * FINALIZE
          */
-        knockBackVelocity = knockBackVelocity.normalized*Mathf.Max(knockBackVelocity.magnitude-knockBackDecceleration*Time.deltaTime, 0);
-        Vector3 finalVelocity = moveVelocity + knockBackVelocity;
+        KnockBackVelocity = KnockBackVelocity.normalized*Mathf.Max(KnockBackVelocity.magnitude-KnockBackDecceleration*Time.deltaTime, 0);
+        Vector3 finalVelocity = MoveVelocity + KnockBackVelocity;
         return finalVelocity * Time.deltaTime;
     }
 
     private bool IsAboveWalkSpeed() {
-        return (moveVelocity.magnitude>(walkSpeedMax+.25));
+        return (MoveVelocity.magnitude>(walkSpeedMax+.25));
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
@@ -464,29 +493,29 @@ public class Character : MonoBehaviour, ICharacterActions {
             if (running) { // if you hit a 
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-                    Vector3 bounceDirection = (moveVelocity-2*Vector3.Project(moveVelocity, mirror)).normalized;
-                    moveVelocity = bounceDirection*moveVelocity.magnitude;
-                    knockBackVelocity = bounceDirection*knockBackVelocity.magnitude; // TODO is this right?
+                    Vector3 bounceDirection = (MoveVelocity-2*Vector3.Project(MoveVelocity, mirror)).normalized;
+                    MoveVelocity = bounceDirection*MoveVelocity.magnitude;
+                    KnockBackVelocity = bounceDirection*KnockBackVelocity.magnitude; // TODO is this right?
                 } else {
-                    moveVelocity.Set(0f, 0f, 0f);
-                    knockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
+                    MoveVelocity.Set(0f, 0f, 0f);
+                    KnockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
                 }
                 hitLagTimer = 2;
                 // TODO add something here:
                 // - stop for some frames
             } else {
-                moveVelocity=Vector3.zero;
-                knockBackVelocity=Vector3.zero;
+                MoveVelocity=Vector3.zero;
+                KnockBackVelocity=Vector3.zero;
             }
         } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
 
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
-            if (otherCharacter.moveVelocity.magnitude<moveVelocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(moveVelocity-otherCharacter.moveVelocity, hit.normal)*boostDV*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+            if (otherCharacter.MoveVelocity.magnitude<MoveVelocity.magnitude) {
+                Vector3 dvNormal = Vector3.Project(MoveVelocity-otherCharacter.MoveVelocity, hit.normal)*boostDV*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 dvNormal.y = 0f;
-                moveVelocity-=dvNormal;
-                otherCharacter.knockBackVelocity=moveVelocity+dvNormal;
+                MoveVelocity-=dvNormal;
+                otherCharacter.KnockBackVelocity=MoveVelocity+dvNormal;
             }
         }
     }
@@ -528,14 +557,9 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else { // not shielding
             if (knockbackVector!=Vector3.zero) {
                 hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
-                knockBackVelocity=knockbackVector;
+                KnockBackVelocity=knockbackVector;
             }
         }
-
-        if (damageTier>=2) {
-            moveVelocity*=.5f;
-        }
-
 
         hp-=damage;
         
@@ -547,7 +571,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     void OnGUI() {
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20, 40, 80, 20), moveVelocity.magnitude+"m/s");
+        GUI.Label(new Rect(20, 40, 80, 20), MoveVelocity.magnitude+"m/s");
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+hp);
         GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);

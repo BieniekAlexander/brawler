@@ -9,12 +9,12 @@ public class StatusEffectDummyUltimate: StatusEffectBase {
 
     public override void Initialize(Character _character) {
         base.Initialize(_character);
-        target.CastContainers[(int)CastId.Ability4].castPrefab.hitEvents[0].hit.effects.Add(slowPrefab);
+        target.castContainers[(int)CastId.Ability4].castPrefab.hitEvents[0].hit.effects.Add(slowPrefab);
     }
     public override void Expire() {
         // TODO this is how I can think to get another ability to temporarily behave differently,
         // but it seems unsafe to modify the prefab because the properties will stay changed if not cleaned up on ending the scene
-        target.CastContainers[(int)CastId.Ability4].castPrefab.hitEvents[0].hit.effects.Remove(slowPrefab);
+        target.castContainers[(int)CastId.Ability4].castPrefab.hitEvents[0].hit.effects.Remove(slowPrefab);
     }
 
     public override void OnCast(CastId castId) {

@@ -5,6 +5,6 @@ using UnityEngine;
 public class CastDummyUltimate : CastBase
 {
     private void Start() {
-        Caster.CastContainers[(int)CastId.Ability4].charges = 5;
+        Caster.castContainers[(int)CastId.Ability4].charges = 5;
     }
 }

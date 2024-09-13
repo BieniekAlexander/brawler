@@ -54,11 +54,13 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 0}
   dimensions:
   - {x: 10, y: 1, z: 10}
+  effects:
+  - {fileID: 3524243433270582037, guid: 62daa47c78c1de9478734b689c7544de, type: 3}
   duration: 10
   knockbackMagnitude: 0
   knockbackTransform: {x: 0, y: 0, z: 0}
   hitTier: 3
-  damage: 1500
+  damage: 200
   hitStunDuration: 0
 --- !u!33 &-7330007324543094842
 MeshFilter:
@@ -87,7 +89,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &-6836506940904796346
 MeshRenderer:

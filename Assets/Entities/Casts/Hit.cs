@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -120,24 +121,34 @@ public class Hit : MonoBehaviour {
     }
 
     public void HandleHitCollisions() {
+        List<Collider> otherColliders = GetOverlappingColliders(hitBox).ToList();
+
         foreach (Collider otherCollider in GetOverlappingColliders(hitBox)) {
             GameObject go = otherCollider.gameObject;
-            Character cb = go.GetComponent<Character>();
+            Character character = go.GetComponent<Character>();
+                
+            if (character is not null && !collisionIds.Contains(character) && character!=caster) {
+                collisionIds.Add(character);
+                Shield shield = character.GetComponentInChildren<Shield>();
 
-            if (cb is not null&&cb!=caster&&!collisionIds.Contains(cb)) {
-                collisionIds.Add(cb);
-                Vector3 kb = GetKnockBackVector(cb.transform.position);
-                cb.TakeDamage(damage, kb, hitStunDuration, hitTier);
+                if (
+                    shield==null || !shield.isActiveAndEnabled
+                    || ((transform.position - shield.transform.position).sqrMagnitude > (transform.position - character.transform.position).sqrMagnitude)
+                ) {
+                    Vector3 kb = GetKnockBackVector(character.transform.position);
+                    character.TakeDamage(damage, kb, hitStunDuration, hitTier);
 
-                for (int i = 0; i < effects.Count; i++) {
-                    // TODO what if I don't want the status effect to stack?
-                    // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                    // e.g. if two slows are applied, refresh slow
-                    StatusEffectBase effect = Instantiate(effects[i]);
-                    effect.Initialize(cb);
+                    for (int i = 0; i < effects.Count; i++) {
+                        // TODO what if I don't want the status effect to stack?
+                        // maybe check if an effect of the same type is active, and if so, do some sort of resolution
+                        // e.g. if two slows are applied, refresh slow
+                        StatusEffectBase effect = Instantiate(effects[i]);
+                        effect.Initialize(character);
+                    }
                 }
             }
         }
+        
     }
 
     private void OnDestroy() {

@@ -69,7 +69,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     public Vector3 MoveVelocity { get; private set; } = new();
     public CommandMovementBase CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
-    private float standingY;
+    private float standingY; private float standingOffset = .1f;
 
     // knockback
     public Vector3 KnockBackVelocity { get; private set; } = new();
@@ -79,6 +79,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     // Walking
     private float walkAcceleration = 50f;
     public float walkSpeedMax = 10f;
+    private Vector3 gravity = new Vector3(0, -.25f, 0);
+    private Vector3 fallVelocity = Vector3.zero;
 
     // Running
     private float runSpeed = 0f;
@@ -353,7 +355,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         Material=GetComponent<Renderer>().material;
         tr=GetComponent<TrailRenderer>();
 
-        standingY = transform.position.y;
+        standingY = transform.position.y + standingOffset;
         healMax = HP;
 
         if (me) // set up controls
@@ -418,7 +420,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             cc.Move(CommandMovement.GetDPosition());
         } else {
             cc.Move(GetDPosition());
-            transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
+            //transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
         }
 
         // apply statusEffects
@@ -494,10 +496,22 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         /*
+         * FALLING
+         */
+        RaycastHit hitInfo;
+
+        if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, cc.radius+standingOffset+.01f)) {
+            standingY = hitInfo.point.y + cc.radius + standingOffset;
+            fallVelocity = new Vector3(0, transform.position.y - standingY, 0);
+        } else {
+            fallVelocity += gravity;
+        }
+        
+        /*
          * FINALIZE
          */
         KnockBackVelocity = KnockBackVelocity.normalized*Mathf.Max(KnockBackVelocity.magnitude-KnockBackDecceleration*Time.deltaTime, 0);
-        Vector3 finalVelocity = MoveVelocity + KnockBackVelocity;
+        Vector3 finalVelocity = MoveVelocity + KnockBackVelocity + fallVelocity;
         return finalVelocity * Time.deltaTime;
     }
 

@@ -1,4 +1,5 @@
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -46,6 +47,10 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private void Reflect(Character character) {
+
+    }
+
     private void FixedUpdate()
     {
         if (rotationalControl != 0) {
@@ -83,7 +88,15 @@ public class Projectile : MonoBehaviour
                 if (c.gameObject.layer == LayerMask.NameToLayer("Terrain"))
                     continue;
 
-                Resolve();
+                Character ch = c.gameObject.GetComponent<Character>();
+
+                if (ch!=null && ch.Reflects) {
+                    Vector3 normal = (c.transform.position - transform.position);
+                    Vector3 bounceDirection = (velocity-2*Vector3.Project(velocity, normal)).normalized;
+                    velocity = bounceDirection * velocity.magnitude;
+                } else {
+                    Resolve();
+                }
                 break;
             }
         }

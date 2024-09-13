@@ -115,7 +115,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int inputCastId = -1;
 
     /* Resources */
-    private int hp = 1000; public int HP { get { return hp; } }
+    public int HP { get; private set; } = 1000;
+    public bool Reflects { get; set; } = false;
     private int maxCharges = 3;
     private int charges = 3;
     private int chargeCooldownMax = 60;
@@ -370,7 +371,7 @@ public class Character : MonoBehaviour, ICharacterActions {
          * Bolt Indicator
          */
         // duration
-        if (shielding)
+        if (Reflects)
             Material.color=Color.blue;
         else if (activeCastId >= 0)
             Material.color=Color.magenta;
@@ -404,7 +405,6 @@ public class Character : MonoBehaviour, ICharacterActions {
     void FixedUpdate() {
         // Handle Casts
         HandleCharges();
-        HandleShield();
         if (inputCastId >= 0) {
             activeCastId = StartCast(inputCastId);
             inputCastId = -1;
@@ -425,14 +425,6 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         statusEffects.RemoveAll((StatusEffectBase effect) => { return (effect == null); });
-    }
-
-    private void HandleShield() {
-        if (shielding) {
-            shieldDuration++;
-        } else {
-            shieldDuration=-1;
-        }
     }
 
     // Movement evaluations
@@ -577,18 +569,14 @@ public class Character : MonoBehaviour, ICharacterActions {
         if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
             damageTier++;
 
-        if (shielding&&damageTier<=2) {
-            damage=0;
-        } else { // not shielding
-            if (knockbackVector!=Vector3.zero) {
-                hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
-                KnockBackVelocity=knockbackVector;
-            }
+        if (knockbackVector!=Vector3.zero) {
+            hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
+            KnockBackVelocity=knockbackVector;
         }
+        
+        HP-=damage;
 
-        hp-=damage;
-
-        if (hp<=0) {
+        if (HP<=0) {
             Destroy(gameObject);
         }
     }
@@ -598,7 +586,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         if (!me) return;
         GUI.Label(new Rect(20, 40, 80, 20), MoveVelocity.magnitude+"m/s");
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
-        GUI.Label(new Rect(20, 100, 80, 20), "HP: "+hp);
+        GUI.Label(new Rect(20, 100, 80, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);
     }
 }

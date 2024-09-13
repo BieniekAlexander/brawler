@@ -19,7 +19,7 @@ public class CastSlot {
     public string name;
     public CastBase castPrefab;
     public int cooldown;
-    public int defaultChargeCount; 
+    public int defaultChargeCount;
 }
 
 public struct CastContainer {
@@ -42,19 +42,20 @@ public enum CastId {
     Attack1 = 0,
     Attack2 = 1,
     Attack3 = 2,
-    BoostedAttack1 = 3,
-    BoostedAttack2 = 4,
-    BoostedAttack3 = 5,
-    Throw1 = 6,
-    Throw2 = 7,
-    BoostedThrow = 8,
-    Ability1 = 9,
-    Ability2 = 10,
-    Ability3 = 11,
-    Ability4 = 12,
-    Special1 = 13,
-    Special2 = 14,
-    Ultimate = 15
+    DashAttack = 3,
+    BoostedAttack1 = 4,
+    BoostedAttack2 = 5,
+    BoostedAttack3 = 6,
+    Throw1 = 7,
+    Throw2 = 8,
+    BoostedThrow = 9,
+    Ability1 = 10,
+    Ability2 = 11,
+    Ability3 = 12,
+    Ability4 = 13,
+    Special1 = 14,
+    Special2 = 15,
+    Ultimate = 16
 }
 
 public class Character : MonoBehaviour, ICharacterActions {
@@ -93,7 +94,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Visuals */
     // Bolt Visualization
-    public Material Material {  get; private set; }
+    public Material Material { get; private set; }
     TrailRenderer tr;
 
     /* Controls */
@@ -148,28 +149,52 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // attacks
     public void OnAttack1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Attack1;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.Attack1;
+        }
     }
     public void OnAttack2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Attack2;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.Attack2;
+        }
     }
     public void OnAttack3(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Attack3;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.Attack3;
+        }
     }
     public void OnBoostedAttack1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.BoostedAttack1;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.BoostedAttack1;
+        }
     }
     public void OnBoostedAttack2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.BoostedAttack2;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.BoostedAttack2;
+        }
     }
     public void OnBoostedAttack3(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.BoostedAttack3;
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.BoostedAttack3;
+        }
     }
 
     // shields
@@ -258,7 +283,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else if (activeCastId==-1) {
             // nothing is being casted, so start this new one
             if (castContainer.castPrefab == null) {
-                Debug.Log("No cast supplied for cast"+(int) castId);
+                Debug.Log("No cast supplied for cast"+(int)castId);
                 return -1;
             }
             if (
@@ -286,7 +311,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else {
             // there's something being actively casted - return that
             return activeCastId;
-            
+
         }
     }
 
@@ -325,7 +350,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         Shield.gameObject.SetActive(false);
         Material=GetComponent<Renderer>().material;
         tr=GetComponent<TrailRenderer>();
-        
+
         standingY = transform.position.y;
 
         if (me) // set up controls
@@ -420,7 +445,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     /// </summary>
     private void Boost() {
         charges--;
-        chargeCooldown=chargeCooldownMax;
+        chargeCooldown = chargeCooldownMax;
         boostTimer = boostMaxDuration;
         runSpeed = Mathf.Min(Mathf.Max(MoveVelocity.magnitude, walkSpeedMax)+boostSpeedBump, boostMaxSpeed);
         boostDV = (boostMaxSpeed-runSpeed)/boostMaxDuration;
@@ -445,7 +470,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         bool aboveWalkSpeed = IsAboveWalkSpeed();
-        Vector3 changeInDirection = (activeCastId>=0)?Vector3.zero:movementDirection;
+        Vector3 changeInDirection = (activeCastId>=0) ? Vector3.zero : movementDirection;
         bool isRunning = running && !Stunned; // really ugly implementation of stun behavior updates - TODO make better
         if (Stunned) changeInDirection = Vector3.zero;
         // TODO:
@@ -457,7 +482,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                 MoveVelocity += (-MoveVelocity.normalized) * Mathf.Min(walkAcceleration*4*Time.deltaTime, MoveVelocity.magnitude);
             } else if (changeInDirection!=Vector3.zero) {
                 MoveVelocity += changeInDirection.normalized * walkAcceleration*Time.deltaTime;
-                
+
                 if (MoveVelocity.magnitude > walkSpeedMax) {
                     MoveVelocity = MoveVelocity.normalized* walkSpeedMax;
                 }
@@ -562,7 +587,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         hp-=damage;
-        
+
         if (hp<=0) {
             Destroy(gameObject);
         }

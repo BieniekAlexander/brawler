@@ -238,7 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
-  moveVelocity: {x: 0, y: 0, z: 0}
+  walkSpeedMax: 10
   castSlots:
   - name: Attack1
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
@@ -254,6 +254,11 @@ MonoBehaviour:
     castPrefab: {fileID: 5634063031192742342, guid: a894861c04cb65d4592baf061c4755c2,
       type: 3}
     cooldown: 60
+    defaultChargeCount: 1
+  - name: DashAttack
+    castPrefab: {fileID: -8179213385086059516, guid: eb4d6a58799ff1744b02e8a12259aa6e,
+      type: 3}
+    cooldown: 30
     defaultChargeCount: 1
   - name: BoostedAttack1
     castPrefab: {fileID: 5634063031192742342, guid: 723f2a6ea9a0aad4781f50fb690ec170,

@@ -117,6 +117,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     /* Resources */
     public int HP { get; private set; } = 1000;
     public bool Reflects { get; set; } = false;
+    private int healMax; private int healMaxOffset = 100;
     private int maxCharges = 3;
     private int charges = 3;
     private int chargeCooldownMax = 60;
@@ -353,6 +354,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         tr=GetComponent<TrailRenderer>();
 
         standingY = transform.position.y;
+        healMax = HP;
 
         if (me) // set up controls
         {
@@ -573,8 +575,9 @@ public class Character : MonoBehaviour, ICharacterActions {
             hitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
             KnockBackVelocity=knockbackVector;
         }
-        
-        HP-=damage;
+
+        HP = (HP-damage<HP)?(HP-damage):Mathf.Min(HP-damage, healMax);
+        healMax = Mathf.Min(healMax, HP+healMaxOffset);
 
         if (HP<=0) {
             Destroy(gameObject);

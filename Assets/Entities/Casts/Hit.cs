@@ -41,6 +41,8 @@ public class Hit : MonoBehaviour {
     /* Effects */
     [SerializeField] private int damage;
     [SerializeField] private int hitStunDuration;
+    [SerializeField] private bool hitsEnemies = true;
+    [SerializeField] private bool hitsFriendlies = false;
 
     // Visualization
     private float animationDuration;
@@ -126,9 +128,17 @@ public class Hit : MonoBehaviour {
         foreach (Collider otherCollider in GetOverlappingColliders(hitBox)) {
             GameObject go = otherCollider.gameObject;
             Character character = go.GetComponent<Character>();
-                
-            if (character is not null && !collisionIds.Contains(character) && character!=caster) {
-                collisionIds.Add(character);
+
+            if (character is not null && !collisionIds.Contains(character)) {
+                collisionIds.Add(character); // this hitbox already hit this character - skip them
+
+                if (
+                    (character == caster && !hitsFriendlies)
+                    || (character != caster && !hitsEnemies)
+                    ) {
+                    continue;
+                }
+
                 Shield shield = character.GetComponentInChildren<Shield>();
 
                 if (
@@ -148,7 +158,7 @@ public class Hit : MonoBehaviour {
                 }
             }
         }
-        
+
     }
 
     private void OnDestroy() {

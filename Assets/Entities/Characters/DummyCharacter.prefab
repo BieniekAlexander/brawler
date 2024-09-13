@@ -313,8 +313,9 @@ MonoBehaviour:
     cooldown: 600
     defaultChargeCount: 1
   - name: Special2
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: 1893018920000934706, guid: 2c339f7a565398943893fcba74523c52,
+      type: 3}
+    cooldown: 240
     defaultChargeCount: 1
   - name: Ultimate
     castPrefab: {fileID: -6026143148467057615, guid: c5d199e5a8378c54aa851ddb0368ec7e,

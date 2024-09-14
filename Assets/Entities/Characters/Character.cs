@@ -104,6 +104,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Controls */
     private CharacterControls characterControls;
+    private Plane aimPlane;
     private Vector3 movementDirection = new();
     private bool boost = false;
     private bool running = false;
@@ -111,7 +112,6 @@ public class Character : MonoBehaviour, ICharacterActions {
     private bool boostedShielding = false;
 
     /* Abilities */
-
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedLight, (int)CastId.BoostedMedium, (int)CastId.BoostedHeavy, (int)CastId.BoostedThrow };
@@ -379,9 +379,10 @@ public class Character : MonoBehaviour, ICharacterActions {
         cc=GetComponent<CharacterController>();
         Shield = GetComponentInChildren<Shield>();
         Shield.gameObject.SetActive(false);
-        Material=GetComponent<Renderer>().material;
-        tr=GetComponent<TrailRenderer>();
-
+        Material = GetComponent<Renderer>().material;
+        tr = GetComponent<TrailRenderer>();
+        
+        aimPlane = new Plane(Vector3.up, transform.position);
         standingY = transform.position.y + standingOffset;
         healMax = HP;
 
@@ -526,7 +527,7 @@ public class Character : MonoBehaviour, ICharacterActions {
          * FALLING
          */
         RaycastHit hitInfo;
-
+        
         if (Physics.Raycast(transform.position, Vector3.down, out hitInfo, cc.radius+standingOffset+.01f)) {
             standingY = hitInfo.point.y + cc.radius + standingOffset;
             fallVelocity = new Vector3(0, transform.position.y - standingY, 0);
@@ -582,16 +583,13 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     public Vector3 GetCursorWorldPosition() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitData;
 
-        if (Physics.Raycast(ray, out hitData, 1000)) {
+        if (aimPlane.Raycast(ray, out float distance)) {
             /*
              * NOTE: the cast is hitting the floor and the bullet is floating over that point
              * Maybe what I should do is add an invisible plane in the gamespace? have the raycast hit that
              */
-            Vector3 cursorWorldPosition = hitData.point;
-            cursorWorldPosition.y = transform.position.y;
-            return cursorWorldPosition;
+            return ray.GetPoint(distance);
         } else {
             return new Vector3(); // TODO maybe return null? I don't know how to handle this in C# yet though
         }

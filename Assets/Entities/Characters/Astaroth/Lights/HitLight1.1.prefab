@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coordinateSystem: 0
+  positionCoordinateSystem: 0
   positions:
   - {x: 0, y: 0, z: 0.4}
   - {x: 10, y: 0, z: 0.45}
@@ -63,8 +63,8 @@ MonoBehaviour:
   - {x: 0.2, y: 0.8, z: 0.5}
   effects: []
   duration: 7
-  knockbackMagnitude: 3
-  knockbackTransform: {x: 0, y: 0, z: 1}
+  knockbackCoordinateSystem: 0
+  knockbackVector: {x: 0, y: 0, z: 10}
   hitTier: 0
   damage: 1
   hitStunDuration: 0

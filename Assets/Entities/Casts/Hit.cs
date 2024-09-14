@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -19,7 +18,7 @@ public class Hit : MonoBehaviour {
     private Character caster;
     private Transform origin; // origin of the cast, allowing for movement during animation
     private bool mirror = false;
-    [SerializeField] private CoordinateSystem coordinateSystem;
+    [SerializeField] private CoordinateSystem positionCoordinateSystem;
     [SerializeField] private Vector3[] positions;
     [SerializeField] private Quaternion[] rotations;
     [SerializeField] private Vector3[] dimensions;
@@ -34,9 +33,9 @@ public class Hit : MonoBehaviour {
     private int frame = 0;
 
     /* Knockback */
-    [SerializeField] private float knockbackMagnitude;
-    [SerializeField] private Vector3 knockbackTransform;
-    [SerializeField][Range(1, 4)] private int hitTier;
+    [SerializeField] private CoordinateSystem knockbackCoordinateSystem;
+    [SerializeField] private Vector3 knockbackVector;
+    [SerializeField][Range(0, 3)] private int hitTier;
 
     /* Effects */
     [SerializeField] private int damage;
@@ -61,11 +60,17 @@ public class Hit : MonoBehaviour {
     }
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
-        Vector3 toTarget = targetPosition-origin.position;
-
-        Vector3 knockBackDirection = Quaternion.Euler(0, knockbackTransform.x, 0)*toTarget;
-        knockBackDirection.y=0f;
-        return knockBackDirection.normalized*knockbackMagnitude;
+        if (knockbackCoordinateSystem==CoordinateSystem.Cartesian) {
+            Vector3 knockBackDirection = transform.rotation * knockbackVector;
+            knockBackDirection.y = 0f;
+            Debug.Log(knockBackDirection);
+            return knockBackDirection;
+        } else { // polar
+            Vector3 hitboxToTargetNormalized = (targetPosition - transform.position).normalized;
+            Vector3 knockBackDirection = Quaternion.Euler(0, knockbackVector.x, 0) * hitboxToTargetNormalized * knockbackVector.z;
+            knockBackDirection.y = 0f;
+            return knockBackDirection;
+        }
     }
 
     public static IEnumerable<Collider> GetOverlappingColliders(Collider collider) {
@@ -103,11 +108,11 @@ public class Hit : MonoBehaviour {
         int rotationFrame = Mathf.Min(frame, rotations.Length-1);
         int dimensionFrame = Mathf.Min(frame, dimensions.Length-1);
 
-        Vector3 offset = (coordinateSystem==CoordinateSystem.Cartesian)
+        Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? positions[positionFrame]
-            : Quaternion.Euler(0, positions[positionFrame].x, 0)*Vector3.forward*positions[rotationFrame].z;
+            : Quaternion.Euler(0, positions[positionFrame].x, 0)*Vector3.forward*positions[positionFrame].z;
 
-        Quaternion orientation = (coordinateSystem==CoordinateSystem.Cartesian)
+        Quaternion orientation = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? Quaternion.identity
             : Quaternion.Euler(0, positions[positionFrame].x, 0);
 

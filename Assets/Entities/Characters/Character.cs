@@ -39,23 +39,26 @@ public struct CastContainer {
 }
 
 public enum CastId {
-    Attack1 = 0,
-    Attack2 = 1,
-    Attack3 = 2,
-    DashAttack = 3,
-    BoostedAttack1 = 4,
-    BoostedAttack2 = 5,
-    BoostedAttack3 = 6,
-    Throw1 = 7,
-    Throw2 = 8,
-    BoostedThrow = 9,
-    Ability1 = 10,
-    Ability2 = 11,
-    Ability3 = 12,
-    Ability4 = 13,
-    Special1 = 14,
-    Special2 = 15,
-    Ultimate = 16
+    Light1 = 0,
+    Light2 = 1,
+    BoostedLight = 2,
+    Medium1 = 3,
+    Medium2 = 4,
+    BoostedMedium = 5,
+    Heavy1 = 6,
+    Heavy2 = 7,
+    BoostedHeavy = 8,
+    Throw1 = 9,
+    Throw2 = 10,
+    BoostedThrow = 11,
+    DashAttack = 12,
+    Ability1 = 13,
+    Ability2 = 14,
+    Ability3 = 15,
+    Ability4 = 16,
+    Special1 = 17,
+    Special2 = 18,
+    Ultimate = 19
 }
 
 public class Character : MonoBehaviour, ICharacterActions {
@@ -78,7 +81,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Walking
     private float walkAcceleration = 50f;
-    public float walkSpeedMax = 10f;
+    public float walkSpeedMax { get; set; } = 10f;
     private Vector3 gravity = new Vector3(0, -.25f, 0);
     private Vector3 fallVelocity = Vector3.zero;
 
@@ -111,7 +114,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
-    public static int[] boostedIds = new int[] { (int)CastId.BoostedAttack1, (int)CastId.BoostedAttack2, (int)CastId.BoostedAttack3, (int)CastId.BoostedThrow };
+    public static int[] boostedIds = new int[] { (int)CastId.BoostedLight, (int)CastId.BoostedMedium, (int)CastId.BoostedHeavy, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     private int activeCastId = -1;
     private int inputCastId = -1;
@@ -152,52 +155,76 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     // attacks
-    public void OnAttack1(InputAction.CallbackContext context) {
+    public void OnLight1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Attack1;
+                inputCastId = (int)CastId.Light1;
         }
     }
-    public void OnAttack2(InputAction.CallbackContext context) {
+    public void OnLight2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Attack2;
+                inputCastId = (int)CastId.Light2;
         }
     }
-    public void OnAttack3(InputAction.CallbackContext context) {
+    public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Attack3;
+                inputCastId = (int)CastId.BoostedLight;
         }
     }
-    public void OnBoostedAttack1(InputAction.CallbackContext context) {
+    public void OnMedium1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedAttack1;
+                inputCastId = (int)CastId.Medium1;
         }
     }
-    public void OnBoostedAttack2(InputAction.CallbackContext context) {
+    public void OnMedium2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedAttack2;
+                inputCastId = (int)CastId.Medium2;
         }
     }
-    public void OnBoostedAttack3(InputAction.CallbackContext context) {
+    public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
                 inputCastId = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedAttack3;
+                inputCastId = (int)CastId.BoostedMedium;
+        }
+    }
+    public void OnHeavy1(InputAction.CallbackContext context) {
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.Heavy1;
+        }
+    }
+    public void OnHeavy2(InputAction.CallbackContext context) {
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.Heavy2;
+        }
+    }
+    public void OnBoostedHeavy(InputAction.CallbackContext context) {
+        if (context.ReadValueAsButton()) {
+            if (boostTimer > 0)
+                inputCastId = (int)CastId.DashAttack;
+            else
+                inputCastId = (int)CastId.BoostedHeavy;
         }
     }
 
@@ -360,7 +387,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         if (me) // set up controls
         {
-            characterControls=new CharacterControls();
+            characterControls = new CharacterControls();
             characterControls.Enable(); // TODO do I need to disable this somewhere?
             characterControls.character.SetCallbacks(this);
         }

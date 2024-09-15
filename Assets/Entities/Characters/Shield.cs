@@ -1,15 +1,13 @@
-using System;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using static CharacterControls;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+
+public enum ShieldLevel {
+    None = 0,
+    Normal = 1,
+    Boosted = 2
+}
 
 public class Shield : MonoBehaviour {
-    public int DamageTier { get; set; } = 2;
+    public ShieldLevel ShieldLevel { get; set; } = ShieldLevel.None;
     public Collider Collider { get; set; }
     public Material Material { get; set; }
     
@@ -29,9 +27,11 @@ public class Shield : MonoBehaviour {
          * Bolt Indicator
          */
         // duration
-        if (DamageTier==2)
+        if (ShieldLevel == ShieldLevel.Boosted)
             Material.color=Color.blue;
+        else if (ShieldLevel == ShieldLevel.Normal)
+            Material.color=Color.cyan;
         else
-            Material.color=Color.magenta;
+            Material.color=Color.white;
     }
 }

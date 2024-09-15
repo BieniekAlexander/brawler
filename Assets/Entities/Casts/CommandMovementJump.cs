@@ -6,12 +6,12 @@ public class CommandMovementJump : CommandMovementBase
 
     public override void Initialize(Character mover, Vector3 _destination, Vector3 initialPosition) {
         base.Initialize(mover, _destination, initialPosition);
-        velocity = path*Time.fixedDeltaTime*(60f/duration);
-        velocity.y = gravity*(duration-2)*Time.fixedDeltaTime/2;
+        Velocity = Path*Time.fixedDeltaTime*(60f/duration);
+        Velocity = new Vector3(Velocity.x, gravity*(duration-2)*Time.fixedDeltaTime/2, Velocity.z);
     }
 
     public override void FixedUpdate() {
-        velocity.y -= gravity * Time.deltaTime;
+        Velocity -= new Vector3(0f, gravity * Time.deltaTime, 0f);
         base.FixedUpdate();
     }
 }

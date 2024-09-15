@@ -7,8 +7,8 @@ public class CommandMovementDash: CommandMovementBase {
 
     public override void Initialize(Character mover, Vector3 _destination, Vector3 initialPosition) {
         base.Initialize(mover, _destination, initialPosition);
-        velocity = path.normalized*speed*Time.deltaTime;
-        duration = Mathf.FloorToInt((path.magnitude/speed)/Time.fixedDeltaTime);
+        Velocity = Path.normalized*speed*Time.deltaTime;
+        duration = Mathf.FloorToInt((Path.magnitude/speed)/Time.fixedDeltaTime);
     }
 
     public override void OnDestroy() {

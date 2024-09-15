@@ -5,12 +5,12 @@ public class StatusEffectSlow: StatusEffectBase {
 
     public override void Initialize(Character _character) {
         base.Initialize(_character);
-        target.walkSpeedMax *= slowFactor;
+        target.WalkSpeedMax *= slowFactor;
     }
 
     public override void Expire() {
         if (target != null) {
-            target.walkSpeedMax /= slowFactor;
+            target.WalkSpeedMax /= slowFactor;
         }
     }
 }

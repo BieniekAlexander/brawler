@@ -68,7 +68,6 @@ public class Character : MonoBehaviour, ICharacterActions {
     /* Movement */
     private CharacterController cc;
     public Shield Shield { get; private set; }
-    public bool RotatingClockwise { get; private set; } = false;
     public Vector3 Velocity { get; private set; } = new();
     public CommandMovementBase CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
@@ -82,7 +81,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     // Walking
     private float WalkAcceleration = 75f;
     public float WalkSpeedMax { get; set; } = 7.5f;
-    private float gravity = -.25f;
+    private float gravity = -.5f;
 
     // Running
     private float runDeceleration = 10f;
@@ -101,6 +100,9 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Controls */
     private CharacterControls characterControls;
+    public bool RotatingClockwise { get; private set; } = false;
+    private float MovingAverageRotation = 0f;
+    [SerializeField] float averageRotationDecay = .5f; // cloesr to d->1f: older frames are discounted more; d=0f: nonsensical, rotation never updates
     private Plane aimPlane;
     private Vector3 movementDirection = new();
     private bool boost = false;
@@ -297,14 +299,13 @@ public class Character : MonoBehaviour, ICharacterActions {
             var playerPosition = cc.transform.position;
             var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
-            float yRotationDiff = newRotation.y - transform.rotation.y;
+            float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
 
-            if (yRotationDiff != 0) {
-                RotatingClockwise = (yRotationDiff>0);
-                // TODO somewhere in Q3, the yRotation goes from positive to negative, and I don't know why,
-                // but it's producing an issue where for about 10% of the circle, rotation direction is incorrect
-                // Debug.Log("old"+transform.rotation.y+" new "+newRotation.y);
-                // Debug.Log("yRotationDiff "+yRotationDiff +" RotatingClockwise "+rotatingClockwise);
+            if (!Mathf.Approximately(yRotationDiff, 0f)) {
+                MovingAverageRotation = averageRotationDecay*yRotationDiff + (1f-averageRotationDecay)*MovingAverageRotation;
+                if (!Mathf.Approximately(MovingAverageRotation, 0f)) {
+                    RotatingClockwise = (MovingAverageRotation<0);
+                }
             }
 
             transform.rotation = newRotation;

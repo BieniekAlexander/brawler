@@ -1546,6 +1546,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
+      propertyPath: averageRotationDecay
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
+        type: 3}
       propertyPath: castSlots.Array.data[3].cooldown
       value: 20
       objectReference: {fileID: 0}

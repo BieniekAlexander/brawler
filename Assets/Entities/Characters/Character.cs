@@ -117,7 +117,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     public int CastIdBuffer = -1;
 
     /* Resources */
-    public int HP { get; private set; } = 1000;
+    public int HP { get; private set; } = HPMax; public static int HPMax = 1000;
     public bool Reflects { get; set; } = false;
     private int healMax; private int healMaxOffset = 100;
     private int maxCharges = 5;

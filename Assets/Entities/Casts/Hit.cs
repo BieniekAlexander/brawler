@@ -160,7 +160,7 @@ public class Hit : MonoBehaviour {
                         effect.Initialize(character);
                     }
                 } else {
-                    Debug.Log("hitting shield");
+                    ;// hitting shield - any shield logic?
                 }
             }
         }

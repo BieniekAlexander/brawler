@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Follow : MonoBehaviour
+public class CameraMovement : MonoBehaviour
 {
     [SerializeField] Transform transTarget;
     private static Vector3 relativePosition = new Vector3(0, 15.0f, -5.0f);

@@ -101,8 +101,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     /* Controls */
     private CharacterControls characterControls;
     public bool RotatingClockwise { get; private set; } = false;
-    private float MovingAverageRotation = 0f;
-    [SerializeField] float averageRotationDecay = .5f; // cloesr to d->1f: older frames are discounted more; d=0f: nonsensical, rotation never updates
+    [SerializeField] public float MinimumRotationThreshold = 1f;
     private Plane aimPlane;
     private Vector3 movementDirection = new();
     private bool boost = false;
@@ -299,13 +298,10 @@ public class Character : MonoBehaviour, ICharacterActions {
             var playerPosition = cc.transform.position;
             var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
-            float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
 
-            if (!Mathf.Approximately(yRotationDiff, 0f)) {
-                MovingAverageRotation = averageRotationDecay*yRotationDiff + (1f-averageRotationDecay)*MovingAverageRotation;
-                if (!Mathf.Approximately(MovingAverageRotation, 0f)) {
-                    RotatingClockwise = (MovingAverageRotation<0);
-                }
+            float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
+            if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
+                RotatingClockwise = (yRotationDiff<0);
             }
 
             transform.rotation = newRotation;

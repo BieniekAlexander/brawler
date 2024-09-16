@@ -61,9 +61,8 @@ public class Hit : MonoBehaviour {
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         if (knockbackCoordinateSystem==CoordinateSystem.Cartesian) {
-            Vector3 knockBackDirection = transform.rotation * knockbackVector;
+            Vector3 knockBackDirection = origin.transform.rotation * knockbackVector;
             knockBackDirection.y = 0f;
-            Debug.Log(knockBackDirection);
             return knockBackDirection;
         } else { // polar
             Vector3 hitboxToTargetNormalized = (targetPosition - transform.position).normalized;
@@ -160,6 +159,8 @@ public class Hit : MonoBehaviour {
                         StatusEffectBase effect = Instantiate(effects[i]);
                         effect.Initialize(character);
                     }
+                } else {
+                    Debug.Log("hitting shield");
                 }
             }
         }

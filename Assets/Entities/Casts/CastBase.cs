@@ -113,8 +113,13 @@ public class CastBase : MonoBehaviour, ICastMessage {
 
     }
 
-    public virtual void UpdateCast(Vector3 worldPosition) {
-        ;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="worldPosition"></param>
+    /// <returns>whether the cast was updated</returns>
+    public virtual bool UpdateCast(Vector3 worldPosition) {
+        return false; // nothing to update
     }
 
     public void FinishCast() {

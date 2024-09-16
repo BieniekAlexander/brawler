@@ -113,8 +113,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.BoostedLight, (int)CastId.BoostedMedium, (int)CastId.BoostedHeavy, (int)CastId.BoostedThrow };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
-    private int activeCastId = -1;
     private int inputCastId = -1;
+    public int CastIdBuffer = -1;
 
     /* Resources */
     public int HP { get; private set; } = 1000;
@@ -155,73 +155,73 @@ public class Character : MonoBehaviour, ICharacterActions {
     public void OnLight1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Light1;
+                CastIdBuffer = (int)CastId.Light1;
         }
     }
     public void OnLight2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Light2;
+                CastIdBuffer = (int)CastId.Light2;
         }
     }
     public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedLight;
+                CastIdBuffer = (int)CastId.BoostedLight;
         }
     }
     public void OnMedium1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Medium1;
+                CastIdBuffer = (int)CastId.Medium1;
         }
     }
     public void OnMedium2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Medium2;
+                CastIdBuffer = (int)CastId.Medium2;
         }
     }
     public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedMedium;
+                CastIdBuffer = (int)CastId.BoostedMedium;
         }
     }
     public void OnHeavy1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Heavy1;
+                CastIdBuffer = (int)CastId.Heavy1;
         }
     }
     public void OnHeavy2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.Heavy2;
+                CastIdBuffer = (int)CastId.Heavy2;
         }
     }
     public void OnBoostedHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
             if (boostTimer > 0)
-                inputCastId = (int)CastId.DashAttack;
+                CastIdBuffer = (int)CastId.DashAttack;
             else
-                inputCastId = (int)CastId.BoostedHeavy;
+                CastIdBuffer = (int)CastId.BoostedHeavy;
         }
     }
 
@@ -250,45 +250,45 @@ public class Character : MonoBehaviour, ICharacterActions {
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Throw1;
+            CastIdBuffer = (int)CastId.Throw1;
     }
     public void OnThrow2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Throw2;
+            CastIdBuffer = (int)CastId.Throw2;
     }
     public void OnBoostedThrow(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.BoostedThrow;
+            CastIdBuffer = (int)CastId.BoostedThrow;
     }
 
     // abilities
     public void OnAbility1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Ability1;
+            CastIdBuffer = (int)CastId.Ability1;
     }
     public void OnAbility2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Ability2;
+            CastIdBuffer = (int)CastId.Ability2;
     }
     public void OnAbility3(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Ability3;
+            CastIdBuffer = (int)CastId.Ability3;
     }
     public void OnAbility4(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Ability4;
+            CastIdBuffer = (int)CastId.Ability4;
     }
     public void OnSpecial1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Special1;
+            CastIdBuffer = (int)CastId.Special1;
     }
     public void OnSpecial2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Special2;
+            CastIdBuffer = (int)CastId.Special2;
     }
     public void OnUltimate(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            inputCastId = (int)CastId.Ultimate;
+            CastIdBuffer = (int)CastId.Ultimate;
     }
 
     void HandleControls() {
@@ -312,46 +312,49 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    private int StartCast(int castId) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="castId"></param>
+    /// <returns>Whether the cast was initiated or not</returns>
+    private bool StartCast(int castId) {
         ref CastContainer castContainer = ref castContainers[castId];
 
         if (castContainer.cast is not null) {
             // we're updating another cast - allowed
             Vector3 cursorWorldPosition = GetCursorWorldPosition();
-            castContainer.cast.UpdateCast(cursorWorldPosition);
-            return activeCastId;
-        } else if (activeCastId==-1) {
-            // nothing is being casted, so start this new one
-            if (castContainer.castPrefab == null) {
-                Debug.Log("No cast supplied for cast"+(int)castId);
-                return -1;
-            }
-            if (
-                castContainer.charges>0
-                && (charges>0 || !boostedIds.Contains(castId))
-                && (energy >= 50 || !specialIds.Contains(castId))
-                && (energy >= 100 || castId!=(int)CastId.Ultimate)
-            ) {
-                if (boostedIds.Contains(castId)) {
-                    charges--;
-                } else if (specialIds.Contains(castId)) {
-                    energy -= 50;
-                } else if (castId == (int)CastId.Ultimate) {
-                    energy -= 100;
-                }
-
-                castContainer.cast = Instantiate(castContainer.castPrefab);
-                castContainer.cast.Initialize(this, RotatingClockwise);
-                castContainer.charges--;
-                castContainer.timer = castContainer.cooldown;
-                return castId;
-            } else {
-                return -1;
-            }
+            return castContainer.cast.UpdateCast(cursorWorldPosition);
         } else {
-            // there's something being actively casted - return that
-            return activeCastId;
+            if (castContainer.charges==0) {
+                return false;
+            } else {
+                // nothing is being casted, so start this new one
+                if (castContainer.castPrefab == null) {
+                    Debug.Log("No cast supplied for cast"+(int)castId);
+                    return true;
+                }
+                if (
+                    (charges>0 || !boostedIds.Contains(castId))
+                    && (energy >= 50 || !specialIds.Contains(castId))
+                    && (energy >= 100 || castId!=(int)CastId.Ultimate)
+                ) {
+                    if (boostedIds.Contains(castId)) {
+                        charges--;
+                    } else if (specialIds.Contains(castId)) {
+                        energy -= 50;
+                    } else if (castId == (int)CastId.Ultimate) {
+                        energy -= 100;
+                    }
 
+                    castContainer.cast = Instantiate(castContainer.castPrefab);
+                    castContainer.cast.Initialize(this, RotatingClockwise);
+                    castContainer.charges--;
+                    castContainer.timer = castContainer.cooldown;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     }
 
@@ -374,12 +377,12 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
         // resolve cast startup
-        int j = (int)activeCastId;
+        int j = (int)inputCastId;
         if (j >= 0) { // if an active cast is designated
             if (castContainers[j].cast == null) {
-                activeCastId = -1;
+                inputCastId = -1;
             } else if (castContainers[j].cast.Frame >= castContainers[j].cast.startupTime) { // if startup time has elapsed
-                activeCastId = -1;
+                inputCastId = -1;
             }
         }
     }
@@ -416,7 +419,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             Material.color=Color.red;
         else if (Reflects)
             Material.color=Color.blue;
-        else if (activeCastId >= 0)
+        else if (inputCastId >= 0)
             Material.color=Color.magenta;
         else if (chargeCooldown<0&&charges>0)
             Material.color=Color.green;
@@ -448,9 +451,10 @@ public class Character : MonoBehaviour, ICharacterActions {
     void FixedUpdate() {
         // Handle Casts
         HandleCharges();
-        if (inputCastId >= 0) {
-            activeCastId = StartCast(inputCastId);
-            inputCastId = -1;
+        if (CastIdBuffer >= 0) {
+            if (StartCast(CastIdBuffer)) {
+                CastIdBuffer = -1;
+            }
         }
         TickCasts();
 
@@ -458,9 +462,14 @@ public class Character : MonoBehaviour, ICharacterActions {
         if (CommandMovement != null) {
             cc.Move(CommandMovement.GetDPosition());
         } else {
-            MoveVelocity = GetMoveVelocity(MoveVelocity, movementDirection);
-            cc.Move(MoveVelocity*Time.deltaTime);
-            transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
+            if (HitLagTimer == 0) {
+                MoveVelocity = GetMoveVelocity(MoveVelocity, movementDirection);
+                KnockBackVelocity = GetDecayedVector(KnockBackVelocity, KnockBackDecceleration); // TODO this will decay the knockback before the first frame of movement - is this what I want? it's probably not a huge deal?
+                cc.Move((MoveVelocity+KnockBackVelocity)*Time.deltaTime);
+                transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
+            } else {
+                HitLagTimer--;
+            }
         }
 
         // apply statusEffects
@@ -562,6 +571,10 @@ public class Character : MonoBehaviour, ICharacterActions {
         return (MoveVelocity.magnitude>(WalkSpeedMax+.25));
     }
 
+    private Vector3 GetDecayedVector(Vector3 vector, float decayRate) {
+        return vector.normalized*Mathf.Max(vector.magnitude-decayRate*Time.deltaTime, 0);
+    }
+
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
 
@@ -570,7 +583,6 @@ public class Character : MonoBehaviour, ICharacterActions {
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
                     Vector3 bounceDirection = (MoveVelocity-2*Vector3.Project(MoveVelocity, mirror)).normalized;
-                    Debug.Log("bounce: "+bounceDirection);
                     MoveVelocity = bounceDirection*MoveVelocity.magnitude;
                     KnockBackVelocity = bounceDirection*KnockBackVelocity.magnitude; // TODO is this right?
                 } else {
@@ -589,10 +601,10 @@ public class Character : MonoBehaviour, ICharacterActions {
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.MoveVelocity.magnitude<MoveVelocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(MoveVelocity-otherCharacter.MoveVelocity, hit.normal)*boostDecay*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                Vector3 dvNormal = Vector3.Project(MoveVelocity-otherCharacter.MoveVelocity, hit.normal)*(-boostDecay)*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 dvNormal.y = 0f;
                 MoveVelocity-=dvNormal;
-                otherCharacter.KnockBackVelocity=MoveVelocity+dvNormal;
+                otherCharacter.MoveVelocity=MoveVelocity+dvNormal;
             }
         }
     }
@@ -633,6 +645,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         HP = (HP-damage<HP)?(HP-damage):Mathf.Min(HP-damage, healMax);
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
+        MoveVelocity = Vector3.zero;
 
         if (HP<=0) {
             Destroy(gameObject);

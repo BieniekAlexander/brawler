@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class CastRocket : CastBase
 {
-   override public void UpdateCast(Vector3 worldPosition) {
+   override public bool UpdateCast(Vector3 worldPosition) {
         for (int i = 0; i < projectiles.Count; i++) {
             if (projectiles[i] != null) {
                 projectiles[i].target.position = worldPosition;
             }
         }
+
+        return true;
     }
 }

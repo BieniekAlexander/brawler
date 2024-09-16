@@ -51,7 +51,7 @@ MonoBehaviour:
   statusEffectPefabs: []
   commandMovementPrefab: {fileID: 0}
   startupTime: 0
-  duration: 30
+  duration: 15
   caster: {fileID: 0}
   hits: []
   projectiles: []

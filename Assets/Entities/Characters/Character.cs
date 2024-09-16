@@ -69,21 +69,20 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CharacterController cc;
     public Shield Shield { get; private set; }
     public bool RotatingClockwise { get; private set; } = false;
-    public Vector3 MoveVelocity { get; private set; } = new();
+    public Vector3 Velocity { get; private set; } = new();
     public CommandMovementBase CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
 
     // knockback
-    public Vector3 KnockBackVelocity { get; private set; } = new();
-    public float KnockBackDecceleration { get; private set; } = 25f;
+    private int hitStunTimer = 0;
+    public float KnockBackDecay { get; private set; } = 1f;
     public int HitLagTimer { get; private set; } = 0;
 
     // Walking
     private float WalkAcceleration = 75f;
     public float WalkSpeedMax { get; set; } = 7.5f;
-    private Vector3 Gravity = new Vector3(0, -.25f, 0);
-    private Vector3 VerticalVelocity = Vector3.zero;
+    private float gravity = -.25f;
 
     // Running
     private float runDeceleration = 10f;
@@ -429,7 +428,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         /*
          * Trail Renderer
          */
-        tr.emitting=(MoveVelocity.magnitude>(WalkSpeedMax+boostSpeedBump*2));
+        tr.emitting=(Velocity.magnitude>(WalkSpeedMax+boostSpeedBump*2));
     }
 
     private void Update() {
@@ -457,20 +456,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
         TickCasts();
-
-        // Update Position
-        if (CommandMovement != null) {
-            cc.Move(CommandMovement.GetDPosition());
-        } else {
-            if (HitLagTimer == 0) {
-                MoveVelocity = GetMoveVelocity(MoveVelocity, movementDirection);
-                KnockBackVelocity = GetDecayedVector(KnockBackVelocity, KnockBackDecceleration); // TODO this will decay the knockback before the first frame of movement - is this what I want? it's probably not a huge deal?
-                cc.Move((MoveVelocity+KnockBackVelocity)*Time.deltaTime);
-                transform.position = new Vector3(transform.position.x, standingY, transform.position.z); // TODO hardcoding the Y position, but I should fix the y calculations
-            } else {
-                HitLagTimer--;
-            }
-        }
+        HandleMovement();
 
         // apply statusEffects
         for (int i = 0; i < statusEffects.Count; i++) {
@@ -478,6 +464,29 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
 
         statusEffects.RemoveAll((StatusEffectBase effect) => { return (effect == null); });
+    }
+
+    private void HandleMovement() {
+        if (HitLagTimer-- >= 0) {
+            return;
+        } else if (CommandMovement != null) {
+            cc.Move(CommandMovement.GetDPosition());
+        } else {
+            Vector3 horizontalPlane = new Vector3(1, 0, 1);
+            Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
+            float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
+
+             if (hitStunTimer-- >= 0) {
+                float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
+                HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
+            } else { // normal movement
+                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, movementDirection);
+
+            }
+
+            Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
+            cc.Move(Velocity*Time.deltaTime);
+        }
     }
 
     // Movement evaluations
@@ -492,18 +501,17 @@ public class Character : MonoBehaviour, ICharacterActions {
         //charges--;
         chargeCooldown = chargeCooldownMax;
         boostTimer = boostMaxDuration;
-        float boostSpeedEnd = Mathf.Max(MoveVelocity.magnitude, WalkSpeedMax)+boostSpeedBump;
+        float boostSpeedEnd = Mathf.Max(Velocity.magnitude, WalkSpeedMax)+boostSpeedBump;
         float boostSpeedStart = boostSpeedEnd + 2*boostSpeedBump;
         boostDecay = (boostSpeedEnd-boostSpeedStart)/boostMaxDuration;
         
-        KnockBackVelocity.Set(0f, 0f, 0f); // TODO return to this
         Vector3 v = GetLookDirection();
         return new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
     }
 
     public void SetCommandMovement(CommandMovementBase _commandMovement) {
         CommandMovement = _commandMovement;
-        MoveVelocity = CommandMovement.Velocity.normalized * MoveVelocity.magnitude; // TODO maybe not the best spot to do this
+        Velocity = CommandMovement.Velocity.normalized * Velocity.magnitude; // TODO maybe not the best spot to do this
     }
 
     /// <summary>
@@ -528,47 +536,61 @@ public class Character : MonoBehaviour, ICharacterActions {
         else return 0;
     }
 
-    private Vector3 GetMoveVelocity(Vector3 currentVelocity, Vector3 biasDirection) {
+    private Vector3 GetHorizontalVelocity(Vector3 horizontalVelocity, Vector3 biasDirection) {
+        horizontalVelocity.y = 0f;
+
         if (boost&&charges>0&&chargeCooldown<=0) {
-            return Boost(currentVelocity);
+            return Boost(horizontalVelocity);
         } else if (boostTimer-->0) {
-            currentVelocity = currentVelocity.normalized * (currentVelocity.magnitude+boostDecay);
-            return currentVelocity;
+            horizontalVelocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
+            return horizontalVelocity;
         }  else if (running && IsAboveWalkSpeed()) {
             float rotationalSpeed = runRotationalSpeed;
             if (ShieldLevel==ShieldLevel.Boosted) {
                 Vector3 lookDirection = GetLookDirection();
                 biasDirection = -GetLookDirection();
-                rotationalSpeed += GetShieldRotationFactor(ShieldLevel, currentVelocity, GetLookDirection());
+                rotationalSpeed += GetShieldRotationFactor(ShieldLevel, horizontalVelocity, GetLookDirection());
             }
 
             return (biasDirection==Vector3.zero)
-                ? currentVelocity
+                ? horizontalVelocity
                 : Vector3.ClampMagnitude(
                     Vector3.RotateTowards(
-                        currentVelocity, // current velocity
+                        horizontalVelocity, // current velocity
                         biasDirection, // update direction if it was supplied
                         rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                         0),
-                    Mathf.Max(WalkSpeedMax, MoveVelocity.magnitude));
+                    Mathf.Max(WalkSpeedMax, Velocity.magnitude));
         } else { // not running
-            float shieldAccelerationFactor = GetShieldAccelerationFactor(ShieldLevel, currentVelocity, GetLookDirection());
-            float accerleration = Mathf.Max(WalkAcceleration-(3/(1+shieldAccelerationFactor))*currentVelocity.magnitude, 20f);
+            float shieldAccelerationFactor = GetShieldAccelerationFactor(ShieldLevel, horizontalVelocity, GetLookDirection());
+            float accerleration = Mathf.Max(WalkAcceleration-(3/(1+shieldAccelerationFactor))*horizontalVelocity.magnitude, 20f);
             float dSpeed = Mathf.Clamp(
-                WalkSpeedMax - Vector3.Dot(currentVelocity, biasDirection),
+                WalkSpeedMax - Vector3.Dot(horizontalVelocity, biasDirection),
                 0, accerleration*Time.deltaTime);
 
             Vector3 newVelocity = Vector3.ClampMagnitude(
-                currentVelocity + dSpeed*((biasDirection == Vector3.zero)?(-currentVelocity.normalized):biasDirection),
-                Mathf.Max(WalkSpeedMax, currentVelocity.magnitude)
+                horizontalVelocity + dSpeed*((biasDirection == Vector3.zero)?(-horizontalVelocity.normalized):biasDirection),
+                Mathf.Max(WalkSpeedMax, horizontalVelocity.magnitude)
             );
 
-            return (Vector3.Dot(currentVelocity, newVelocity)<0) ? Vector3.zero : newVelocity;
+            return (Vector3.Dot(horizontalVelocity, newVelocity)<0) ? Vector3.zero : newVelocity;
         }
     }
 
+    private float GetVerticalVelocity(float currentYVelocity, float gravity) {
+        if (currentYVelocity <= 0 && Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f)) {
+            // // snap the character to the standing Height - TODO current implementation seems hacky, but it works?
+            standingY = hitInfo.point.y + cc.radius + standingOffset;
+            transform.position = new Vector3(transform.position.x, standingY, transform.position.z);
+            return 0f;
+        } else {
+            return currentYVelocity + gravity;
+        }
+
+    }
+
     private bool IsAboveWalkSpeed() {
-        return (MoveVelocity.magnitude>(WalkSpeedMax+.25));
+        return (Velocity.magnitude>(WalkSpeedMax+.25));
     }
 
     private Vector3 GetDecayedVector(Vector3 vector, float decayRate) {
@@ -582,29 +604,26 @@ public class Character : MonoBehaviour, ICharacterActions {
             if (running) { // if you hit a 
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-                    Vector3 bounceDirection = (MoveVelocity-2*Vector3.Project(MoveVelocity, mirror)).normalized;
-                    MoveVelocity = bounceDirection*MoveVelocity.magnitude;
-                    KnockBackVelocity = bounceDirection*KnockBackVelocity.magnitude; // TODO is this right?
+                    Vector3 bounceDirection = (Velocity-2*Vector3.Project(Velocity, mirror)).normalized;
+                    Velocity = bounceDirection*Velocity.magnitude;
                 } else {
-                    MoveVelocity.Set(0f, 0f, 0f);
-                    KnockBackVelocity.Set(0f, 0f, 0f); // TODO how to handle knockback?
+                    Velocity.Set(0f, 0f, 0f);
                 }
                 HitLagTimer = 2;
                 // TODO add something here:
                 // - stop for some frames
             } else {
-                MoveVelocity=Vector3.zero;
-                KnockBackVelocity=Vector3.zero;
+                Velocity=Vector3.zero;
             }
         } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
 
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
-            if (otherCharacter.MoveVelocity.magnitude<MoveVelocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(MoveVelocity-otherCharacter.MoveVelocity, hit.normal)*(-boostDecay)*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+            if (otherCharacter.Velocity.magnitude<Velocity.magnitude) {
+                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-boostDecay)*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 dvNormal.y = 0f;
-                MoveVelocity-=dvNormal;
-                otherCharacter.MoveVelocity=MoveVelocity+dvNormal;
+                Velocity-=dvNormal;
+                otherCharacter.Velocity=Velocity+dvNormal;
             }
         }
     }
@@ -623,11 +642,20 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
+    public void TakeKnockback(Vector3 knockbackVector, float knockbackFactor, int hitLag, int hitStun) {
+        HitLagTimer = hitLag;
+        hitStunTimer = hitStun;
+
+        if (knockbackFactor > 0) {
+            Velocity = Vector3.zero;
+        }
+
+        Velocity += knockbackFactor*knockbackVector;
+    }
+
     public void TakeDamage(
         int damage,
-        Vector3 knockbackVector,
-        int hitStunDuration,
-        int damageTier = 1
+        int damageTier = 1 // TODO still deciding if I'll use this here
         ) {
         // TODO finish implementation:
         // - evaluate knockback diff
@@ -635,17 +663,12 @@ public class Character : MonoBehaviour, ICharacterActions {
         // - evaluate changes according to hit level
         if (invincible) return;
 
-        if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
-            damageTier++;
-
-        if (knockbackVector!=Vector3.zero) {
-            HitLagTimer=hitStunDuration; // TODO maybe I should only reapply it if hitStunDuration>0f
-            KnockBackVelocity=knockbackVector;
-        }
+        /*if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
+            damageTier++;*/
 
         HP = (HP-damage<HP)?(HP-damage):Mathf.Min(HP-damage, healMax);
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
-        MoveVelocity = Vector3.zero;
+        Velocity = Vector3.zero;
 
         if (HP<=0) {
             Destroy(gameObject);
@@ -655,7 +678,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     void OnGUI() {
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20, 40, 80, 20), MoveVelocity.magnitude+"m/s");
+        GUI.Label(new Rect(20, 40, 80, 20), Velocity.magnitude+"m/s");
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);

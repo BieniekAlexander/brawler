@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static UnityEngine.Rendering.DebugUI;
+using UnityEngine.TextCore.Text;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 
 /// <summary>
@@ -39,7 +42,8 @@ public class Hit : MonoBehaviour {
 
     /* Effects */
     [SerializeField] private int damage;
-    [SerializeField] private int hitStunDuration;
+    [SerializeField] private int hitLagDuration = 0;
+    [SerializeField] private int hitStunDuration = 10;
     [SerializeField] private bool hitsEnemies = true;
     [SerializeField] private bool hitsFriendlies = false;
 
@@ -62,12 +66,11 @@ public class Hit : MonoBehaviour {
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         if (knockbackCoordinateSystem==CoordinateSystem.Cartesian) {
             Vector3 knockBackDirection = origin.transform.rotation * knockbackVector;
-            knockBackDirection.y = 0f;
+            if (mirror) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
             return knockBackDirection;
         } else { // polar
-            Vector3 hitboxToTargetNormalized = (targetPosition - transform.position).normalized;
+            Vector3 hitboxToTargetNormalized = Vector3.Scale(targetPosition - transform.position, new Vector3(1,0,1)).normalized;
             Vector3 knockBackDirection = Quaternion.Euler(0, knockbackVector.x, 0) * hitboxToTargetNormalized * knockbackVector.z;
-            knockBackDirection.y = 0f;
             return knockBackDirection;
         }
     }
@@ -126,12 +129,30 @@ public class Hit : MonoBehaviour {
         transform.rotation = origin.rotation*orientation*rotations[rotationFrame];
     }
 
+    public static GameObject GetClosestGameObject(GameObject reference, params GameObject[] others) {
+        Array.Sort(
+            others,
+            (o1, o2) => { return ((reference.transform.position - o1.transform.position).sqrMagnitude).CompareTo((reference.transform.position - o2.transform.position).sqrMagnitude); }
+        );
+
+        return others[0];
+    }
+
+    public static float GetKnockBackFactor(Hit hit, Shield shield) {
+        if (hit.hitTier==0) return 0;
+        else return ((float)hit.hitTier - (int)shield.ShieldLevel)/hit.hitTier;
+    }
+
     public void HandleHitCollisions() {
         List<Collider> otherColliders = GetOverlappingColliders(hitBox).ToList();
 
         foreach (Collider otherCollider in GetOverlappingColliders(hitBox)) {
+            // identify the character that was hit
             GameObject go = otherCollider.gameObject;
             Character character = go.GetComponent<Character>();
+            if (character == null) { // the case that something else of the c
+                character = go.GetComponentInParent<Character>();
+            }
 
             if (character is not null && !collisionIds.Contains(character)) {
                 collisionIds.Add(character); // this hitbox already hit this character - skip them
@@ -143,24 +164,32 @@ public class Hit : MonoBehaviour {
                     continue;
                 }
 
+                Vector3 knockbackVector = GetKnockBackVector(character.transform.position);
+                float knockbackFactor = 1f;
                 Shield shield = character.GetComponentInChildren<Shield>();
+                int d = damage;
 
-                if (
-                    shield==null || !shield.isActiveAndEnabled
-                    || ((transform.position - shield.transform.position).sqrMagnitude > (transform.position - character.transform.position).sqrMagnitude)
+                if ( // hitting shield
+                    shield!=null
+                    && shield.isActiveAndEnabled
+                    && GetClosestGameObject(gameObject, character.gameObject, shield.gameObject)==shield.gameObject
                 ) {
-                    Vector3 kb = GetKnockBackVector(character.transform.position);
-                    character.TakeDamage(damage, kb, hitStunDuration, hitTier);
-
+                    knockbackFactor = GetKnockBackFactor(this, shield);
+                } else { // hitting player
                     for (int i = 0; i < effects.Count; i++) {
                         // TODO what if I don't want the status effect to stack?
                         // maybe check if an effect of the same type is active, and if so, do some sort of resolution
                         // e.g. if two slows are applied, refresh slow
                         StatusEffectBase effect = Instantiate(effects[i]);
                         effect.Initialize(character);
+                        character.TakeDamage(d, hitTier);
                     }
-                } else {
-                    ;// hitting shield - any shield logic?
+                }
+
+                if (knockbackFactor>0) {
+                    character.TakeKnockback(knockbackVector, knockbackFactor, hitLagDuration, hitStunDuration);
+                } else if (knockbackFactor<0 && origin==caster.transform) {
+                    caster.TakeKnockback(knockbackVector, knockbackFactor, 0, hitStunDuration);
                 }
             }
         }

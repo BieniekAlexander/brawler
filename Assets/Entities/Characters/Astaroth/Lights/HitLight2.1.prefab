@@ -49,10 +49,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   positionCoordinateSystem: 0
   positions:
-  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: 0.5}
+  - {x: 0, y: 0, z: 1.25}
   - {x: 0, y: 0, z: 1.5}
-  - {x: 0, y: 0, z: 1.75}
-  - {x: 0, y: 0, z: 1.9}
+  - {x: 0, y: 0, z: 1.8}
   - {x: 0, y: 0, z: 2}
   rotations:
   - {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
@@ -62,7 +62,7 @@ MonoBehaviour:
   duration: 5
   knockbackCoordinateSystem: 1
   knockbackVector: {x: 0, y: 0, z: 10}
-  hitTier: 0
+  hitTier: 1
   damage: 5
   hitStunDuration: 0
   hitsEnemies: 1

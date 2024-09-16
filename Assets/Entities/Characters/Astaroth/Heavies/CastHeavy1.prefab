@@ -44,7 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitEvents: []
+  hitEvents:
+  - hit: {fileID: 5084085653392112361, guid: 067767b4065268e43a73323816bce9e1, type: 3}
+    startFrame: 20
   projectileEvents: []
   statusEffectPefabs: []
   commandMovementPrefab: {fileID: 0}

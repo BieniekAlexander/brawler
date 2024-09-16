@@ -1,8 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class HealthBar : MonoBehaviour {
+
+/// <summary>
+/// https://weeklyhow.com/how-to-make-a-health-bar-in-unity/#google_vignette
+/// </summary>
+public class HPBarVisuals : MonoBehaviour {
     [SerializeField] public Character character;
     private Slider healthBar;
     

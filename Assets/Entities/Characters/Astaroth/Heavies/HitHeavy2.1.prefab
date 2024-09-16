@@ -58,8 +58,9 @@ MonoBehaviour:
   duration: 5
   knockbackCoordinateSystem: 0
   knockbackVector: {x: 0, y: 0, z: 25}
-  hitTier: 1
+  hitTier: 3
   damage: 5
+  hitLagDuration: 5
   hitStunDuration: 10
   hitsEnemies: 1
   hitsFriendlies: 0

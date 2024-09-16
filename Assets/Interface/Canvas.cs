@@ -5,7 +5,7 @@ using UnityEngine;
 /// https://discussions.unity.com/t/how-to-convert-from-world-space-to-canvas-space/117981/3
 /// </summary>
 public class Canvas : MonoBehaviour {
-    [SerializeField] List<HealthBar> HealthBars = new List<HealthBar>();
+    [SerializeField] List<HPBarVisuals> HealthBars = new List<HPBarVisuals>();
     [SerializeField] Transform cameraPosition;
     
     private RectTransform CanvasRect;
@@ -17,7 +17,7 @@ public class Canvas : MonoBehaviour {
         CanvasRect = GetComponent<RectTransform>();
         Cam = Camera.main;
 
-        foreach (HealthBar healthBar in HealthBars) {
+        foreach (HPBarVisuals healthBar in HealthBars) {
             hpBarTransforms.Add(healthBar.GetComponent<RectTransform>());
         }
     }

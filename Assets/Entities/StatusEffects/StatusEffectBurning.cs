@@ -8,6 +8,6 @@ public class StatusEffectBurning: StatusEffectBase {
     }
 
     public override void Tick() {
-        target.TakeDamage(damage, Vector3.zero, 0);
+        target.TakeDamage(damage, 0);
     }
 }

@@ -81,7 +81,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Walking
     private float WalkAcceleration = 75f;
-    public float WalkSpeedMax { get; set; } = 10f;
+    public float WalkSpeedMax { get; set; } = 7.5f;
     private Vector3 Gravity = new Vector3(0, -.25f, 0);
     private Vector3 VerticalVelocity = Vector3.zero;
 
@@ -495,7 +495,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         float boostSpeedEnd = Mathf.Max(MoveVelocity.magnitude, WalkSpeedMax)+boostSpeedBump;
         float boostSpeedStart = boostSpeedEnd + 2*boostSpeedBump;
         boostDecay = (boostSpeedEnd-boostSpeedStart)/boostMaxDuration;
-
+        
         KnockBackVelocity.Set(0f, 0f, 0f); // TODO return to this
         Vector3 v = GetLookDirection();
         return new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
@@ -534,7 +534,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else if (boostTimer-->0) {
             currentVelocity = currentVelocity.normalized * (currentVelocity.magnitude+boostDecay);
             return currentVelocity;
-        }  else if (running) {
+        }  else if (running && IsAboveWalkSpeed()) {
             float rotationalSpeed = runRotationalSpeed;
             if (ShieldLevel==ShieldLevel.Boosted) {
                 Vector3 lookDirection = GetLookDirection();
@@ -550,7 +550,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                         biasDirection, // update direction if it was supplied
                         rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                         0),
-                    Mathf.Max(WalkSpeedMax, currentVelocity.magnitude));
+                    Mathf.Max(WalkSpeedMax, MoveVelocity.magnitude));
         } else { // not running
             float shieldAccelerationFactor = GetShieldAccelerationFactor(ShieldLevel, currentVelocity, GetLookDirection());
             float accerleration = Mathf.Max(WalkAcceleration-(3/(1+shieldAccelerationFactor))*currentVelocity.magnitude, 20f);

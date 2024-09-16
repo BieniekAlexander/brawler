@@ -57,7 +57,7 @@ MonoBehaviour:
   effects: []
   duration: 5
   knockbackCoordinateSystem: 0
-  knockbackVector: {x: 0, y: 0, z: 20}
+  knockbackVector: {x: 0, y: 0, z: 25}
   hitTier: 1
   damage: 5
   hitStunDuration: 10

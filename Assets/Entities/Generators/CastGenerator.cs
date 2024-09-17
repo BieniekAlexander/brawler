@@ -25,11 +25,10 @@ public class CastGenerator : MonoBehaviour
     {
         for (int i = 0; i < castRoutines.Count; i++) {
             CastRoutine cr = castRoutines[i];
-            Debug.Log("timer:"+cr.timer);
+            
             if (++cr.timer == cr.frequency) {
                 CastBase c = CastBase.Initiate(cr.cast, transform, castTargetPosition, false);
                 cr.timer = 0;
-                Debug.Log("casted");
             }
         }
     }

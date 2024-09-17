@@ -79,7 +79,8 @@ MonoBehaviour:
   knockbackVector: {x: -5, y: 0, z: 15}
   hitTier: 2
   damage: 1
-  hitStunDuration: 0
+  hitLagDuration: 5
+  hitStunDuration: 10
   hitsEnemies: 1
   hitsFriendlies: 0
 --- !u!136 &7506723417326245698

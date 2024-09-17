@@ -18,7 +18,6 @@ public class Hit : MonoBehaviour {
     enum CoordinateSystem { Polar, Cartesian };
 
     /* Position */
-    private Character caster;
     private Transform origin; // origin of the cast, allowing for movement during animation
     private bool mirror = false;
     [SerializeField] private CoordinateSystem positionCoordinateSystem;
@@ -80,8 +79,19 @@ public class Hit : MonoBehaviour {
         return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
-    public void Initialize(Character _caster, Transform _origin, bool _mirror) {
-        caster = _caster;
+    public static Hit Initiate(Hit _hit, Transform _origin, bool _mirror) {
+        Hit hit = Instantiate(_hit);
+        hit.Initialize(_origin, _mirror);
+        return hit;
+    }
+
+    public static Hit Initiate(Hit _hit, Vector3 _position, Quaternion _rotation, Transform _origin, bool _mirror) {
+        Hit hit = Instantiate(_hit, _position, _rotation);
+        hit.Initialize(_origin, _mirror);
+        return hit;
+    }
+
+    private void Initialize(Transform _origin, bool _mirror) {
         mirror = _mirror;
 
         if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
@@ -158,8 +168,8 @@ public class Hit : MonoBehaviour {
                 collisionIds.Add(character); // this hitbox already hit this character - skip them
 
                 if (
-                    (character == caster && !hitsFriendlies)
-                    || (character != caster && !hitsEnemies)
+                    (origin==character.transform && !hitsFriendlies)
+                    || (origin!=character.transform && !hitsEnemies)
                     ) {
                     continue;
                 }
@@ -188,17 +198,12 @@ public class Hit : MonoBehaviour {
 
                 if (knockbackFactor>0) {
                     character.TakeKnockback(knockbackVector, knockbackFactor, hitLagDuration, hitStunDuration);
-                } else if (knockbackFactor<0 && origin==caster.transform) {
-                    caster.TakeKnockback(knockbackVector, knockbackFactor, 0, hitStunDuration);
+                } else if (knockbackFactor<0 && origin.gameObject.CompareTag("Character")) {
+                    Character c = origin.GetComponent<Character>();
+                    c.TakeKnockback(knockbackVector, knockbackFactor, 0, hitStunDuration);
                 }
             }
         }
 
-    }
-
-    private void OnDestroy() {
-        if (origin.GetComponent<Character>() == null) {
-            Destroy(origin.gameObject);
-        }
     }
 }

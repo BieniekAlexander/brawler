@@ -7,7 +7,7 @@ public class Projectile : MonoBehaviour
     /* Movement */
     private CharacterController _cc;
     private Vector3 velocity;
-    private Character caster;
+    private Transform origin;
     public Transform target;
     [SerializeField] float rotationalControl = 120f;
     [SerializeField] float maxSpeed = 15f;
@@ -17,9 +17,22 @@ public class Projectile : MonoBehaviour
     /* Target */
     [SerializeField] private Hit hit;
 
-    public void Initialize(Character _caster, Transform _target) {
+    public static Projectile Initiate(Projectile _projectile, Transform _origin, Transform _target) {
+        Projectile projectile = Instantiate(_projectile);
+        projectile.Initialize(_origin, _target);
+        return projectile;
+    }
+
+    public static Projectile Initiate(Projectile _projectile, Vector3 _position, Quaternion _rotation, Transform _origin, Transform _target) {
+        Projectile projectile = Instantiate(_projectile, _position, _rotation);
+        projectile.Initialize(_origin, _target);
+        return projectile;
+    }
+
+
+    private void Initialize(Transform _origin, Transform _target) {
+        origin = _origin;
         target = _target;
-        caster = _caster;
     }
 
     public void Start()
@@ -34,12 +47,10 @@ public class Projectile : MonoBehaviour
         Transform t = new GameObject("HitBox Origin").transform;
         t.position = transform.position;
 
-        Instantiate(
+        Hit.Initiate(
             hit,
             transform.position,
-            transform.rotation
-        ).Initialize(
-            caster,
+            transform.rotation,
             t,
             false // TODO mirror this at some point? idk
         );

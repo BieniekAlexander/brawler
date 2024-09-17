@@ -45,44 +45,59 @@ public class CastBase : MonoBehaviour, ICastMessage {
     private int frame = 0;
     public int Frame { get { return frame; } }
 
-    private bool rotatingClockwise = true;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public int duration;
+    private bool rotatingClockwise = true;
+    public Transform CastAimPositionTransform { get; private set; }
 
 
-    public Character caster;
-    public Character Caster { get { return caster; } }
+    public Transform Origin { get; private set; }
     public List<Hit> hits;
     public List<Projectile> projectiles;
     public List<StatusEffectBase> statusEffects;
 
-    public void Initialize(Character _caster, bool _rotatingClockwise) {
-        caster =_caster;
+    public static CastBase Initiate(CastBase _cast, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+        CastBase cast = Instantiate(_cast);
+        cast.Initialize(_origin, _castAimPositionTransform, _rotatingClockwise);
+        return cast;
+    }
+
+    private void Initialize(Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+        Origin = _origin;
+        CastAimPositionTransform = _castAimPositionTransform;
         rotatingClockwise = _rotatingClockwise;
 
         foreach (HitEvent hitEvent in hitEvents) {
             Assert.IsNotNull(hitEvent.hit);
         }
 
-        foreach (StatusEffectBase sePrefab in statusEffectPefabs) {
-            StatusEffectBase se = Instantiate(sePrefab);
-            se.Initialize(caster);
-            statusEffects.Add(se);
+        if (Origin.CompareTag("Character")) {
+            Character caster = Origin.GetComponent<Character>();
+            foreach (StatusEffectBase sePrefab in statusEffectPefabs) {
+                StatusEffectBase se = Instantiate(sePrefab);
+                se.Initialize(caster);
+                statusEffects.Add(se);
+            }
+
+            if (commandMovementPrefab != null) {
+                CommandMovementBase commandMovement = Instantiate(commandMovementPrefab, transform);
+                commandMovement.Initialize(caster, CastAimPositionTransform.position, caster.transform.position);
+                caster.SetCommandMovement(commandMovement);
+            }
         }
 
-        if (commandMovementPrefab != null) {
-            CommandMovementBase commandMovement = Instantiate(commandMovementPrefab, transform);
-            commandMovement.Initialize(caster, caster.GetCursorWorldPosition(), caster.transform.position);
-            caster.SetCommandMovement(commandMovement);
-        }
     }
 
     void FixedUpdate() {
         foreach (HitEvent hitEvent in hitEvents) {
             if (hitEvent.startFrame==frame) {
-                Hit h = Instantiate(hitEvent.hit);
-                h.Initialize(caster, caster.transform, !rotatingClockwise);
-                hits.Add(h);
+                hits.Add(
+                    Hit.Initiate(
+                        hitEvent.hit,
+                        Origin,
+                        !rotatingClockwise
+                    )
+                );
             }
         }
 
@@ -91,19 +106,23 @@ public class CastBase : MonoBehaviour, ICastMessage {
                 Vector3 projectilePosition;
 
                 if (projectileEvent.positioning==Positioning.Directional) {
-                    projectilePosition = caster.transform.position+(caster.transform.rotation*projectileEvent.radialOffset)*Vector3.forward*projectileEvent.range;
+                    projectilePosition = Origin.position+(projectileEvent.radialOffset*Origin.rotation)*Vector3.forward*projectileEvent.range;
                 } else {
-                    Vector3 castVector = caster.GetCursorWorldPosition() - caster.transform.position;
+                    Vector3 castVector = CastAimPositionTransform.position - Origin.position;
                     castVector.y = 0;
                     float distance = Mathf.Min(projectileEvent.range, castVector.magnitude);
-                    projectilePosition = caster.transform.position + distance*castVector.normalized;
+                    projectilePosition = Origin.position + distance*castVector.normalized;
                 }
-
-                Transform target = new GameObject("Projectile Target").transform;
-                target.position = caster.GetCursorWorldPosition();
-                Projectile p = Instantiate(projectileEvent.projectile, projectilePosition, caster.transform.rotation*projectileEvent.radialOffset);
-                p.Initialize(caster, target);
-                projectiles.Add(p);
+                
+                projectiles.Add(
+                    Projectile.Initiate(
+                        projectileEvent.projectile,
+                        projectilePosition,
+                        Origin.rotation*projectileEvent.radialOffset,
+                        Origin,
+                        CastAimPositionTransform
+                    )
+                );
             }
         }
 
@@ -118,7 +137,7 @@ public class CastBase : MonoBehaviour, ICastMessage {
     /// </summary>
     /// <param name="worldPosition"></param>
     /// <returns>whether the cast was updated</returns>
-    public virtual bool UpdateCast(Vector3 worldPosition) {
+    public virtual bool UpdateCast() {
         return false; // nothing to update
     }
 

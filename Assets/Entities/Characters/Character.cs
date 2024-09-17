@@ -102,6 +102,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private CharacterControls characterControls;
     public bool RotatingClockwise { get; private set; } = false;
     [SerializeField] public float MinimumRotationThreshold = 1f;
+    public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
     private Vector3 movementDirection = new();
     private bool boost = false;
@@ -294,9 +295,9 @@ public class Character : MonoBehaviour, ICharacterActions {
     void HandleControls() {
         if (me) {
             // aiming TODO move to input manager
-            Vector3 cursorWorldPosition = GetCursorWorldPosition();
+            UpdateCursorTransformWorldPosition();
             var playerPosition = cc.transform.position;
-            var direction = new Vector3(cursorWorldPosition.x-playerPosition.x, 0, cursorWorldPosition.z-playerPosition.z).normalized;
+            var direction = new Vector3(CursorTransform.position.x-playerPosition.x, 0, CursorTransform.position.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
 
             float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
@@ -318,8 +319,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         if (castContainer.cast is not null) {
             // we're updating another cast - allowed
-            Vector3 cursorWorldPosition = GetCursorWorldPosition();
-            return castContainer.cast.UpdateCast(cursorWorldPosition);
+            return castContainer.cast.UpdateCast();
         } else {
             if (castContainer.charges==0) {
                 return false;
@@ -342,8 +342,12 @@ public class Character : MonoBehaviour, ICharacterActions {
                         energy -= 100;
                     }
 
-                    castContainer.cast = Instantiate(castContainer.castPrefab);
-                    castContainer.cast.Initialize(this, RotatingClockwise);
+                    castContainer.cast = CastBase.Initiate(
+                        castContainer.castPrefab,
+                        transform,
+                        CursorTransform,
+                        RotatingClockwise);
+
                     castContainer.charges--;
                     castContainer.timer = castContainer.cooldown;
                     return true;
@@ -389,7 +393,11 @@ public class Character : MonoBehaviour, ICharacterActions {
         Shield.gameObject.SetActive(false);
         Material = GetComponent<Renderer>().material;
         tr = GetComponent<TrailRenderer>();
-        
+
+        GameObject cursorGameObject = new GameObject("Player Cursor Object");
+        cursorGameObject.transform.parent = transform;
+        CursorTransform = cursorGameObject.transform;
+
         aimPlane = new Plane(Vector3.up, transform.position);
         standingY = transform.position.y + standingOffset;
         healMax = HP;
@@ -488,7 +496,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Movement evaluations
     private Vector3 GetLookDirection() {
-        return (GetCursorWorldPosition()-cc.transform.position).normalized; 
+        return (CursorTransform.position-cc.transform.position).normalized; 
     }
 
     /// <summary>
@@ -625,17 +633,13 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    public Vector3 GetCursorWorldPosition() {
+    public void UpdateCursorTransformWorldPosition() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (aimPlane.Raycast(ray, out float distance)) {
-            /*
-             * NOTE: the cast is hitting the floor and the bullet is floating over that point
-             * Maybe what I should do is add an invisible plane in the gamespace? have the raycast hit that
-             */
-            return ray.GetPoint(distance);
+            CursorTransform.position = ray.GetPoint(distance);
         } else {
-            return new Vector3(); // TODO maybe return null? I don't know how to handle this in C# yet though
+            CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self
         }
     }
 

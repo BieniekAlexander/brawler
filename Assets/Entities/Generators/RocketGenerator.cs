@@ -29,7 +29,13 @@ public class RocketGenerator : MonoBehaviour
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
                 Vector3 initialPosition = new Vector3(randX, target.position.y+.1f, randZ);
-                Instantiate(rocketPrefab, initialPosition, Quaternion.LookRotation(target.position - initialPosition)).Initialize(null, target);
+                Projectile.Initiate(
+                    rocketPrefab,
+                    transform.position,
+                    Quaternion.LookRotation(target.position - initialPosition),
+                    transform,
+                    target
+                );
             }
             
             timer = reloadTime;

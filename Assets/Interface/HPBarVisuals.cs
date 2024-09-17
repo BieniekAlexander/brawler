@@ -4,7 +4,7 @@ using UnityEngine.UI;
 /// <summary>
 /// https://weeklyhow.com/how-to-make-a-health-bar-in-unity/#google_vignette
 /// </summary>
-public class HPBarVisuals : MonoBehaviour {
+public class HPBarVisuals  : MonoBehaviour {
     [SerializeField] public Character character;
     private Slider healthBar;
     

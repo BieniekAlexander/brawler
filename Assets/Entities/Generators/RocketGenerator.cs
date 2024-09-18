@@ -33,6 +33,7 @@ public class RocketGenerator : MonoBehaviour
                     rocketPrefab,
                     transform.position,
                     Quaternion.LookRotation(target.position - initialPosition),
+                    null,
                     transform,
                     target
                 );

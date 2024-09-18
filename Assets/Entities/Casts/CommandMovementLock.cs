@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 public class CommandMovementLock : CommandMovementBase {
@@ -19,7 +16,11 @@ public class CommandMovementLock : CommandMovementBase {
             Character character = Lock.GetComponent<Character>();
             return character.Velocity * Time.deltaTime;
         } else {
-            throw new NotImplementedException("Don't know how to ahndle this if it's not crated by a character");
+            throw new NotImplementedException("Don't know how to handle movement if not tied to char"); // TODO pending refactor, make movability interface
         }
+    }
+
+    public override Quaternion GetRotation(Vector3 _currentPosition, Quaternion _currentRotation) {
+        return Quaternion.LookRotation(Lock.position-_currentPosition, Vector3.up);
     }
 }

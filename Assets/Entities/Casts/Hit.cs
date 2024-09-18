@@ -18,6 +18,7 @@ public class Hit : MonoBehaviour {
     enum CoordinateSystem { Polar, Cartesian };
 
     /* Position */
+    public Character Caster;
     public Transform Origin; // origin of the cast, allowing for movement during animation
     public bool Mirror { get; private set; } = false;
     [SerializeField] private CoordinateSystem positionCoordinateSystem;
@@ -64,6 +65,7 @@ public class Hit : MonoBehaviour {
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         if (knockbackCoordinateSystem==CoordinateSystem.Cartesian) {
+            // TODO knockback is behaving very oddly with this setting, particularly with the throw hitbox I was working on - why?
             Vector3 knockBackDirection = Origin.transform.rotation * knockbackVector;
             if (Mirror) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
             return knockBackDirection;
@@ -79,25 +81,26 @@ public class Hit : MonoBehaviour {
         return (from c in colliders where collider.bounds.Intersects(c.bounds) select c);
     }
 
-    public static Hit Initiate(Hit _hit, Transform _origin, bool _mirror) {
+    public static Hit Initiate(Hit _hit, Character _owner, Transform _origin, bool _mirror) {
         Hit hit = Instantiate(_hit);
-        hit.Initialize(_origin, _mirror);
+        hit.Initialize(_owner, _origin, _mirror);
         return hit;
     }
 
-    public static Hit Instantiate(Grab _grab, Transform _origin, bool _mirror) {
+    public static Hit Instantiate(Grab _grab, Character _owner, Transform _origin, bool _mirror) {
         Hit hit = Instantiate(_grab);
-        hit.Initialize(_origin, _mirror);
+        hit.Initialize(_owner, _origin, _mirror);
         return hit;
     }
 
-    public static Hit Initiate(Hit _hit, Vector3 _position, Quaternion _rotation, Transform _origin, bool _mirror) {
+    public static Hit Initiate(Hit _hit, Vector3 _position, Quaternion _rotation, Character _owner, Transform _origin, bool _mirror) {
         Hit hit = Instantiate(_hit, _position, _rotation);
-        hit.Initialize(_origin, _mirror);
+        hit.Initialize(_owner, _origin, _mirror);
         return hit;
     }
 
-    private void Initialize(Transform _origin, bool _mirror) {
+    private void Initialize(Character _owner, Transform _origin, bool _mirror) {
+        Caster = _owner;
         Mirror = _mirror;
 
         if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
@@ -122,6 +125,8 @@ public class Hit : MonoBehaviour {
     }
 
     public void HandleMove() {
+        if (Origin==null) return; // TODO if a character dies during grab, this hits null refs, so this is my cheap fix
+
         int positionFrame = Mathf.Min(frame, positions.Length-1);
         int rotationFrame = Mathf.Min(frame, rotations.Length-1);
         int dimensionFrame = Mathf.Min(frame, dimensions.Length-1);
@@ -161,12 +166,11 @@ public class Hit : MonoBehaviour {
 
     public Vector3 GetHitLagVelocity(Character target) {
         // TODO generalize to someting that's moving (not just a character)
-        if (Origin.CompareTag("Character")) {
+        if (Origin == Caster.transform) {
             Vector3 toTarget = target.transform.position-Origin.position;
             Vector3 originVelocity = Origin.GetComponent<Character>().Velocity;
             Vector3 frameVelocity = target.Velocity - originVelocity;
             Vector3 normal = new Vector3(-toTarget.z, 0f, toTarget.x).normalized;
-            Debug.Log(normal);
 
             Vector3 velocityPerp = Vector3.Project(originVelocity, toTarget);
             Vector3 hitLagNormal = Vector3.Project(originVelocity, normal);
@@ -188,30 +192,30 @@ public class Hit : MonoBehaviour {
         foreach (Collider otherCollider in GetOverlappingColliders(HitBox)) {
             // identify the character that was hit
             GameObject go = otherCollider.gameObject;
-            Character character = go.GetComponent<Character>();
-            if (character == null) { // the case that something else of the c
-                character = go.GetComponentInParent<Character>();
+            Character target = go.GetComponent<Character>();
+            if (target == null) { // the case that something else of the c
+                target = go.GetComponentInParent<Character>();
             }
 
-            if (character is not null && !collisionIds.Contains(character)) {
-                collisionIds.Add(character); // this hitbox already hit this character - skip them
+            if (target is not null && !collisionIds.Contains(target)) {
+                collisionIds.Add(target); // this hitbox already hit this character - skip them
 
                 if (
-                    (Origin==character.transform && !HitsFriendlies)
-                    || (Origin!=character.transform && !HitsEnemies)
+                    (Caster==target && !HitsFriendlies)
+                    || (Caster!=target && !HitsEnemies)
                     ) {
                     continue;
                 }
 
-                Vector3 baseKnockbackVector = GetKnockBackVector(character.transform.position);
-                float knockbackFactor = 1f;
-                Shield shield = character.GetComponentInChildren<Shield>();
+                Vector3 baseKnockbackVector = GetKnockBackVector(target.transform.position);
+                float knockbackFactor = HitTier>0?1f:0f;
+                Shield shield = target.GetComponentInChildren<Shield>();
                 int d = damage;
 
                 if ( // hitting shield
                     shield!=null
                     && shield.isActiveAndEnabled
-                    && GetClosestGameObject(gameObject, character.gameObject, shield.gameObject)==shield.gameObject
+                    && GetClosestGameObject(gameObject, target.gameObject, shield.gameObject)==shield.gameObject
                 ) {
                     knockbackFactor = GetKnockBackFactor(this, shield);
                 } else { // hitting player
@@ -220,15 +224,15 @@ public class Hit : MonoBehaviour {
                         // maybe check if an effect of the same type is active, and if so, do some sort of resolution
                         // e.g. if two slows are applied, refresh slow
                         StatusEffectBase effect = Instantiate(effects[i]);
-                        effect.Initialize(character);
+                        effect.Initialize(target);
                     }
 
-                    character.TakeDamage(d, HitTier);
+                    target.TakeDamage(d);
                 }
 
                 if (knockbackFactor>0) {
-                    character.TakeKnockback(
-                        GetHitLagVelocity(character),
+                    target.TakeKnockback(
+                        GetHitLagVelocity(target),
                         hitLagDuration,
                         knockbackFactor*baseKnockbackVector,
                         hitStunDuration);

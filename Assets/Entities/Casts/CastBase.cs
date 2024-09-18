@@ -50,19 +50,20 @@ public class CastBase : MonoBehaviour, ICastMessage {
     private bool rotatingClockwise = true;
     public Transform CastAimPositionTransform { get; private set; }
 
-
+    private Character Caster;
     public Transform Origin { get; private set; }
     public List<Hit> hits;
     public List<Projectile> projectiles;
     public List<StatusEffectBase> statusEffects;
 
-    public static CastBase Initiate(CastBase _cast, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+    public static CastBase Initiate(CastBase _cast, Character _owner, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
         CastBase cast = Instantiate(_cast);
-        cast.Initialize(_origin, _castAimPositionTransform, _rotatingClockwise);
+        cast.Initialize(_owner, _origin, _castAimPositionTransform, _rotatingClockwise);
         return cast;
     }
 
-    private void Initialize(Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+    private void Initialize(Character _owner, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+        Caster = _owner;
         Origin = _origin;
         CastAimPositionTransform = _castAimPositionTransform;
         rotatingClockwise = _rotatingClockwise;
@@ -71,18 +72,17 @@ public class CastBase : MonoBehaviour, ICastMessage {
             Assert.IsNotNull(hitEvent.hit);
         }
 
-        if (Origin.CompareTag("Character")) {
-            Character caster = Origin.GetComponent<Character>();
+        if (Caster != null) {
             foreach (StatusEffectBase sePrefab in statusEffectPefabs) {
                 StatusEffectBase se = Instantiate(sePrefab);
-                se.Initialize(caster);
+                se.Initialize(Caster);
                 statusEffects.Add(se);
             }
 
             if (commandMovementPrefab != null) {
                 CommandMovementBase commandMovement = Instantiate(commandMovementPrefab, transform);
-                commandMovement.Initialize(caster, CastAimPositionTransform.position, caster.transform.position);
-                caster.SetCommandMovement(commandMovement);
+                commandMovement.Initialize(Caster, CastAimPositionTransform.position, Caster.transform.position);
+                Caster.SetCommandMovement(commandMovement);
             }
         }
 
@@ -94,6 +94,7 @@ public class CastBase : MonoBehaviour, ICastMessage {
                 hits.Add(
                     Hit.Initiate(
                         hitEvent.hit,
+                        Caster,
                         Origin,
                         !rotatingClockwise
                     )
@@ -119,6 +120,7 @@ public class CastBase : MonoBehaviour, ICastMessage {
                         projectileEvent.projectile,
                         projectilePosition,
                         Origin.rotation*projectileEvent.radialOffset,
+                        Caster,
                         Origin,
                         CastAimPositionTransform
                     )

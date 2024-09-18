@@ -24,6 +24,8 @@ public class Canvas : MonoBehaviour {
 
     // Update is called once per frame
     void FixedUpdate() {
+        HealthBars.RemoveAll(bar => bar==null);
+
         for (int i = 0; i < HealthBars.Count; i++) {
             Vector2 ViewportPosition = Cam.WorldToViewportPoint(HealthBars[i].character.transform.position+offset);
             Vector2 WorldObject_ScreenPosition = new Vector2(

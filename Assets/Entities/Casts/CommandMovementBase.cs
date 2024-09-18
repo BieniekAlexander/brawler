@@ -19,6 +19,10 @@ public abstract class CommandMovementBase : MonoBehaviour {
         return Velocity;
     }
 
+    public virtual Quaternion GetRotation(Vector3 _currentPosition, Quaternion _currentRotation) {
+        return _currentRotation;
+    }
+
     public virtual void FixedUpdate() {
         if (++Frame >= duration) {
             Destroy(gameObject);

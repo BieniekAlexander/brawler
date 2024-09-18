@@ -8,7 +8,7 @@ public class HPBarVisuals  : MonoBehaviour {
     [SerializeField] public Character character;
     private Slider healthBar;
     
-    private void Start() {
+    private void Awake() {
         healthBar = GetComponent<Slider>();
         healthBar.maxValue = Character.HPMax;
         healthBar.value = character.HP;
@@ -16,6 +16,8 @@ public class HPBarVisuals  : MonoBehaviour {
 
     public void Update() {
         // TODO this happens every frame and will be slow - make this a callback instead
+        if (character==null) Destroy(gameObject);
+
         healthBar.value = character.HP;
     }
 }

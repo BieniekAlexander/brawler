@@ -27,7 +27,7 @@ public class CastGenerator : MonoBehaviour
             CastRoutine cr = castRoutines[i];
             
             if (++cr.timer == cr.frequency) {
-                CastBase c = CastBase.Initiate(cr.cast, transform, castTargetPosition, false);
+                CastBase c = CastBase.Initiate(cr.cast, null, transform, castTargetPosition, false);
                 cr.timer = 0;
             }
         }

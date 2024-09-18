@@ -347,6 +347,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
                     castContainer.cast = CastBase.Initiate(
                         castContainer.castPrefab,
+                        this,
                         transform,
                         CursorTransform,
                         RotatingClockwise);
@@ -477,6 +478,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private void HandleMovement() {
         if (CommandMovement != null) {
             cc.Move(CommandMovement.GetDPosition());
+            transform.rotation = CommandMovement.GetRotation(transform.position, transform.rotation);
         } else {
             Vector3 horizontalPlane = new Vector3(1, 0, 1);
             Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
@@ -524,7 +526,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     /// <summary>
-    /// TODO WIP
+    /// Determines the acceleration of the Character's movemnt while the shield is up
+    /// Generally, the Character shall slow down when the direction of their shield is in the direction of their movement
     /// </summary>
     /// <param name="level"></param>
     /// <param name="velocity"></param>
@@ -538,6 +541,13 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
+    /// <summary>
+    /// Determines how much the player's velocity rotates when using a boosted shield
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="velocity"></param>
+    /// <param name="lookVector"></param>
+    /// <returns></returns>
     private float GetShieldRotationFactor(ShieldLevel level, Vector3 velocity, Vector3 lookVector) {
         if (ShieldLevel == ShieldLevel.Boosted) {
 
@@ -652,6 +662,9 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     public void TakeKnockback(Vector3 _hitLagVector, int _hitLagDuration, Vector3 _knockbackVector, int _hitStunDuration) {
+        Destroy(CommandMovement);
+        CommandMovement = null;
+
         // hit lag
         HitLagTimer = _hitLagDuration;
         HitLagVector = _hitLagVector;
@@ -667,8 +680,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     public void TakeDamage(
-        int damage,
-        int damageTier = 1 // TODO still deciding if I'll use this here
+        int damage
         ) {
         // TODO finish implementation:
         // - evaluate knockback diff
@@ -681,7 +693,6 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         HP = (HP-damage<HP) ? (HP-damage) : Mathf.Min(HP-damage, healMax);
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
-        Velocity = Vector3.zero;
 
         if (HP<=0) {
             Destroy(gameObject);

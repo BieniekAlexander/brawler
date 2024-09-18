@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
     /* Movement */
     private CharacterController _cc;
     private Vector3 velocity;
+    private Character Caster;
     private Transform origin;
     public Transform target;
     [SerializeField] float rotationalControl = 120f;
@@ -17,20 +18,21 @@ public class Projectile : MonoBehaviour
     /* Target */
     [SerializeField] private Hit hit;
 
-    public static Projectile Initiate(Projectile _projectile, Transform _origin, Transform _target) {
+    public static Projectile Initiate(Projectile _projectile, Character _caster, Transform _origin, Transform _target) {
         Projectile projectile = Instantiate(_projectile);
-        projectile.Initialize(_origin, _target);
+        projectile.Initialize(_caster, _origin, _target);
         return projectile;
     }
 
-    public static Projectile Initiate(Projectile _projectile, Vector3 _position, Quaternion _rotation, Transform _origin, Transform _target) {
+    public static Projectile Initiate(Projectile _projectile, Vector3 _position, Quaternion _rotation, Character _caster, Transform _origin, Transform _target) {
         Projectile projectile = Instantiate(_projectile, _position, _rotation);
-        projectile.Initialize(_origin, _target);
+        projectile.Initialize(_caster, _origin, _target);
         return projectile;
     }
 
 
-    private void Initialize(Transform _origin, Transform _target) {
+    private void Initialize(Character _caster, Transform _origin, Transform _target) {
+        Caster =  _caster;
         origin = _origin;
         target = _target;
     }
@@ -51,6 +53,7 @@ public class Projectile : MonoBehaviour
             hit,
             transform.position,
             transform.rotation,
+            Caster,
             t,
             false // TODO mirror this at some point? idk
         );

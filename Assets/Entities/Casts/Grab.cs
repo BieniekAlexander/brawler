@@ -18,7 +18,7 @@ public class Grab : Hit {
     enum CoordinateSystem { Polar, Cartesian };
 
     /* Command Movement */
-    [SerializeField] public CommandMovementBase commandMovement;
+    [SerializeField] public CommandMovementBase commandMovementPrefab;
 
     /* Hits */
     [SerializeField] List<HitEvent> hitEvents;
@@ -54,7 +54,17 @@ public class Grab : Hit {
                 ) {
                     ;   // TODO implement grab techs
                 } else { // grabbing player
-                    character.SetCommandMovement(commandMovement);
+                    // TODO rename these vars - they're very mixed up
+                    CommandMovementLock z = (CommandMovementLock) commandMovementPrefab;
+                    CommandMovementLock commandMovementLock = Instantiate(z);
+                    commandMovementLock.Initialize(character,
+                        Vector2.zero, // TODO what are these zeroes? Are they okay?
+                        Vector2.zero,
+                        Origin,
+                        z.range*Vector3.forward,
+                        z.duration);
+
+                    character.SetCommandMovement(commandMovementLock);
                 }
             }
         }

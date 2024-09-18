@@ -48,10 +48,10 @@ public enum CastId {
     Heavy1 = 6,
     Heavy2 = 7,
     BoostedHeavy = 8,
-    Throw1 = 9,
-    Throw2 = 10,
-    BoostedThrow = 11,
-    DashAttack = 12,
+    DashAttack = 9,
+    Throw1 = 10,
+    Throw2 = 11,
+    BoostedThrow = 12,
     Ability1 = 13,
     Ability2 = 14,
     Ability3 = 15,
@@ -252,8 +252,9 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
+        if (context.ReadValueAsButton()){
             CastIdBuffer = (int)CastId.Throw1;
+        }
     }
     public void OnThrow2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())

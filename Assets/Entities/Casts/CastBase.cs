@@ -91,7 +91,6 @@ public class CastBase : MonoBehaviour, ICastMessage {
     void FixedUpdate() {
         foreach (HitEvent hitEvent in hitEvents) {
             if (hitEvent.startFrame==frame) {
-                Debug.Log(hitEvent.hit.name);
                 hits.Add(
                     Hit.Initiate(
                         hitEvent.hit,

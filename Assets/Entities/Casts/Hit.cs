@@ -43,8 +43,8 @@ public class Hit : MonoBehaviour {
     [SerializeField] private int damage;
     [SerializeField] private int hitLagDuration = 0;
     [SerializeField] private int hitStunDuration = 10;
-    [SerializeField] public bool HitsEnemies { get; private set; } = true;
-    [SerializeField] public bool HitsFriendlies { get; private set; } = false;
+    [SerializeField] public bool HitsEnemies = true;
+    [SerializeField] public bool HitsFriendlies = false;
 
     // Visualization
     private float animationDuration;

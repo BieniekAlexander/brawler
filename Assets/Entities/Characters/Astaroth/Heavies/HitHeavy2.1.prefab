@@ -60,7 +60,7 @@ MonoBehaviour:
   knockbackVector: {x: 0, y: 0, z: 25}
   hitTier: 3
   damage: 5
-  hitLagDuration: 7
+  hitLagDuration: 120
   hitStunDuration: 15
   hitsEnemies: 1
   hitsFriendlies: 0

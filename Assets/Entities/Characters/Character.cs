@@ -74,6 +74,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     private float standingY; private float standingOffset = .1f;
 
     // knockback
+    private Vector3 HitLagVector;
+    private Vector3 KnockBackVector;
     private int hitStunTimer = 0;
     public float KnockBackDecay { get; private set; } = 1f;
     public int HitLagTimer { get; private set; } = 0;
@@ -472,21 +474,22 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     private void HandleMovement() {
-        if (HitLagTimer-- >= 0) {
-            return;
-        } else if (CommandMovement != null) {
+        if (CommandMovement != null) {
             cc.Move(CommandMovement.GetDPosition());
         } else {
             Vector3 horizontalPlane = new Vector3(1, 0, 1);
             Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
             float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
 
-             if (hitStunTimer-- >= 0) {
+            if (HitLagTimer > 0) {
+                HitLagTimer--; // no-op - velocity is constant
+            } else if (HitLagTimer-- == 0) {
+                HorizontalVelocity = KnockBackVector;
+            } else if (hitStunTimer-- > 0) {
                 float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
                 HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
             } else { // normal movement
                 HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, movementDirection);
-
             }
 
             Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
@@ -496,7 +499,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Movement evaluations
     private Vector3 GetLookDirection() {
-        return (CursorTransform.position-cc.transform.position).normalized; 
+        return (CursorTransform.position-cc.transform.position).normalized;
     }
 
     /// <summary>
@@ -509,7 +512,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         float boostSpeedEnd = Mathf.Max(Velocity.magnitude, WalkSpeedMax)+boostSpeedBump;
         float boostSpeedStart = boostSpeedEnd + 2*boostSpeedBump;
         boostDecay = (boostSpeedEnd-boostSpeedStart)/boostMaxDuration;
-        
+
         Vector3 v = GetLookDirection();
         return new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
     }
@@ -527,18 +530,18 @@ public class Character : MonoBehaviour, ICharacterActions {
     /// <param name="lookVector"></param>
     /// <returns></returns>
     private float GetShieldAccelerationFactor(ShieldLevel level, Vector3 velocity, Vector3 lookVector) {
-        if (ShieldLevel == ShieldLevel.None) return 0; else {
+        if (ShieldLevel == ShieldLevel.None) return 0;
+        else {
             float x = (int)ShieldLevel * Vector3.Dot(velocity.normalized, lookVector.normalized);
-            return Mathf.Pow(x, (int) ShieldLevel);
+            return Mathf.Pow(x, (int)ShieldLevel);
         }
     }
 
     private float GetShieldRotationFactor(ShieldLevel level, Vector3 velocity, Vector3 lookVector) {
         if (ShieldLevel == ShieldLevel.Boosted) {
-            
+
             return 2.5f * (1-Vector3.Dot(velocity.normalized, lookVector.normalized));
-        }
-        else return 0;
+        } else return 0;
     }
 
     private Vector3 GetHorizontalVelocity(Vector3 horizontalVelocity, Vector3 biasDirection) {
@@ -549,7 +552,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         } else if (boostTimer-->0) {
             horizontalVelocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
             return horizontalVelocity;
-        }  else if (running && IsAboveWalkSpeed()) {
+        } else if (running && IsAboveWalkSpeed()) {
             float rotationalSpeed = runRotationalSpeed;
             if (ShieldLevel==ShieldLevel.Boosted) {
                 Vector3 lookDirection = GetLookDirection();
@@ -574,7 +577,11 @@ public class Character : MonoBehaviour, ICharacterActions {
                 0, accerleration*Time.deltaTime);
 
             Vector3 newVelocity = Vector3.ClampMagnitude(
-                horizontalVelocity + dSpeed*((biasDirection == Vector3.zero)?(-horizontalVelocity.normalized):biasDirection),
+                horizontalVelocity + dSpeed*(
+                    (biasDirection == Vector3.zero)
+                    ? (running ? Vector3.zero : (-horizontalVelocity.normalized))
+                    : biasDirection
+                ),
                 Mathf.Max(WalkSpeedMax, horizontalVelocity.magnitude)
             );
 
@@ -643,15 +650,19 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    public void TakeKnockback(Vector3 knockbackVector, float knockbackFactor, int hitLag, int hitStun) {
-        HitLagTimer = hitLag;
-        hitStunTimer = hitStun;
+    public void TakeKnockback(Vector3 _hitLagVector, int _hitLagDuration, Vector3 _knockbackVector, int _hitStunDuration) {
+        // hit lag
+        HitLagTimer = _hitLagDuration;
+        HitLagVector = _hitLagVector;
+        // hit stun
+        hitStunTimer = _hitStunDuration;
+        KnockBackVector = _knockbackVector;
 
-        if (knockbackFactor > 0) {
-            Velocity = Vector3.zero;
+        if (HitLagTimer > 0) {
+            Velocity = HitLagVector;
+        } else if (hitStunTimer > 0) {
+            Velocity = KnockBackVector;
         }
-
-        Velocity += knockbackFactor*knockbackVector;
     }
 
     public void TakeDamage(
@@ -667,7 +678,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         /*if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
             damageTier++;*/
 
-        HP = (HP-damage<HP)?(HP-damage):Mathf.Min(HP-damage, healMax);
+        HP = (HP-damage<HP) ? (HP-damage) : Mathf.Min(HP-damage, healMax);
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
         Velocity = Vector3.zero;
 

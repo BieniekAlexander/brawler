@@ -153,6 +153,29 @@ public class Hit : MonoBehaviour {
         else return ((float)hit.hitTier - (int)shield.ShieldLevel)/hit.hitTier;
     }
 
+    public Vector3 HitLagVelocity(Character target) {
+        // TODO generalize to someting that's moving (not just a character)
+        if (origin.CompareTag("Character")) {
+            Vector3 toTarget = target.transform.position-origin.position;
+            Vector3 originVelocity = origin.GetComponent<Character>().Velocity;
+            Vector3 frameVelocity = target.Velocity - originVelocity;
+            Vector3 normal = new Vector3(-toTarget.z, 0f, toTarget.x).normalized;
+            Debug.Log(normal);
+
+            Vector3 velocityPerp = Vector3.Project(originVelocity, toTarget);
+            Vector3 hitLagNormal = Vector3.Project(originVelocity, normal);
+            
+            if (Vector3.Dot(velocityPerp, toTarget)>0) { // if the frame of reference is towards the target
+                return velocityPerp + hitLagNormal;
+            } else {
+                return hitLagNormal;
+            }
+        }
+        
+        // fallback
+        return Vector3.zero;
+    }
+
     public void HandleHitCollisions() {
         List<Collider> otherColliders = GetOverlappingColliders(hitBox).ToList();
 
@@ -174,7 +197,7 @@ public class Hit : MonoBehaviour {
                     continue;
                 }
 
-                Vector3 knockbackVector = GetKnockBackVector(character.transform.position);
+                Vector3 baseKnockbackVector = GetKnockBackVector(character.transform.position);
                 float knockbackFactor = 1f;
                 Shield shield = character.GetComponentInChildren<Shield>();
                 int d = damage;
@@ -197,10 +220,18 @@ public class Hit : MonoBehaviour {
                 }
 
                 if (knockbackFactor>0) {
-                    character.TakeKnockback(knockbackVector, knockbackFactor, hitLagDuration, hitStunDuration);
+                    character.TakeKnockback(
+                        HitLagVelocity(character),
+                        hitLagDuration,
+                        knockbackFactor*baseKnockbackVector,
+                        hitStunDuration);
                 } else if (knockbackFactor<0 && origin.gameObject.CompareTag("Character")) {
                     Character c = origin.GetComponent<Character>();
-                    c.TakeKnockback(knockbackVector, knockbackFactor, 0, hitStunDuration);
+                    c.TakeKnockback(
+                        Vector3.zero,
+                        0,
+                        knockbackFactor*baseKnockbackVector,
+                        hitStunDuration);
                 }
             }
         }

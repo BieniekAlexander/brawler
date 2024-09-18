@@ -153,7 +153,7 @@ public class Hit : MonoBehaviour {
         else return ((float)hit.hitTier - (int)shield.ShieldLevel)/hit.hitTier;
     }
 
-    public Vector3 HitLagVelocity(Character target) {
+    public Vector3 GetHitLagVelocity(Character target) {
         // TODO generalize to someting that's moving (not just a character)
         if (origin.CompareTag("Character")) {
             Vector3 toTarget = target.transform.position-origin.position;
@@ -221,7 +221,7 @@ public class Hit : MonoBehaviour {
 
                 if (knockbackFactor>0) {
                     character.TakeKnockback(
-                        HitLagVelocity(character),
+                        GetHitLagVelocity(character),
                         hitLagDuration,
                         knockbackFactor*baseKnockbackVector,
                         hitStunDuration);

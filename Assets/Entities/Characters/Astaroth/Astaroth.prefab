@@ -238,6 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
+  MinimumRotationThreshold: 0
   castSlots:
   - name: Light1
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
@@ -292,7 +293,7 @@ MonoBehaviour:
   - name: Throw1
     castPrefab: {fileID: 5634063031192742342, guid: 77108086dc63b5943b182ef0190df45b,
       type: 3}
-    cooldown: -1
+    cooldown: 15
     defaultChargeCount: 1
   - name: Throw2
     castPrefab: {fileID: 5634063031192742342, guid: 8958b1d2a61eed348be1404c9b7ac002,

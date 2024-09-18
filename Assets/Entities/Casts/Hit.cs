@@ -18,15 +18,15 @@ public class Hit : MonoBehaviour {
     enum CoordinateSystem { Polar, Cartesian };
 
     /* Position */
-    private Transform origin; // origin of the cast, allowing for movement during animation
-    private bool mirror = false;
+    public Transform Origin; // origin of the cast, allowing for movement during animation
+    public bool Mirror { get; private set; } = false;
     [SerializeField] private CoordinateSystem positionCoordinateSystem;
-    [SerializeField] private Vector3[] positions;
-    [SerializeField] private Quaternion[] rotations;
-    [SerializeField] private Vector3[] dimensions;
+    [SerializeField] public Vector3[] positions;
+    [SerializeField] public Quaternion[] rotations;
+    [SerializeField] public Vector3[] dimensions;
 
     /* Collision */
-    private Collider hitBox;
+    public Collider HitBox { get; private set; }
     public HashSet<Character> collisionIds = new();
     [SerializeField] public List<StatusEffectBase> effects = new();
 
@@ -37,14 +37,14 @@ public class Hit : MonoBehaviour {
     /* Knockback */
     [SerializeField] private CoordinateSystem knockbackCoordinateSystem;
     [SerializeField] private Vector3 knockbackVector;
-    [SerializeField][Range(0, 3)] private int hitTier;
+    [SerializeField][Range(0, 3)] public int HitTier;
 
     /* Effects */
     [SerializeField] private int damage;
     [SerializeField] private int hitLagDuration = 0;
     [SerializeField] private int hitStunDuration = 10;
-    [SerializeField] private bool hitsEnemies = true;
-    [SerializeField] private bool hitsFriendlies = false;
+    [SerializeField] public bool HitsEnemies { get; private set; } = true;
+    [SerializeField] public bool HitsFriendlies { get; private set; } = false;
 
     // Visualization
     private float animationDuration;
@@ -55,7 +55,7 @@ public class Hit : MonoBehaviour {
         Assert.IsTrue(1<=rotations.Length&&rotations.Length<=duration);
         Assert.IsTrue(1<=dimensions.Length&&dimensions.Length<=duration);
 
-        hitBox=GetComponent<Collider>();
+        HitBox=GetComponent<Collider>();
     }
 
     public void Start() {
@@ -64,8 +64,8 @@ public class Hit : MonoBehaviour {
 
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         if (knockbackCoordinateSystem==CoordinateSystem.Cartesian) {
-            Vector3 knockBackDirection = origin.transform.rotation * knockbackVector;
-            if (mirror) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
+            Vector3 knockBackDirection = Origin.transform.rotation * knockbackVector;
+            if (Mirror) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
             return knockBackDirection;
         } else { // polar
             Vector3 hitboxToTargetNormalized = Vector3.Scale(targetPosition - transform.position, new Vector3(1,0,1)).normalized;
@@ -85,6 +85,12 @@ public class Hit : MonoBehaviour {
         return hit;
     }
 
+    public static Hit Instantiate(Grab _grab, Transform _origin, bool _mirror) {
+        Hit hit = Instantiate(_grab);
+        hit.Initialize(_origin, _mirror);
+        return hit;
+    }
+
     public static Hit Initiate(Hit _hit, Vector3 _position, Quaternion _rotation, Transform _origin, bool _mirror) {
         Hit hit = Instantiate(_hit, _position, _rotation);
         hit.Initialize(_origin, _mirror);
@@ -92,18 +98,18 @@ public class Hit : MonoBehaviour {
     }
 
     private void Initialize(Transform _origin, bool _mirror) {
-        mirror = _mirror;
+        Mirror = _mirror;
 
         if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
-            origin=new GameObject().transform;
-            origin.position=transform.position;
-            origin.rotation=transform.rotation;
+            Origin=new GameObject().transform;
+            Origin.position=transform.position;
+            Origin.rotation=transform.rotation;
         } else {
-            origin=_origin;
+            Origin=_origin;
         }
 
-        transform.rotation=origin.rotation*rotations[0];
-        transform.position=origin.position+positions[0];
+        transform.rotation=Origin.rotation*rotations[0];
+        transform.position=Origin.position+positions[0];
     }
 
     private void FixedUpdate() {
@@ -129,14 +135,14 @@ public class Hit : MonoBehaviour {
             : Quaternion.Euler(0, positions[positionFrame].x, 0);
 
         // TODO make sure that the calculations without an origin are correct
-        if (mirror) {
+        if (Mirror) {
             offset.x *= -1;
             orientation.y *= -1;
         }
 
         transform.localScale = dimensions[dimensionFrame];
-        transform.position = origin.position+origin.rotation*offset;
-        transform.rotation = origin.rotation*orientation*rotations[rotationFrame];
+        transform.position = Origin.position+Origin.rotation*offset;
+        transform.rotation = Origin.rotation*orientation*rotations[rotationFrame];
     }
 
     public static GameObject GetClosestGameObject(GameObject reference, params GameObject[] others) {
@@ -149,15 +155,15 @@ public class Hit : MonoBehaviour {
     }
 
     public static float GetKnockBackFactor(Hit hit, Shield shield) {
-        if (hit.hitTier==0) return 0;
-        else return ((float)hit.hitTier - (int)shield.ShieldLevel)/hit.hitTier;
+        if (hit.HitTier==0) return 0;
+        else return ((float)hit.HitTier - (int)shield.ShieldLevel)/hit.HitTier;
     }
 
     public Vector3 GetHitLagVelocity(Character target) {
         // TODO generalize to someting that's moving (not just a character)
-        if (origin.CompareTag("Character")) {
-            Vector3 toTarget = target.transform.position-origin.position;
-            Vector3 originVelocity = origin.GetComponent<Character>().Velocity;
+        if (Origin.CompareTag("Character")) {
+            Vector3 toTarget = target.transform.position-Origin.position;
+            Vector3 originVelocity = Origin.GetComponent<Character>().Velocity;
             Vector3 frameVelocity = target.Velocity - originVelocity;
             Vector3 normal = new Vector3(-toTarget.z, 0f, toTarget.x).normalized;
             Debug.Log(normal);
@@ -176,10 +182,10 @@ public class Hit : MonoBehaviour {
         return Vector3.zero;
     }
 
-    public void HandleHitCollisions() {
-        List<Collider> otherColliders = GetOverlappingColliders(hitBox).ToList();
+    public virtual void HandleHitCollisions() {
+        List<Collider> otherColliders = GetOverlappingColliders(HitBox).ToList();
 
-        foreach (Collider otherCollider in GetOverlappingColliders(hitBox)) {
+        foreach (Collider otherCollider in GetOverlappingColliders(HitBox)) {
             // identify the character that was hit
             GameObject go = otherCollider.gameObject;
             Character character = go.GetComponent<Character>();
@@ -191,8 +197,8 @@ public class Hit : MonoBehaviour {
                 collisionIds.Add(character); // this hitbox already hit this character - skip them
 
                 if (
-                    (origin==character.transform && !hitsFriendlies)
-                    || (origin!=character.transform && !hitsEnemies)
+                    (Origin==character.transform && !HitsFriendlies)
+                    || (Origin!=character.transform && !HitsEnemies)
                     ) {
                     continue;
                 }
@@ -215,8 +221,9 @@ public class Hit : MonoBehaviour {
                         // e.g. if two slows are applied, refresh slow
                         StatusEffectBase effect = Instantiate(effects[i]);
                         effect.Initialize(character);
-                        character.TakeDamage(d, hitTier);
                     }
+
+                    character.TakeDamage(d, HitTier);
                 }
 
                 if (knockbackFactor>0) {
@@ -225,8 +232,8 @@ public class Hit : MonoBehaviour {
                         hitLagDuration,
                         knockbackFactor*baseKnockbackVector,
                         hitStunDuration);
-                } else if (knockbackFactor<0 && origin.gameObject.CompareTag("Character")) {
-                    Character c = origin.GetComponent<Character>();
+                } else if (knockbackFactor<0 && Origin.gameObject.CompareTag("Character")) {
+                    Character c = Origin.GetComponent<Character>();
                     c.TakeKnockback(
                         Vector3.zero,
                         0,

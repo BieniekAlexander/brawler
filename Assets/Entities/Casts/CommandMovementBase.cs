@@ -11,7 +11,6 @@ public abstract class CommandMovementBase : MonoBehaviour {
     public int Frame { get; private set; } = 0;
     public List<StatusEffectBase> Effects { get; private set; } = new();
 
-
     public virtual void Initialize(Character mover,  Vector3 _destination, Vector3 initialPosition) {
         Path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);
     }

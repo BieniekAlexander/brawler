@@ -204,7 +204,6 @@ public class Hit : MonoBehaviour {
                     (Caster==target && !HitsFriendlies)
                     || (Caster!=target && !HitsEnemies)
                     ) {
-                    Debug.Log("not hit friendlies enemies clause");
                     continue;
                 }
 

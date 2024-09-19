@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2849847753845790583}
   - component: {fileID: 8132188160890251787}
   - component: {fileID: -1381651177396327487}
+  - component: {fileID: -4671031975909978345}
   m_Layer: 3
   m_Name: Shield
   m_TagString: Character
@@ -105,3 +106,15 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4671031975909978345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 967517793056741292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a865d4f0cdff4439a7b4c8435f8326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

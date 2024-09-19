@@ -60,7 +60,7 @@ MonoBehaviour:
   duration: 3
   knockbackCoordinateSystem: 0
   knockbackVector: {x: 0, y: 0, z: 0}
-  HitTier: 0
+  HitTier: 1
   damage: 50
   hitLagDuration: 0
   hitStunDuration: 0

@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 967517793056741292}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.2070026, y: 6, z: -7.0281515}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e2d463c2d2dcb7143879c4de4f53866c, type: 2}
+  - {fileID: 2100000, guid: f54c0b42ae6e30b4f83e91b543ce09a1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -237,7 +237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff29245a97187da4b80e22df503139dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  me: 0
   MinimumRotationThreshold: 0
   castSlots:
   - name: Light1
@@ -341,3 +340,5 @@ MonoBehaviour:
     cooldown: -1
     defaultChargeCount: 1
   CastIdBuffer: -1
+  ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
+    type: 3}

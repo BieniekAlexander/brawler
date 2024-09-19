@@ -63,11 +63,10 @@ public enum CastId {
 
 public class Character : MonoBehaviour, ICharacterActions {
     // is this me? TODO better way to do this
-    [SerializeField] bool me;
+    [SerializeField] public bool me { get; set; } = false;
 
     /* Movement */
     private CharacterController cc;
-    public Shield Shield { get; private set; }
     public Vector3 Velocity { get; private set; } = new();
     public CommandMovementBase CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
@@ -137,6 +136,10 @@ public class Character : MonoBehaviour, ICharacterActions {
     /* Status Effects */
     private List<StatusEffectBase> statusEffects = new();
     private bool invincible = false;
+
+    /* Children */
+    [SerializeField] public Shield ShieldPrefab;
+    public Shield Shield { get; private set; }
 
     /*
      * CONTROLS
@@ -295,11 +298,19 @@ public class Character : MonoBehaviour, ICharacterActions {
             CastIdBuffer = (int)CastId.Ultimate;
     }
 
+    public void SetMe() {
+        me = true; // work on this more
+        characterControls = new CharacterControls();
+        characterControls.Enable(); // TODO do I need to disable this somewhere?
+        characterControls.character.SetCallbacks(this);
+    }
+
     void HandleControls() {
         if (me) {
             // aiming TODO move to input manager
             UpdateCursorTransformWorldPosition();
             var playerPosition = cc.transform.position;
+            aimPlane.SetNormalAndPosition(Vector3.up, playerPosition);
             var direction = new Vector3(CursorTransform.position.x-playerPosition.x, 0, CursorTransform.position.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
 
@@ -392,26 +403,24 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     private void Awake() {
-        cc=GetComponent<CharacterController>();
-        Shield = GetComponentInChildren<Shield>();
-        Shield.gameObject.SetActive(false);
-        Material = GetComponent<Renderer>().material;
-        tr = GetComponent<TrailRenderer>();
-
+        // Controls
         GameObject cursorGameObject = new GameObject("Player Cursor Object");
         cursorGameObject.transform.parent = transform;
         CursorTransform = cursorGameObject.transform;
-
         aimPlane = new Plane(Vector3.up, transform.position);
+
+        // State
+        cc=GetComponent<CharacterController>();
         standingY = transform.position.y + standingOffset;
         healMax = HP;
 
-        if (me) // set up controls
-        {
-            characterControls = new CharacterControls();
-            characterControls.Enable(); // TODO do I need to disable this somewhere?
-            characterControls.character.SetCallbacks(this);
-        }
+        // Children
+        Shield = Instantiate(ShieldPrefab, transform);
+        Shield.gameObject.SetActive(false);
+
+        // Visuals
+        Material = GetComponent<Renderer>().material;
+        tr = GetComponent<TrailRenderer>();
 
         for (int i = 0; i<castSlots.Length; i++) {
             castContainers[i] = new CastContainer(castSlots[i]);

@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Caster: {fileID: 0}
   Origin: {fileID: 0}
   positionCoordinateSystem: 0
   positions:
@@ -63,7 +64,7 @@ MonoBehaviour:
   duration: 10
   knockbackCoordinateSystem: 0
   knockbackVector: {x: 0, y: 0, z: -5}
-  HitTier: 0
+  HitTier: 1
   damage: 300
   hitLagDuration: 0
   hitStunDuration: 0

@@ -193,7 +193,7 @@ public class Hit : MonoBehaviour {
             // identify the character that was hit
             GameObject go = otherCollider.gameObject;
             Character target = go.GetComponent<Character>();
-            if (target == null) { // the case that something else of the c
+            if (target == null) { // the case that the hitbox hit a child of the character
                 target = go.GetComponentInParent<Character>();
             }
 
@@ -204,6 +204,7 @@ public class Hit : MonoBehaviour {
                     (Caster==target && !HitsFriendlies)
                     || (Caster!=target && !HitsEnemies)
                     ) {
+                    Debug.Log("not hit friendlies enemies clause");
                     continue;
                 }
 

@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Caster: {fileID: 0}
+  Origin: {fileID: 0}
   positionCoordinateSystem: 0
   positions:
   - {x: 0, y: 0, z: 2.5}
@@ -60,12 +62,12 @@ MonoBehaviour:
   duration: 5
   knockbackCoordinateSystem: 1
   knockbackVector: {x: 0, y: 0, z: -10}
-  hitTier: 2
+  HitTier: 2
   damage: 1
   hitLagDuration: 5
   hitStunDuration: 10
-  hitsEnemies: 1
-  hitsFriendlies: 1
+  HitsEnemies: 1
+  HitsFriendlies: 0
 --- !u!136 &7506723417326245698
 CapsuleCollider:
   m_ObjectHideFlags: 0

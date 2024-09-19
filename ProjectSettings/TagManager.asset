@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Character
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX

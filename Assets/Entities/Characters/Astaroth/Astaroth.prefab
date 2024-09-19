@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 4584570722456235046}
   - component: {fileID: 8359697329656048070}
   - component: {fileID: 3614030272537791910}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Astaroth
-  m_TagString: Respawn
+  m_TagString: Character
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

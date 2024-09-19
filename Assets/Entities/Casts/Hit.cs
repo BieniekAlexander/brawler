@@ -232,14 +232,16 @@ public class Hit : MonoBehaviour {
 
                 if (knockbackFactor>0) {
                     target.TakeKnockback(
-                        GetHitLagVelocity(target),
                         hitLagDuration,
                         knockbackFactor*baseKnockbackVector,
                         hitStunDuration);
+
+                    if (Origin.transform == Caster.transform) {
+                        Caster.TakeKnockback(hitLagDuration);
+                    }
                 } else if (knockbackFactor<0 && Origin.gameObject.CompareTag("Character")) {
                     Character c = Origin.GetComponent<Character>();
                     c.TakeKnockback(
-                        Vector3.zero,
                         0,
                         knockbackFactor*baseKnockbackVector,
                         hitStunDuration);

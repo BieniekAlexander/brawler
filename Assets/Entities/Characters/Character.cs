@@ -73,8 +73,6 @@ public class Character : MonoBehaviour, ICharacterActions {
     private float standingY; private float standingOffset = .1f;
 
     // knockback
-    private Vector3 HitLagVector;
-    private Vector3 KnockBackVector;
     private int hitStunTimer = 0;
     public float KnockBackDecay { get; private set; } = 1f;
     public int HitLagTimer { get; private set; } = 0;
@@ -493,10 +491,8 @@ public class Character : MonoBehaviour, ICharacterActions {
             Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
             float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
 
-            if (HitLagTimer > 0) {
-                HitLagTimer--; // no-op - velocity is constant
-            } else if (HitLagTimer-- == 0) {
-                HorizontalVelocity = KnockBackVector;
+            if (HitLagTimer-- > 0) {
+                return; // no-op - don't move, don't update velocity, no nothing
             } else if (hitStunTimer-- > 0) {
                 float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
                 HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
@@ -670,22 +666,21 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    public void TakeKnockback(Vector3 _hitLagVector, int _hitLagDuration, Vector3 _knockbackVector, int _hitStunDuration) {
+    public void TakeKnockback(int _hitLagDuration, Vector3 _knockbackVector, int _hitStunDuration) {
         Destroy(CommandMovement);
         CommandMovement = null;
 
-        // hit lag
+        // hit lag, hit stun
         HitLagTimer = _hitLagDuration;
-        HitLagVector = _hitLagVector;
-        // hit stun
         hitStunTimer = _hitStunDuration;
-        KnockBackVector = _knockbackVector;
 
-        if (HitLagTimer > 0) {
-            Velocity = HitLagVector;
-        } else if (hitStunTimer > 0) {
-            Velocity = KnockBackVector;
+        if (_knockbackVector != Vector3.zero) {
+            Velocity = _knockbackVector;
         }
+    }
+
+    public void TakeKnockback(int _hitLagDuration) {
+        TakeKnockback(_hitLagDuration, Vector3.zero, 0);
     }
 
     public void TakeDamage(

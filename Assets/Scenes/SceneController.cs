@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,29 +7,51 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SceneController : MonoBehaviour
 {
+    [SerializeField] List<Character> CharacterPrefabs;
     public static SceneController Instance;
 
-    string scene1 = "scene1";
-    string scene2 = "scene2";
+    string scene0 = "TempleSummit";
+    string scene1 = "Forsaken";
+    private string activeScene;
 
-    // Start is called before the first frame update
-    void Awake()   {
+    void Awake() {
         if (Instance == null) {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeScene();
         } else {
             Destroy(gameObject);
+            InitializeScene();
+        }
+    }
+
+    void InitializeScene() {
+        GameObject[] spawnGameObjects = GameObject.FindGameObjectsWithTag("SpawnPoint"); // "GetComponentsInChildren" name misleading - will return parent too
+
+        for (int i = 0; i < CharacterPrefabs.Count; i++) {
+            Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
+            if (i == 0) {
+                Char.SetMe();
+                GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
+            }
         }
     }
 
     void Update() {
         if (Input.GetKey(KeyCode.RightControl) && Input.GetKey(KeyCode.RightAlt)) {
             if (Input.GetKey(KeyCode.R)) {
+                activeScene = scene0;
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                InitializeScene();
+                Debug.Log($"[{this.name}] Reloading scene");
             } else if (Input.GetKey(KeyCode.Keypad0)) {
-                SceneManager.LoadScene(scene1);
+                SceneManager.LoadScene(scene0);
+                InitializeScene();
+                Debug.Log($"[{this.name}] Loading {scene0}");
             } else if (Input.GetKey(KeyCode.Keypad1)) {
-                SceneManager.LoadScene(scene2);
+                SceneManager.LoadScene(scene1);
+                InitializeScene();
+                Debug.Log($"[{this.name}] Loading {scene1}");
             }
         }
     }

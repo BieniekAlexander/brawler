@@ -507,7 +507,9 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     // Movement evaluations
     private Vector3 GetLookDirection() {
-        return (CursorTransform.position-cc.transform.position).normalized;
+        Vector3 LookDirection = CursorTransform.position-cc.transform.position;
+        LookDirection.y = 0;
+        return LookDirection.normalized;
     }
 
     /// <summary>
@@ -648,7 +650,9 @@ public class Character : MonoBehaviour, ICharacterActions {
             Character otherCharacter = collisionObject.GetComponent<Character>();
 
             if (otherCharacter.Velocity.magnitude<Velocity.magnitude) {
-                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-boostDecay)*Time.deltaTime*5; // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
+                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-boostDecay)*Time.deltaTime*30;
                 dvNormal.y = 0f;
                 Velocity-=dvNormal;
                 otherCharacter.Velocity=Velocity+dvNormal;

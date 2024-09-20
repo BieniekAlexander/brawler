@@ -25,6 +25,8 @@ public class CameraMovement : MonoBehaviour
             float cameraZ = (Input.mousePosition.y - (Screen.height / 2)) / Screen.height;
             Vector3 relativeMousePosition = new Vector3(cameraX, 0, cameraZ) * relativePosition.y * 1f * cameraLockFactor;
             transform.position = TransTarget.position + relativePosition + relativeMousePosition;
+        } else {
+            transform.position = new Vector3(0, 50, -20);
         }
     }
 }

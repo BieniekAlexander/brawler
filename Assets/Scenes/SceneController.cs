@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +15,11 @@ public class SceneController : MonoBehaviour
     string scene1 = "Forsaken";
     private string activeScene;
 
+    public static GameObject[] GetSceneSpawns() {
+        return GameObject.FindGameObjectsWithTag("SpawnPoint"); // "GetComponentsInChildren" name misleading - will return parent too
+    }
+
+
     void Awake() {
         if (Instance == null) {
             Instance = this;
@@ -26,7 +32,7 @@ public class SceneController : MonoBehaviour
     }
 
     void InitializeScene() {
-        GameObject[] spawnGameObjects = GameObject.FindGameObjectsWithTag("SpawnPoint"); // "GetComponentsInChildren" name misleading - will return parent too
+        GameObject[] spawnGameObjects = GetSceneSpawns();
 
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);

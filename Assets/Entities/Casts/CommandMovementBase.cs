@@ -9,7 +9,7 @@ public abstract class CommandMovementBase : MonoBehaviour {
     public Vector3 Path { get; set; }
     public Vector3 Velocity { get; set; }
     public int Frame { get; private set; } = 0;
-    public List<StatusEffectBase> Effects { get; private set; } = new();
+    public List<EffectBase> Effects { get; private set; } = new();
 
     public virtual void Initialize(Character mover,  Vector3 _destination, Vector3 initialPosition) {
         Path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);

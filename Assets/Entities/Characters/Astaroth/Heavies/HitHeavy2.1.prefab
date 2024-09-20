@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Caster: {fileID: 0}
   Origin: {fileID: 0}
+  Mirror: 0
   positionCoordinateSystem: 0
   positions:
   - {x: 0, y: 0, z: 2}
@@ -56,16 +57,19 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 1}
   dimensions:
   - {x: 2, y: 0, z: 2}
+  Collider: {fileID: 0}
   effects: []
   duration: 5
-  knockbackCoordinateSystem: 0
-  knockbackVector: {x: 0, y: 0, z: 25}
-  HitTier: 3
+  DissapearOnTrigger: 0
+  frame: 0
   damage: 5
-  hitLagDuration: 7
-  hitStunDuration: 15
   HitsEnemies: 1
   HitsFriendlies: 0
+  KnockbackCoordinateSystem: 0
+  BaseKnockbackVector: {x: 0, y: 0, z: 18}
+  HitTier: 3
+  hitLagDuration: 7
+  hitStunDuration: 15
 --- !u!135 &4750509685277307634
 SphereCollider:
   m_ObjectHideFlags: 0

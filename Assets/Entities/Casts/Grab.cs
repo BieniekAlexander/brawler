@@ -13,10 +13,10 @@ public class Grab : Hit {
     /* Cast, to be triggered on grab */
     [SerializeField] CastBase TriggerCastPrefab;
 
-    public override void HandleHitCollisions() {
-        List<Collider> otherColliders = GetOverlappingColliders(HitBox).ToList();
+    public override void HandleCollisions() {
+        List<Collider> otherColliders = GetOverlappingColliders(Collider).ToList();
 
-        foreach (Collider otherCollider in GetOverlappingColliders(HitBox)) {
+        foreach (Collider otherCollider in GetOverlappingColliders(Collider)) {
             // identify the character that was hit
             GameObject go = otherCollider.gameObject;
             Character target = go.GetComponent<Character>();
@@ -24,8 +24,8 @@ public class Grab : Hit {
                 target = go.GetComponentInParent<Character>();
             }
 
-            if (target is not null && !collisionIds.Contains(target)) {
-                collisionIds.Add(target); // this hitbox already hit this character - skip them
+            if (target is not null && !TriggeredColliderIds.Contains(target)) {
+                TriggeredColliderIds.Add(target); // this hitbox already hit this character - skip them
 
                 if (
                     (Caster==target && !HitsFriendlies)

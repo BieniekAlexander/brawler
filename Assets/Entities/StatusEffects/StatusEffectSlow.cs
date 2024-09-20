@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StatusEffectSlow: StatusEffectBase {
+public class StatusEffectSlow: EffectBase {
     private float slowFactor = .5f;
 
     public override void Initialize(Character _character) {

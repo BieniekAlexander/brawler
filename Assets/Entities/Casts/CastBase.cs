@@ -39,7 +39,7 @@ public class CastBase : MonoBehaviour, ICastMessage {
     // Start is called before the first frame update
     [SerializeField] public HitEvent[] hitEvents;
     [SerializeField] ProjectileEvent[] projectileEvents;
-    [SerializeField] List<StatusEffectBase> statusEffectPefabs;
+    [SerializeField] List<EffectBase> statusEffectPefabs;
     [SerializeField] public CommandMovementBase commandMovementPrefab;
 
     private int frame = 0;
@@ -54,7 +54,7 @@ public class CastBase : MonoBehaviour, ICastMessage {
     public Transform Origin { get; private set; }
     public List<Hit> hits;
     public List<Projectile> projectiles;
-    public List<StatusEffectBase> statusEffects;
+    public List<EffectBase> statusEffects;
 
     public static CastBase Initiate(CastBase _cast, Character _owner, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
         CastBase cast = Instantiate(_cast);
@@ -73,8 +73,8 @@ public class CastBase : MonoBehaviour, ICastMessage {
         }
 
         if (Caster != null) {
-            foreach (StatusEffectBase sePrefab in statusEffectPefabs) {
-                StatusEffectBase se = Instantiate(sePrefab);
+            foreach (EffectBase sePrefab in statusEffectPefabs) {
+                EffectBase se = Instantiate(sePrefab);
                 se.Initialize(Caster);
                 statusEffects.Add(se);
             }

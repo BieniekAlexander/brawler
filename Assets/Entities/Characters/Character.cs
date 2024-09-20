@@ -67,7 +67,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Movement */
     private CharacterController cc;
-    public Vector3 Velocity { get; private set; } = new();
+    [HideInInspector] public Vector3 Velocity = new();
     public CommandMovementBase CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
@@ -132,7 +132,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int maxEnergy = 100;
 
     /* Status Effects */
-    private List<StatusEffectBase> statusEffects = new();
+    private List<EffectBase> statusEffects = new();
     private bool invincible = false;
 
     /* Children */
@@ -479,7 +479,7 @@ public class Character : MonoBehaviour, ICharacterActions {
             statusEffects[i].Tick();
         }
 
-        statusEffects.RemoveAll((StatusEffectBase effect) => { return (effect == null); });
+        statusEffects.RemoveAll((EffectBase effect) => { return (effect == null); });
     }
 
     private void HandleMovement() {
@@ -608,7 +608,9 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     private float GetVerticalVelocity(float currentYVelocity, float gravity) {
-        if (currentYVelocity <= 0 && Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f)) {
+        Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f);
+
+        if (currentYVelocity <= 0 && hitInfo.transform!=null && hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Terrain")) {
             // // snap the character to the standing Height - TODO current implementation seems hacky, but it works?
             standingY = hitInfo.point.y + cc.radius + standingOffset;
             transform.position = new Vector3(transform.position.x, standingY, transform.position.z);
@@ -630,7 +632,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
 
-        if (collisionObject.layer==LayerMask.NameToLayer("Default")) {
+        if (collisionObject.layer==LayerMask.NameToLayer("Terrain")) {
             if (running) { // if you hit a 
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
@@ -704,7 +706,7 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         if (HP<=0) {
             Destroy(gameObject);
-        }
+        } 
     }
 
     void OnGUI() {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
-public class StatusEffectImmaterial: StatusEffectBase {
+public class StatusEffectImmaterial: EffectBase {
     public override void Initialize(Character _character) {
         base.Initialize(_character);
         _character.gameObject.layer = LayerMask.NameToLayer("Immaterial");

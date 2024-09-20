@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StatusEffectBurning: StatusEffectBase {
+public class StatusEffectBurning: EffectBase {
     [SerializeField] int damage;
 
     public override void Initialize(Character _character) {

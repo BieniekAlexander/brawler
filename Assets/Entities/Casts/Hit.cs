@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
+
 
 
 /// <summary>
@@ -11,7 +9,7 @@ using UnityEngine.Assertions;
 ///     I update its properties from default values, so any changes to the size will only be to transform.localScale
 /// </summary>
 [Serializable]
-public class Hit : Trigger {
+public class Hit : Trigger, ICollidable {
     /* Effects */
     [SerializeField] private int damage;
     [SerializeField] public bool HitsEnemies = true;
@@ -20,7 +18,7 @@ public class Hit : Trigger {
     /* Knockback */
     [SerializeField] private CoordinateSystem KnockbackCoordinateSystem;
     [SerializeField] private Vector3 BaseKnockbackVector;
-    [SerializeField][Range(0, 3)] public int HitTier;
+    [SerializeField] public HitTier HitTier;
     [SerializeField] private int hitLagDuration = 0;
     [SerializeField] private int hitStunDuration = 10;
 
@@ -41,119 +39,90 @@ public class Hit : Trigger {
         }
     }
 
-    /* Initialization */
-    public static Hit Initiate(Hit _hit, Character _owner, Transform _origin, bool _mirror) {
-        Hit hit = Instantiate(_hit);
-        hit.Initialize(_owner, _origin, _mirror);
-        return hit;
+    /* ICollidable Methods */
+    public virtual void OnCollideWith(ICollidable other) {
+        Physics.Raycast(
+                transform.position,
+                other.GetCollider().transform.position,
+                out RaycastHit hitInfo,
+                LayerMask.NameToLayer("Characters") // TODO dunno if this will hit shields, but it should
+            ); // TODO this will also currently ignore other IDamagables and IMovables, but I'll fix this later
+
+        if (other is IMoves Mover) {
+            float targetKnockbackFactor = Mover.TakeKnockBack(
+                    hitInfo.point,
+                    hitLagDuration,
+                    BaseKnockbackVector,
+                    hitStunDuration,
+                    HitTier
+                );
+
+            if (targetKnockbackFactor > 0f && (Caster is IMoves thisMover)) {
+                // TODO this might apply knockback to things other than characters
+                thisMover.TakeKnockBack(
+                    thisMover.GetTransform().position,
+                    hitLagDuration,
+                    targetKnockbackFactor  * BaseKnockbackVector,
+                    hitStunDuration,
+                    HitTier
+                );
+            }
+        }
+
+        if (other is IDamageable Damagable) {
+            Damagable.TakeDamage(
+                hitInfo.point,
+                damage,
+                HitTier
+            );
+        }
     }
 
-    public static Hit Instantiate(Grab _grab, Character _owner, Transform _origin, bool _mirror) {
-        Hit hit = Instantiate(_grab);
-        hit.Initialize(_owner, _origin, _mirror);
-        return hit;
-    }
-
-    public static Hit Initiate(Hit _hit, Vector3 _position, Quaternion _rotation, Character _owner, Transform _origin, bool _mirror) {
-        Hit hit = Instantiate(_hit, _position, _rotation);
-        hit.Initialize(_owner, _origin, _mirror);
-        return hit;
-    }
-
-    private void Initialize(Character _owner, Transform _origin, bool _mirror) {
-        Caster = _owner;
-        Mirror = _mirror;
-
-        if (_origin is null) { // if the constructor didn't supply an origin to follow, make one
-            Origin=new GameObject().transform;
-            Origin.position=transform.position;
-            Origin.rotation=transform.rotation;
+    /*
+    foreach (Collider target in GetOverlappingColliders(Collider)) {
+        if (
+            (Caster==target.gameObject && !HitsFriendlies)
+            || (Caster!=target.gameObject && !HitsEnemies)
+        ) {
+            ;
         } else {
-            Origin=_origin;
-        }
+            // find the contact point of the hit and apply knockback
+            // as implemented below, the contact point is the raycast from the hitbox center to the target 
+            Physics.Raycast(
+                transform.position,
+                target.transform.position,
+                out RaycastHit hitInfo,
+                LayerMask.NameToLayer("Characters") // TODO dunno if this will hit shields, but it should
+            );
 
-        transform.rotation=Origin.rotation*rotations[0];
-        transform.position=Origin.position+positions[0];
-    }
+            if (target is IMoves) { // if it can be knocked back, do so
+                // TODO make sure this all behaves properly
+                float targetKnockbackFactor = (target as IMoves).TakeKnockBack(
+                    hitInfo.point,
+                    hitLagDuration,
+                    BaseKnockbackVector,
+                    hitStunDuration,
+                    HitTier
+                );
 
-    /* Utility Functions */
-    public static float GetKnockBackFactor(Hit hit, Shield shield) {
-        if (hit.HitTier==0) return 0;
-        else return ((float)hit.HitTier - (int)shield.ShieldLevel)/hit.HitTier;
-    }
-
-    /* State Handling */
-    private void FixedUpdate() {
-        if (frame>=duration)
-            Destroy(gameObject);
-
-        UpdateTransform();
-        HandleCollisions();
-        frame++;
-    }
-
-    public virtual void HandleCollisions() {
-        List<Collider> otherColliders = GetOverlappingColliders(Collider).ToList();
-
-        foreach (Collider otherCollider in GetOverlappingColliders(Collider)) {
-            // identify the character that was hit
-            GameObject go = otherCollider.gameObject;
-            Character target = go.GetComponent<Character>();
-            if (target == null) { // the case that the hitbox hit a child of the character
-                target = go.GetComponentInParent<Character>();
-            }
-
-            if (target is not null && !RedundantCollisions && !TriggeredColliderIds.Contains(target)) {
-                TriggeredColliderIds.Add(target); // this hitbox already hit this character - skip them
-
-                if (
-                    (Caster==target && !HitsFriendlies)
-                    || (Caster!=target && !HitsEnemies)
-                    ) {
-                    continue;
-                }
-
-                Vector3 baseKnockbackVector = GetKnockBackVector(target.transform.position);
-                float knockbackFactor = HitTier>0?1f:0f;
-                Shield shield = target.GetComponentInChildren<Shield>();
-                int d = damage;
-
-                if ( // hitting shield
-                    shield!=null
-                    && shield.isActiveAndEnabled
-                    && GetClosestGameObject(gameObject, target.gameObject, shield.gameObject)==shield.gameObject
-                ) {
-                    knockbackFactor = GetKnockBackFactor(this, shield);
-                } else { // hitting player
-                    for (int i = 0; i < effects.Count; i++) {
-                        // TODO what if I don't want the status effect to stack?
-                        // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                        // e.g. if two slows are applied, refresh slow
-                        EffectBase effect = Instantiate(effects[i]);
-                        effect.Initialize(target);
-                    }
-
-                    target.TakeDamage(d);
-                }
-
-                if (knockbackFactor>0) {
-                    target.TakeKnockback(
+                if (targetKnockbackFactor > 0f && Caster.CompareTag("Character")) {
+                    (Caster.GetComponent<Character>()).TakeKnockBack(
+                        Caster.transform.position,
                         hitLagDuration,
-                        knockbackFactor*baseKnockbackVector,
-                        hitStunDuration);
-
-                    if (Origin.transform == Caster.transform) {
-                        Caster.TakeKnockback(hitLagDuration);
-                    }
-                } else if (knockbackFactor<0 && Origin.gameObject.CompareTag("Character")) {
-                    Character c = Origin.GetComponent<Character>();
-                    c.TakeKnockback(
-                        0,
-                        knockbackFactor*baseKnockbackVector,
-                        hitStunDuration);
+                        targetKnockbackFactor  * BaseKnockbackVector,
+                        hitStunDuration,
+                        1
+                    );
                 }
             }
-        }
 
-    }
+            if (target is IDamageable) {
+                (target as IDamageable).TakeDamage(
+                    hitInfo.point,
+                    damage
+                );
+            }   
+        }   
+    }*/
 }
+

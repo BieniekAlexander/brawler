@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RocketGenerator : MonoBehaviour
+public class RocketGenerator : MonoBehaviour, ICasts
 {
     [SerializeField] private Projectile rocketPrefab;
     [SerializeField] Transform target;
@@ -29,18 +29,29 @@ public class RocketGenerator : MonoBehaviour
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
                 Vector3 initialPosition = new Vector3(randX, target.position.y+.1f, randZ);
-                Projectile.Initiate(
+                Castable.Cast(
                     rocketPrefab,
-                    transform.position,
-                    Quaternion.LookRotation(target.position - initialPosition),
-                    null,
+                    this,
                     transform,
-                    target
+                    target,
+                    IsRotatingClockwise()
                 );
             }
             
             timer = reloadTime;
         }
+    }
+
+    public Transform GetOriginTransform() {
+        return transform;
+    }
+
+    public Transform GetTargetTransform() {
+        return target; // TODO return to this - maybe I want the generator to handle its own target
+    }
+
+    public bool IsRotatingClockwise() {
+        return true; // TODO return to this - make sure that I'm calculating the rotation shits
     }
 }
 

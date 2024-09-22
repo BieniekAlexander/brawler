@@ -1,11 +1,11 @@
-using System;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.InputSystem;
 using static CharacterControls;
 using System.Collections.Generic;
+using System.Linq;
+using System;
+using Unity.VisualScripting;
+using UnityEditor;
+using UnityEngine.InputSystem;
+using UnityEngine;
 
 [Serializable]
 public class CastSlot {
@@ -17,7 +17,7 @@ public class CastSlot {
     }
 
     public string name;
-    public CastBase castPrefab;
+    public Cast castPrefab;
     public int cooldown;
     public int defaultChargeCount;
 }
@@ -31,8 +31,8 @@ public struct CastContainer {
         charges = _castSlot.defaultChargeCount;
     }
 
-    public CastBase castPrefab;
-    public CastBase cast;
+    public Cast castPrefab;
+    public Cast cast;
     public int cooldown;
     public int timer;
     public int charges;
@@ -61,14 +61,14 @@ public enum CastId {
     Ultimate = 19
 }
 
-public class Character : MonoBehaviour, ICharacterActions {
+public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions {
     // is this me? TODO better way to do this
     [SerializeField] public bool me { get; set; } = false;
 
     /* Movement */
     private CharacterController cc;
     [HideInInspector] public Vector3 Velocity = new();
-    public CommandMovementBase CommandMovement { get; private set; } = null;
+    public CommandMovement CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
 
@@ -99,14 +99,13 @@ public class Character : MonoBehaviour, ICharacterActions {
 
     /* Controls */
     private CharacterControls characterControls;
-    public bool RotatingClockwise { get; private set; } = false;
+    private bool RotatingClockwise = false;
     [SerializeField] public float MinimumRotationThreshold = 1f;
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
     private Vector3 movementDirection = new();
     private bool boost = false;
     private bool running = false;
-    private ShieldLevel ShieldLevel = ShieldLevel.None;
 
     /* Abilities */
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
@@ -132,7 +131,7 @@ public class Character : MonoBehaviour, ICharacterActions {
     private int maxEnergy = 100;
 
     /* Status Effects */
-    private List<EffectBase> statusEffects = new();
+    private List<Effect> statusEffects = new();
     private bool invincible = false;
 
     /* Children */
@@ -232,22 +231,20 @@ public class Character : MonoBehaviour, ICharacterActions {
     // shields
     public void OnShield(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            ShieldLevel = ShieldLevel.Normal;
             Shield.gameObject.SetActive(true);
-            Shield.ShieldLevel = ShieldLevel;
+            Shield.ShieldTier = ShieldTier.Normal;
         } else {
-            ShieldLevel = ShieldLevel.None;
             Shield.gameObject.SetActive(false);
+            Shield.ShieldTier = ShieldTier.None;
         }
     }
     public void OnBoostedShield(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            ShieldLevel = ShieldLevel.Boosted;
-            Shield.gameObject.SetActive(context.ReadValueAsButton());
-            Shield.ShieldLevel = ShieldLevel;
+            Shield.gameObject.SetActive(true);
+            Shield.ShieldTier = ShieldTier.Boosted;
         } else {
-            ShieldLevel = ShieldLevel.None;
             Shield.gameObject.SetActive(false);
+            Shield.ShieldTier = ShieldTier.None;
         }
     }
 
@@ -321,9 +318,8 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /* Casts */
+    /// <summary/>
     /// <param name="castId"></param>
     /// <returns>Whether the cast was initiated or not</returns>
     private bool StartCast(int castId) {
@@ -331,7 +327,8 @@ public class Character : MonoBehaviour, ICharacterActions {
 
         if (castContainer.cast is not null) {
             // we're updating another cast - allowed
-            return castContainer.cast.UpdateCast();
+            castContainer.cast.Recast(CursorTransform);
+            return true;
         } else {
             if (castContainer.charges==0) {
                 return false;
@@ -354,7 +351,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                         energy -= 100;
                     }
 
-                    castContainer.cast = CastBase.Initiate(
+                    castContainer.cast = Cast.Initiate(
                         castContainer.castPrefab,
                         this,
                         transform,
@@ -400,6 +397,20 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
+    /* ICasts Methods */
+    public bool IsRotatingClockwise() {
+        return RotatingClockwise;
+    }
+
+    public Transform GetOriginTransform() {
+        return transform;
+    }
+
+    public Transform GetTargetTransform() {
+        return CursorTransform;
+    }
+
+    /* MonoBehavior */
     private void Awake() {
         // Controls
         GameObject cursorGameObject = new GameObject("Player Cursor Object");
@@ -472,37 +483,14 @@ public class Character : MonoBehaviour, ICharacterActions {
             }
         }
         TickCasts();
-        HandleMovement();
+        Move();
 
         // apply statusEffects
         for (int i = 0; i < statusEffects.Count; i++) {
             statusEffects[i].Tick();
         }
 
-        statusEffects.RemoveAll((EffectBase effect) => { return (effect == null); });
-    }
-
-    private void HandleMovement() {
-        if (CommandMovement != null) {
-            cc.Move(CommandMovement.GetDPosition());
-            transform.rotation = CommandMovement.GetRotation(transform.position, transform.rotation);
-        } else {
-            Vector3 horizontalPlane = new Vector3(1, 0, 1);
-            Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
-            float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
-
-            if (HitLagTimer-- > 0) {
-                return; // no-op - don't move, don't update velocity, no nothing
-            } else if (hitStunTimer-- > 0) {
-                float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
-                HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
-            } else { // normal movement
-                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, movementDirection);
-            }
-
-            Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
-            cc.Move(Velocity*Time.deltaTime);
-        }
+        statusEffects.RemoveAll((Effect effect) => { return (effect == null); });
     }
 
     // Movement evaluations
@@ -527,7 +515,7 @@ public class Character : MonoBehaviour, ICharacterActions {
         return new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
     }
 
-    public void SetCommandMovement(CommandMovementBase _commandMovement) {
+    public void SetCommandMovement(CommandMovement _commandMovement) {
         CommandMovement = _commandMovement;
         Velocity = CommandMovement.Velocity.normalized * Velocity.magnitude; // TODO maybe not the best spot to do this
     }
@@ -540,11 +528,11 @@ public class Character : MonoBehaviour, ICharacterActions {
     /// <param name="velocity"></param>
     /// <param name="lookVector"></param>
     /// <returns></returns>
-    private float GetShieldAccelerationFactor(ShieldLevel level, Vector3 velocity, Vector3 lookVector) {
-        if (ShieldLevel == ShieldLevel.None) return 0;
+    private float GetShieldAccelerationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
+        if (Shield.ShieldTier == ShieldTier.None) return 0;
         else {
-            float x = (int)ShieldLevel * Vector3.Dot(velocity.normalized, lookVector.normalized);
-            return Mathf.Pow(x, (int)ShieldLevel);
+            float x = (int)Shield.ShieldTier * Vector3.Dot(velocity.normalized, lookVector.normalized);
+            return Mathf.Pow(x, (int)Shield.ShieldTier);
         }
     }
 
@@ -555,8 +543,8 @@ public class Character : MonoBehaviour, ICharacterActions {
     /// <param name="velocity"></param>
     /// <param name="lookVector"></param>
     /// <returns></returns>
-    private float GetShieldRotationFactor(ShieldLevel level, Vector3 velocity, Vector3 lookVector) {
-        if (ShieldLevel == ShieldLevel.Boosted) {
+    private float GetShieldRotationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
+        if (Shield.ShieldTier == ShieldTier.Boosted) {
 
             return 2.5f * (1-Vector3.Dot(velocity.normalized, lookVector.normalized));
         } else return 0;
@@ -572,10 +560,10 @@ public class Character : MonoBehaviour, ICharacterActions {
             return horizontalVelocity;
         } else if (running && IsAboveWalkSpeed()) {
             float rotationalSpeed = runRotationalSpeed;
-            if (ShieldLevel==ShieldLevel.Boosted) {
+            if (Shield.ShieldTier==ShieldTier.Boosted) {
                 Vector3 lookDirection = GetLookDirection();
                 biasDirection = -GetLookDirection();
-                rotationalSpeed += GetShieldRotationFactor(ShieldLevel, horizontalVelocity, GetLookDirection());
+                rotationalSpeed += GetShieldRotationFactor(Shield.ShieldTier, horizontalVelocity, GetLookDirection());
             }
 
             return (biasDirection==Vector3.zero)
@@ -588,7 +576,7 @@ public class Character : MonoBehaviour, ICharacterActions {
                         0),
                     Mathf.Max(WalkSpeedMax, Velocity.magnitude));
         } else { // not running
-            float shieldAccelerationFactor = GetShieldAccelerationFactor(ShieldLevel, horizontalVelocity, GetLookDirection());
+            float shieldAccelerationFactor = GetShieldAccelerationFactor(Shield.ShieldTier, horizontalVelocity, GetLookDirection());
             float accerleration = Mathf.Max(WalkAcceleration-(3/(1+shieldAccelerationFactor))*horizontalVelocity.magnitude, 20f);
             float dSpeed = Mathf.Clamp(
                 WalkSpeedMax - Vector3.Dot(horizontalVelocity, biasDirection),
@@ -608,9 +596,10 @@ public class Character : MonoBehaviour, ICharacterActions {
     }
 
     private float GetVerticalVelocity(float currentYVelocity, float gravity) {
-        Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f);
+        int excludeAllButTerrainLayer = 1<<LayerMask.NameToLayer("Terrain");
+        Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, excludeAllButTerrainLayer);
 
-        if (currentYVelocity <= 0 && hitInfo.transform!=null && hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Terrain")) {
+        if (currentYVelocity <= 0 && hitInfo.transform!=null) {
             // // snap the character to the standing Height - TODO current implementation seems hacky, but it works?
             standingY = hitInfo.point.y + cc.radius + standingOffset;
             transform.position = new Vector3(transform.position.x, standingY, transform.position.z);
@@ -672,41 +661,103 @@ public class Character : MonoBehaviour, ICharacterActions {
         }
     }
 
-    public void TakeKnockback(int _hitLagDuration, Vector3 _knockbackVector, int _hitStunDuration) {
-        Destroy(CommandMovement);
-        CommandMovement = null;
+    /* IMoves Methods */
+    public Transform GetTransform() { return transform; }
+    public Vector3 GetVelocity() { return Velocity; }
 
-        // hit lag, hit stun
-        HitLagTimer = _hitLagDuration;
-        hitStunTimer = _hitStunDuration;
+    public void Move() {
+        if (CommandMovement != null) {
+            cc.Move(CommandMovement.GetDPosition());
+            transform.rotation = CommandMovement.GetRotation(transform.position, transform.rotation);
+        } else {
+            Vector3 horizontalPlane = new Vector3(1, 0, 1);
+            Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
+            float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
 
-        if (_knockbackVector != Vector3.zero) {
-            Velocity = _knockbackVector;
+            if (HitLagTimer-- > 0) {
+                return; // no-op - don't move, don't update velocity, no nothing
+            } else if (hitStunTimer-- > 0) {
+                float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
+                HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
+            } else { // normal movement
+                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, movementDirection);
+            }
+
+            Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
+            cc.Move(Velocity*Time.deltaTime);
         }
     }
 
-    public void TakeKnockback(int _hitLagDuration) {
-        TakeKnockback(_hitLagDuration, Vector3.zero, 0);
+    public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
+        if (HitTier==HitTier.Feather) return 0;
+        else if (HitTier==HitTier.Pure) return 1;
+        else return ((int)HitTier - (int)ShieldTier)/(float)HitTier;
     }
 
-    public void TakeDamage(
-        int damage
-        ) {
-        // TODO finish implementation:
-        // - evaluate knockback diff
-        // - evaluate damage according to whether I'm shielding and such
-        // - evaluate changes according to hit level
-        if (invincible) return;
+    /// <summary>
+    /// Returns true if the contact poins is not intersecting with the <paramref name="Character"/>'s <paramref name="Shield"/>
+    /// </summary>
+    /// <remarks>I'll leave it up to the caller as to where the <paramref name="contactPoint"/> is</remarks>
+    /// <param name="contactPoint"></param>
+    /// <returns></returns>
+    private bool HitsShield(Vector3 contactPoint) {
+        // I want the attack to hit shield if the contact point is not inside the shield
+        // 
+        /// https://www.desmos.com/3d
+        // \left(\left(x-.5\right)\right)^{2}+\left(y\right)^{2}>\left(x^{2}+y^{2}\right)
+        // x^{2}+y^{2}=1
+        if (Shield.isActiveAndEnabled) {
+            return !(Shield.GetCollider().bounds.Contains(contactPoint));
+        } else {
+            return false;
+        }
+    }
 
-        /*if (IsAboveWalkSpeed()) // TODO should this be evaluated based on `isRunning` or the movement speed? What if I'm shielding?
-            damageTier++;*/
+    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
+        float knockBackFactor = HitsShield(contactPoint)
+            ? GetKnockBackFactor(hitTier, (Shield.isActiveAndEnabled ? Shield.ShieldTier : 0))
+            : 1f;
+
+        if (knockBackFactor > 0) {
+            Destroy(CommandMovement);
+            CommandMovement = null;
+
+            // hit lag, hit stun
+            HitLagTimer = hitLagDuration;
+            hitStunTimer = hitStunDuration;
+
+            if (knockBackVector != Vector3.zero) {
+                Velocity = knockBackFactor*knockBackVector;
+            }
+        }
+
+        return knockBackFactor;
+    }
+
+    /* IDamageable Methods */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_contactPoint"></param>
+    /// <param name="damage"></param>
+    public void TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
+        // TODO add some sort of implementation to ignore shield
+        if ((hitTier!=HitTier.Pure) && (invincible || HitsShield(_contactPoint))) return;
 
         HP = (HP-damage<HP) ? (HP-damage) : Mathf.Min(HP-damage, healMax);
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
 
         if (HP<=0) {
-            Destroy(gameObject);
+            OnDeath();
         } 
+    }
+
+    public void TakeHeal(int damage) {
+        HP = Math.Max(HP+damage, healMax);
+    }
+
+    public void OnDeath() {
+        Destroy(gameObject);
     }
 
     void OnGUI() {

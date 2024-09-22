@@ -1,19 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
-public class StatusEffectImmaterial: EffectBase {
-    public override void Initialize(Character _character) {
-        base.Initialize(_character);
-        _character.gameObject.layer = LayerMask.NameToLayer("Immaterial");
+public class StatusEffectImmaterial: Effect {
+    private int originalLayer;
+
+    public override void Initialize(MonoBehaviour _target) {
+        base.Initialize(_target);
+        originalLayer = Target.gameObject.layer;
+        Target.gameObject.layer = LayerMask.NameToLayer("Immaterial");
     }
 
     public override void Tick() {;}
 
     public override void Expire() {
-        if (target != null){
-            target.gameObject.layer = LayerMask.NameToLayer("Characters");
+        if (Target != null){
+            Target.gameObject.layer = originalLayer;
         }
     }
 }

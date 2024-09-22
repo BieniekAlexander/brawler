@@ -1,14 +1,13 @@
 using System;
 using UnityEngine;
 
-public class CommandMovementLock : CommandMovementBase {
+public class CommandMovementLock : CommandMovement {
+    [SerializeField] float Offset;
     private Transform Lock;
-    private Vector3 Offset;
 
-    public void Initialize(Character mover, Vector3 _destination, Vector3 initialPosition, Transform _lock, Vector3 _offset, int _duration) {
-        base.Initialize(mover, _destination, initialPosition);
-        Lock = _lock;
-        Offset = _offset;
+    public void Initialize(IMoves mover, Transform _destination) {
+        base.Initialize(mover, _destination);
+        Lock = _destination;
     }
 
     public override Vector3 GetDPosition() {

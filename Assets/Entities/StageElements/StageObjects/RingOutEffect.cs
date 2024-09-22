@@ -1,28 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class RingOutEffect : EffectBase
+public class RingOutEffect : Effect
 {
     [SerializeField] public int RingOutDamage = 250;
     [SerializeField] public int RingOutDuration = 60*5;
 
-    public override void Initialize(Character _character) {
-        target = _character;
-        target.TakeDamage(RingOutDamage);
-        target.Velocity = Vector3.zero;
+    private Character Character;
 
-        if (target == null) {
-            Destroy(gameObject);
-        } else {
-            target.gameObject.SetActive(false);
+    public override void Initialize(MonoBehaviour _target) {
+        base.Initialize(_target);
+        
+        if (Target.CompareTag("Character")) {
+            Character = Target.GetComponent<Character>();
+
+            Character.TakeDamage(Character.transform.position, RingOutDamage, HitTier.Pure);
+            Character.Velocity = Vector3.zero;
+
+            if (Character == null) {
+                Destroy(gameObject);
+            } else {
+                Character.gameObject.SetActive(false);
+            }
         }
     }
 
     public override void Expire() {
-        GameObject[] spawns = SceneController.GetSceneSpawns();
-        GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
-        target.transform.position = randomSpawn.transform.position;
-        target.gameObject.SetActive(true);
+        if (Character != null) {
+            GameObject[] spawns = SceneController.GetSceneSpawns();
+            GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
+            Character.transform.position = randomSpawn.transform.position;
+            Character.gameObject.SetActive(true);
+        }
     }
 }

@@ -5,17 +5,17 @@ public interface IStatusEffectMessage : IEventSystemHandler {
     void OnCast(CastId castId);
 }
 
-public abstract class EffectBase : MonoBehaviour, IStatusEffectMessage {
+public abstract class Effect : MonoBehaviour, IStatusEffectMessage {
     [SerializeField] int tickRate;
     [SerializeField] public int duration;
-    [HideInInspector] public Character target;
+    [HideInInspector] public MonoBehaviour Target;
     private int frame;
 
     /// <summary>
     /// What to do when the status effect starts
     /// </summary>
-    public virtual void Initialize(Character _character) {
-        target = _character;
+    public virtual void Initialize(MonoBehaviour _target) {
+        Target = _target;
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public abstract class EffectBase : MonoBehaviour, IStatusEffectMessage {
 
     public void FixedUpdate() {
         if (++frame >= duration) {
-            if (target != null) {
+            if (Target != null) {
                 // TODO I'm worried about target suddenly being null because of destruction
                 // https://community.gamedev.tv/t/question-about-destroy-gameobject/176998/4
                 Expire();
@@ -34,7 +34,7 @@ public abstract class EffectBase : MonoBehaviour, IStatusEffectMessage {
             Destroy(gameObject);
         }
 
-        if (tickRate>0 && frame%tickRate == 0 && target != null) Tick();
+        if (tickRate>0 && frame%tickRate == 0 && Target != null) Tick();
     }
 
     /// <summary>

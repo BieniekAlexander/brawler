@@ -1,72 +1,57 @@
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class Projectile : Castable, IMoves, ICollidable
 {
     /* Movement */
-    private CharacterController _cc;
-    private Vector3 velocity;
-    private Character Caster;
-    private Transform origin;
-    public Transform target;
-    [SerializeField] float rotationalControl = 120f;
-    [SerializeField] float maxSpeed = 15f;
-    [SerializeField] public int duration;
-    public int frame;
+    private Vector3 Velocity;
+    [SerializeField] float MaxSpeed = 15f;
+    [SerializeField] float InitialOffset = 15f;
+    [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
-    /* Target */
-    [SerializeField] private Hit hit;
+    // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
+    // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
+    // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
+    [SerializeField] Positioning Positioning = Positioning.Directional;
 
-    public static Projectile Initiate(Projectile _projectile, Character _caster, Transform _origin, Transform _target) {
-        Projectile projectile = Instantiate(_projectile);
-        projectile.Initialize(_caster, _origin, _target);
-        return projectile;
+    /// </summary/>
+    /// <param name="_caster"></param>
+    /// <param name="_origin"></param>
+    /// <param name="_target"></param>
+    /// <param name="_mirrored"></param>
+    public override void Initialize(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
+        base.Initialize(_caster, _origin, _target, _mirrored);
+        Vector3 Direction = Target.position - Origin.position;
+        Velocity = MaxSpeed * Direction;
+
+        if (Positioning == Positioning.Directional) {
+            transform.position = Origin.position + InitialOffset*Direction;
+        } else { // Positioning == Positioning.Absolute
+            float CastDistance = (Target.position - Origin.position).magnitude;
+            transform.position = Mathf.Min(InitialOffset, CastDistance)*Direction;
+        }
     }
 
-    public static Projectile Initiate(Projectile _projectile, Vector3 _position, Quaternion _rotation, Character _caster, Transform _origin, Transform _target) {
-        Projectile projectile = Instantiate(_projectile, _position, _rotation);
-        projectile.Initialize(_caster, _origin, _target);
-        return projectile;
+    public override void FixedUpdate() {
+        Move();
+        HandleCollisions();
+
+        if (Frame == Duration) {
+            Destroy(gameObject);
+        }
+
+        Frame++;
     }
 
-
-    private void Initialize(Character _caster, Transform _origin, Transform _target) {
-        Caster =  _caster;
-        origin = _origin;
-        target = _target;
+    /* IMoves Methods */
+    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) {
+        return 0f;
     }
 
-    public void Start()
-    {
-        _cc = GetComponent<CharacterController>();
-        velocity = (transform.rotation * Vector3.forward).normalized * maxSpeed;
-        frame = 0;
+    public void Move() {
+        transform.position += Velocity;
     }
-
-    private void Resolve()
-    {
-        Transform t = new GameObject("HitBox Origin").transform;
-        t.position = transform.position;
-
-        Hit.Initiate(
-            hit,
-            transform.position,
-            transform.rotation,
-            Caster,
-            t,
-            false // TODO mirror this at some point? idk
-        );
-
-        Destroy(gameObject);
-    }
-
-    private void Reflect(Character character) {
-
-    }
-
-    private void FixedUpdate()
-    {
+    /* TODO code ported from old Rocket implementation
+    private void FixedUpdate() {
         if (rotationalControl != 0) {
             // source: https://www.youtube.com/watch?v=Z6qBeuN-H1M
             Vector3 targetDirection = target.position - _cc.transform.position;
@@ -80,7 +65,7 @@ public class Projectile : MonoBehaviour
             velocity = transform.rotation * velocity.normalized * maxSpeed * (180 - Quaternion.Angle(transform.rotation, targetRotation)) / 180;
             velocity.y = 0;
         }
-        
+
         _cc.Move(velocity * Time.deltaTime);
         handleCollisions();
 
@@ -88,41 +73,51 @@ public class Projectile : MonoBehaviour
             Resolve();
         }
     }
-    
-    private void handleCollisions()
+    */
+
+    public Transform GetTransform() { return transform; }
+
+    public Vector3 GetVelocity() { return Velocity; }
+
+    public void SetCommandMovement(CommandMovement CommandMovement) {
+        // TODO implement this
+        return;
+    }
+
+    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
+        return 0f; // TODO I won't let this take knockback right now, but maybe!
+    }
+
+    /* ICollidable Methods */
+    public void HandleCollisions() {
+        CollisionUtils.HandleCollisions(this);
+    }
+
+
+    private void Resolve()
     {
-        if (gameObject.layer == LayerMask.NameToLayer("Casts")) {
-            return;
-        } else {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, transform.localScale.x);
+        Transform t = new GameObject("HitBox Origin").transform;
+        t.position = transform.position;
+        /*
+        Hit.Initiate(
+            hit,
+            transform.position,
+            transform.rotation,
+            Caster,
+            t,
+            false // TODO mirror this at some point? idk
+        );*/
 
-            foreach (Collider c in colliders) {
-                if (c.gameObject == gameObject)
-                    continue;
-                if (c.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-                    continue;
+        Destroy(gameObject);
+    }
 
-                Character ch = c.gameObject.GetComponent<Character>();
+    public void OnCollideWith(ICollidable other) {
+        if (other is Character Character) {
 
-                if (ch!=null && ch.Reflects) {
-                    Vector3 normal = (c.transform.position - transform.position);
-                    Vector3 bounceDirection = (velocity-2*Vector3.Project(velocity, normal)).normalized;
-                    velocity = bounceDirection * velocity.magnitude;
-                } else {
-                    Resolve();
-                }
-                break;
-            }
         }
     }
 
-    public void UpdateTarget(Vector3 position) { 
-        target.position = position;
-    }
-
-    private void OnDestroy() {
-        if (target!=null && target.GetComponent<Character>() is null) {
-            Destroy(target.gameObject);
-        }
+    public Collider GetCollider() {
+        return GetComponent<Collider>();
     }
 }

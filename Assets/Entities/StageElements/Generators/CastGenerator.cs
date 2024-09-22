@@ -5,7 +5,7 @@ using UnityEngine;
 
 [Serializable]
 public class CastRoutine {
-    public CastBase cast;
+    public Cast cast;
     public int frequency;
     public int timer;
 }
@@ -27,7 +27,7 @@ public class CastGenerator : MonoBehaviour
             CastRoutine cr = castRoutines[i];
             
             if (++cr.timer == cr.frequency) {
-                CastBase c = CastBase.Initiate(cr.cast, null, transform, castTargetPosition, false);
+                Cast c = Cast.Initiate(cr.cast, null, transform, castTargetPosition, false);
                 cr.timer = 0;
             }
         }

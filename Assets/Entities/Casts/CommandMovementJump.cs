@@ -1,12 +1,13 @@
 using UnityEngine;
 
-public class CommandMovementJump : CommandMovementBase
+public class CommandMovementJump : CommandMovement
 {
     private float gravity = .5f;
 
-    public override void Initialize(Character mover, Vector3 _destination, Vector3 initialPosition) {
-        base.Initialize(mover, _destination, initialPosition);
-        Velocity = Path*Time.fixedDeltaTime*(60f/duration);
+    // TODO I have no idea if this implementation will work
+    public override void Initialize(IMoves mover, Transform target) {
+        base.Initialize(mover, target);
+        Velocity = (60f/duration)*Time.fixedDeltaTime*Path;
         Velocity = new Vector3(Velocity.x, gravity*(duration-2)*Time.fixedDeltaTime/2, Velocity.z);
     }
 

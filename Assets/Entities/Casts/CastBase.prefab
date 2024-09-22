@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 5634063031192742342}
+  - component: {fileID: 3718465444556887870}
   m_Layer: 0
   m_Name: CastBase
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5634063031192742342
+--- !u!114 &3718465444556887870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,6 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitEvents: []
-  projectileEvents: []
-  duration: 30
+  effectPefabs: []
+  commandMovementPrefab: {fileID: 0}
+  FrameCastablesMap:
+    m_keys: 09000000
+    m_values:
+    - data: []
+  ConditionCastablesMap:
+    m_keys: feffffff
+    m_values:
+    - data: []
+  Frame: 0
+  startupTime: 0
+  duration: 0
+  Origin: {fileID: 0}
+  Castables: []
+  statusEffects: []

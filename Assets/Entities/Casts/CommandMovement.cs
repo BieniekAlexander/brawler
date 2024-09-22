@@ -1,18 +1,21 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
-public abstract class CommandMovementBase : MonoBehaviour {
+public abstract class CommandMovement : MonoBehaviour {
     [SerializeField] public int duration;
     [SerializeField] public float range;
 
     public Vector3 Path { get; set; }
     public Vector3 Velocity { get; set; }
     public int Frame { get; private set; } = 0;
-    public List<EffectBase> Effects { get; private set; } = new();
+    public List<Effect> Effects { get; private set; } = new();
 
-    public virtual void Initialize(Character mover,  Vector3 _destination, Vector3 initialPosition) {
-        Path = (_destination-initialPosition).normalized*Mathf.Min((_destination-initialPosition).magnitude, range);
+    public virtual void Initialize(IMoves mover, Transform target) {
+        Path = (target.position-mover.GetTransform().position).normalized
+            * Mathf.Min(
+                (target.position-mover.GetTransform().position).magnitude,
+                range
+            );
     }
 
     public virtual Vector3 GetDPosition() {

@@ -24,7 +24,7 @@ public abstract class Castable: MonoBehaviour, ICasts
     [SerializeField] public int Duration;
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform Origin;
-    [HideInInspector] public Transform Target;
+    [HideInInspector] public Transform Target; // TODO do I need this?
     [HideInInspector] public bool Mirror = false;
     [HideInInspector] public int Frame = 0;
     [SerializeField]
@@ -47,7 +47,6 @@ public abstract class Castable: MonoBehaviour, ICasts
         Origin = _origin;
         Target = _target;
         Mirror = _mirrored;
-        Frame = Duration;
     }
 
     /// <summary/>
@@ -70,9 +69,7 @@ public abstract class Castable: MonoBehaviour, ICasts
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="_target"></param>
-    public void Recast(Transform _target) {
-        Target = _target;
-    }
+    public virtual void Recast(Transform _target){; }
 
     /* ICasts Methods */
     public bool IsRotatingClockwise() {
@@ -88,10 +85,8 @@ public abstract class Castable: MonoBehaviour, ICasts
     }
 
     public virtual void FixedUpdate() {
-        if (Frame == Duration) {
+        if (Frame++ == Duration) {
             Destroy(gameObject);
         }
-
-        Frame++;
     }
 }

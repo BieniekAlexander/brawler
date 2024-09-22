@@ -60,8 +60,8 @@ public enum CastId {
     Special2 = 18,
     Ultimate = 19
 }
+public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
 
-public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions {
     // is this me? TODO better way to do this
     [SerializeField] public bool me { get; set; } = false;
 
@@ -767,5 +767,19 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);
+    }
+
+    /* ICollidable */
+    public void OnCollideWith(ICollidable other) {
+        ; // TODO noop for now - maybe the Character never has to be the one to handle their own collisions? I don't know yet
+    }
+
+    public void HandleCollisions() {
+        ;
+    }
+
+    public Collider GetCollider() {
+        // TODO this might be poor performance, but it's the quickest way for me to get this for now
+        return GetComponent<Collider>();
     }
 }

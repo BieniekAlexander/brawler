@@ -90,7 +90,7 @@ public class Projectile : Castable, IMoves, ICollidable
 
     /* ICollidable Methods */
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this);
+        CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
     }
 
 

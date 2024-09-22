@@ -48,7 +48,6 @@ public class Cast: MonoBehaviour, ICastMessage {
         Origin = _origin;
         CastAimPositionTransform = _castAimPositionTransform;
         rotatingClockwise = _rotatingClockwise;
-        Debug.Log("how many times is this run? I bet you forgot about this hehe");
 
         foreach (KeyValuePair<CastableCondition, Castable[]> CastableEvents in ConditionCastablesMap) {
             foreach (Castable Castable in CastableEvents.Value) {

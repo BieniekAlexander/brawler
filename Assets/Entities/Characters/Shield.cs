@@ -43,7 +43,7 @@ public class Shield : MonoBehaviour, ICollidable {
     }
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this);
+        CollisionUtils.HandleCollisions(this, null);
     }
 
     public Collider GetCollider() {

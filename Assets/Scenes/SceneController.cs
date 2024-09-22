@@ -37,6 +37,7 @@ public class SceneController : MonoBehaviour
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
             if (i == 0) {
+                Char.gameObject.name = "Player";
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             }

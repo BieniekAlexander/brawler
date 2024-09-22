@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using UnityEngine;
 
 
@@ -40,64 +41,35 @@ public class Hit : Trigger, ICollidable {
     }
 
     /* ICollidable Methods */
-    public virtual void OnCollideWith(ICollidable other) {
+    public override void OnCollideWith(ICollidable Other) {
         Physics.Raycast(
                 transform.position,
-                other.GetCollider().transform.position,
+                Other.GetCollider().transform.position,
                 out RaycastHit hitInfo,
                 LayerMask.NameToLayer("Characters") // TODO dunno if this will hit shields, but it should
             ); // TODO this will also currently ignore other IDamagables and IMovables, but I'll fix this later
 
-        if (other is IMoves Mover) {
-            float targetKnockbackFactor = Mover.TakeKnockBack(
+        if (Other is IDamageable OtherDamagable) {
+            if ((Caster==OtherDamagable && !HitsFriendlies)
+                || (Caster!=OtherDamagable && !HitsEnemies)
+            ) {
+                return;
+            } else {
+                OtherDamagable.TakeDamage(
                     hitInfo.point,
-                    hitLagDuration,
-                    BaseKnockbackVector,
-                    hitStunDuration,
-                    HitTier
-                );
-
-            if (targetKnockbackFactor > 0f && (Caster is IMoves thisMover)) {
-                // TODO this might apply knockback to things other than characters
-                thisMover.TakeKnockBack(
-                    thisMover.GetTransform().position,
-                    hitLagDuration,
-                    targetKnockbackFactor  * BaseKnockbackVector,
-                    hitStunDuration,
+                    damage,
                     HitTier
                 );
             }
         }
 
-        if (other is IDamageable Damagable) {
-            Damagable.TakeDamage(
-                hitInfo.point,
-                damage,
-                HitTier
-            );
-        }
-    }
-
-    /*
-    foreach (Collider target in GetOverlappingColliders(Collider)) {
-        if (
-            (Caster==target.gameObject && !HitsFriendlies)
-            || (Caster!=target.gameObject && !HitsEnemies)
-        ) {
-            ;
-        } else {
-            // find the contact point of the hit and apply knockback
-            // as implemented below, the contact point is the raycast from the hitbox center to the target 
-            Physics.Raycast(
-                transform.position,
-                target.transform.position,
-                out RaycastHit hitInfo,
-                LayerMask.NameToLayer("Characters") // TODO dunno if this will hit shields, but it should
-            );
-
-            if (target is IMoves) { // if it can be knocked back, do so
-                // TODO make sure this all behaves properly
-                float targetKnockbackFactor = (target as IMoves).TakeKnockBack(
+        if (Other is IMoves OtherMover) {
+            if ((Caster==OtherMover && !HitsFriendlies)
+                || (Caster!=OtherMover && !HitsEnemies)
+            ) {
+                return;
+            } else {
+                float targetKnockbackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
                     hitLagDuration,
                     BaseKnockbackVector,
@@ -105,24 +77,18 @@ public class Hit : Trigger, ICollidable {
                     HitTier
                 );
 
-                if (targetKnockbackFactor > 0f && Caster.CompareTag("Character")) {
-                    (Caster.GetComponent<Character>()).TakeKnockBack(
-                        Caster.transform.position,
+                if (targetKnockbackFactor < 0f && (Caster is IMoves thisMover)) {
+                    // TODO this might apply knockback to things other than characters
+                    thisMover.TakeKnockBack(
+                        thisMover.GetTransform().position,
                         hitLagDuration,
                         targetKnockbackFactor  * BaseKnockbackVector,
                         hitStunDuration,
-                        1
+                        HitTier
                     );
                 }
             }
-
-            if (target is IDamageable) {
-                (target as IDamageable).TakeDamage(
-                    hitInfo.point,
-                    damage
-                );
-            }   
-        }   
-    }*/
+        }
+    }
 }
 

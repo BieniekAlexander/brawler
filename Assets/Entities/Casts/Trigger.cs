@@ -40,22 +40,24 @@ public class Trigger : Castable, ICollidable {
         Origin = _origin;
         Target = _target;
         Mirror = _mirrored;
+    }
 
+    public void Start() {
+        // Evaluate the position of the Trigger before it's accounted for in game logic
         Move();
     }
 
     public void FixedUpdate() {
         // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they will
-        if (Frame>=Duration)
+        if (Frame>=Duration) {
             Destroy(gameObject);
+        }
 
         Move();
         HandleCollisions();
         Frame++;
     }
-
-    public virtual void Recast(Transform _target){;}
-
+   
     /* IMoves Methods */
     public virtual void Move() {
         if (Origin==null) return; // TODO if a character dies during grab, this hits null refs, so this is my cheap fix
@@ -92,29 +94,17 @@ public class Trigger : Castable, ICollidable {
     public Collider GetCollider() { return Collider; }
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this);
-    }
-
-    public bool CheckInCollisionLogAndPush(ICollidable Collidable) {
-        // TODO maybe this should go to Castable? 
-        if (CollisionLog.Contains(Collidable)) {
-            return true;
-        } else {
-            CollisionLog.Add(Collidable);
-            return false;
-        }
+        CollisionUtils.HandleCollisions(this, CollisionLog);
     }
 
     public virtual void OnCollideWith(ICollidable other) {
-        if (!CheckInCollisionLogAndPush(other)) {
-            if (other is MonoBehaviour mono) {
-                for (int i = 0; i < effects.Count; i++) {
-                    // TODO what if I don't want the status effect to stack?
-                    // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                    // e.g. if two slows are applied, refresh slow
-                    Effect effect = Instantiate(effects[i]);
-                    effect.Initialize(mono);
-                }
+        if (other is MonoBehaviour mono) {
+            for (int i = 0; i < effects.Count; i++) {
+                // TODO what if I don't want the status effect to stack?
+                // maybe check if an effect of the same type is active, and if so, do some sort of resolution
+                // e.g. if two slows are applied, refresh slow
+                Effect effect = Instantiate(effects[i]);
+                effect.Initialize(mono);
             }
         }
     }

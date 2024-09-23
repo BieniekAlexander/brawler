@@ -47,25 +47,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Caster: {fileID: 0}
+  Duration: 1
   Origin: {fileID: 0}
+  Target: {fileID: 0}
+  Mirror: 0
+  Frame: 0
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
   positionCoordinateSystem: 0
   positions:
   - {x: 0, y: 0, z: 0}
   rotations:
   - {x: 0, y: 0, z: 0, w: 1}
   dimensions:
-  - {x: 0.2, y: 0.8, z: 0.5}
+  - {x: 0.2, y: 0.2, z: 0.2}
+  Collider: {fileID: 0}
   effects: []
-  duration: 3
-  knockbackCoordinateSystem: 0
-  knockbackVector: {x: 0, y: 0, z: 0}
-  HitTier: 1
+  RedundantCollisions: 0
+  DissapearOnTrigger: 0
   damage: 50
-  hitLagDuration: 0
-  hitStunDuration: 0
   HitsEnemies: 1
   HitsFriendlies: 0
+  KnockbackCoordinateSystem: 0
+  BaseKnockbackVector: {x: 0, y: 0, z: 0}
+  HitTier: 0
+  hitLagDuration: 0
+  hitStunDuration: 0
 --- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0

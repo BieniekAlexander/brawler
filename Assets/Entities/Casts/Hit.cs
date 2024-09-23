@@ -66,13 +66,15 @@ public class Hit : Trigger, ICollidable {
         if (Other is IMoves OtherMover) {
             if ((Caster==OtherMover && !HitsFriendlies)
                 || (Caster!=OtherMover && !HitsEnemies)
+                || BaseKnockbackVector == Vector3.zero // if the attack has no knockback - TODO is this the best way to enforce this?
             ) {
                 return;
             } else {
+                Vector3 knockBackVector = GetKnockBackVector(OtherMover.GetTransform().position);
                 float targetKnockbackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
                     hitLagDuration,
-                    BaseKnockbackVector,
+                    knockBackVector,
                     hitStunDuration,
                     HitTier
                 );
@@ -82,7 +84,7 @@ public class Hit : Trigger, ICollidable {
                     thisMover.TakeKnockBack(
                         thisMover.GetTransform().position,
                         hitLagDuration,
-                        targetKnockbackFactor  * BaseKnockbackVector,
+                        knockBackVector,
                         hitStunDuration,
                         HitTier
                     );

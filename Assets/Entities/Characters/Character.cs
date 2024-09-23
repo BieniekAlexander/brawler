@@ -60,6 +60,11 @@ public enum CastId {
     Special2 = 18,
     Ultimate = 19
 }
+
+public enum CharacterState {
+
+}
+
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
 
     // is this me? TODO better way to do this

@@ -7,8 +7,8 @@ public class CommandMovementJump : CommandMovement
     // TODO I have no idea if this implementation will work
     public override void Initialize(IMoves mover, Transform target) {
         base.Initialize(mover, target);
-        Velocity = (60f/duration)*Time.fixedDeltaTime*Path;
-        Velocity = new Vector3(Velocity.x, gravity*(duration-2)*Time.fixedDeltaTime/2, Velocity.z);
+        Velocity = (60f/Duration)*Time.fixedDeltaTime*Path;
+        Velocity = new Vector3(Velocity.x, gravity*(Duration-2)*Time.fixedDeltaTime/2, Velocity.z);
     }
 
     public override void FixedUpdate() {

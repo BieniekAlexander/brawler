@@ -29,7 +29,7 @@ public class RocketGenerator : MonoBehaviour, ICasts
                 float randX = Random.Range(10f, 20f) * RandomNegative();
                 float randZ = Random.Range(10f, 20f) * RandomNegative();
                 Vector3 initialPosition = new Vector3(randX, target.position.y+.1f, randZ);
-                Castable.Cast(
+                Castable.CreateCast(
                     rocketPrefab,
                     this,
                     transform,

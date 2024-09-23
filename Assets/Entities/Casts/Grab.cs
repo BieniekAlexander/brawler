@@ -2,43 +2,52 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class Grab : Hit {
+public class Grab : Trigger, ICollidable {
     /* Command Movement */
     [SerializeField] public CommandMovement commandMovementPrefab;
 
     /* Cast, to be triggered on grab */
-    [SerializeField] Castable TriggerCastPrefab;
+    [SerializeField] public Cast OnGrabCast;
+    [SerializeField] public bool HitsEnemies = true;
+    [SerializeField] public bool HitsFriendlies = false;
+    [SerializeField] HitTier HitTier;
 
-    public virtual void OnCollideWith(ICollidable other) {
-        // identify the character that was hit
-        if (other.GetCollider().transform.GetComponent<Character>() is Character Target) {
+    public override void OnCollideWith(ICollidable other) {
+        // TODO probably hardcode Caster not grabbing oneself
+
+        if (other is IMoves OtherMover) {
             if (
-                (Caster==(Target as ICasts) && !HitsFriendlies)
-                || (Caster!=(Target as ICasts) && !HitsEnemies)
+                (Caster==OtherMover && !HitsFriendlies)
+                || (Caster!=OtherMover && !HitsEnemies)
             ) {
                 return;
             } else {
                 CommandMovementLock cmLock = (CommandMovementLock)commandMovementPrefab;
                 CommandMovementLock commandMovementLock = Instantiate(cmLock);
-                Target.SetCommandMovement(commandMovementLock);
+                OtherMover.SetCommandMovement(commandMovementLock);
                 commandMovementLock.Initialize(
-                    Target,
+                    OtherMover,
                     (Caster as IMoves).GetTransform()
                 );
-
-                Castable c = Cast(
-                    TriggerCastPrefab,
-                    Caster,
-                    Caster.GetOriginTransform(),
-                    Target.GetTransform(),
-                    false); // TODO clockwise
             }
-        } else if (other.GetCollider().transform.GetComponent<Shield>() is Shield Shield) {
-            Character Owner = Shield.GetComponentInParent<Character>();
-            if (GetClosestGameObject(gameObject, Owner.gameObject, Owner.gameObject)==Shield.gameObject
-                && (int)HitTier <= (int)Shield.ShieldTier)
-                ; // TODO no-op - need to implement things like grab techs and such
-                //OnCollideWith(Shield);
+
+            if (other is Character GrabbedCharacter) {
+                Cast.Initiate(
+                    OnGrabCast,
+                    Caster,
+                    GrabbedCharacter.transform,
+                    Caster.GetTargetTransform(),
+                    true
+                );
+            } else if (other.GetCollider().transform.GetComponent<Shield>() is Shield Shield) {
+                Character Owner = Shield.GetComponentInParent<Character>();
+                if (GetClosestGameObject(gameObject, Owner.gameObject, Owner.gameObject)==Shield.gameObject
+                    && (int)HitTier <= (int)Shield.ShieldTier)
+                    ; // TODO no-op - need to implement things like grab techs and such
+                      //OnCollideWith(Shield);
+            }
         }
+        // identify the character that was hit
+        
     }
 }

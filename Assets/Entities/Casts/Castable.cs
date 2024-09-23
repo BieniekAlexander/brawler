@@ -56,7 +56,7 @@ public abstract class Castable: MonoBehaviour, ICasts
     /// <param name="_target"></param>
     /// <param name="_mirrored"></param>
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
-    public static Castable Cast(Castable CastablePrefab, ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
+    public static Castable CreateCast(Castable CastablePrefab, ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
         Castable Castable = Instantiate(CastablePrefab);
         Castable.Initialize(_caster, _origin, _target, _mirrored);
         return Castable;

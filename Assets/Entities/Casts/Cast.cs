@@ -76,10 +76,10 @@ public class Cast: MonoBehaviour, ICastMessage {
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Castable Castable in FrameCastablesMap[Frame]) {
                 Castables.Add(
-                    Castable.Cast(
+                    Castable.CreateCast(
                         Castable,
                         Caster,
-                        Caster.GetOriginTransform(),
+                        Origin,
                         Caster.GetTargetTransform(),
                         !Caster.IsRotatingClockwise()
                     )
@@ -94,7 +94,7 @@ public class Cast: MonoBehaviour, ICastMessage {
                 // create the casts
                 foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnFinishStartup]) {
                     Castables.Add(
-                        Castable.Cast(
+                        Castable.CreateCast(
                             Castable,
                             Caster,
                             Caster.GetOriginTransform(),

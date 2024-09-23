@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class CommandMovement : MonoBehaviour {
-    [SerializeField] public int duration;
-    [SerializeField] public float range;
+    [SerializeField] public int Duration;
+    [SerializeField] public float Range;
 
     public Vector3 Path { get; set; }
     public Vector3 Velocity { get; set; }
@@ -14,7 +14,7 @@ public abstract class CommandMovement : MonoBehaviour {
         Path = (target.position-mover.GetTransform().position).normalized
             * Mathf.Min(
                 (target.position-mover.GetTransform().position).magnitude,
-                range
+                Range
             );
     }
 
@@ -27,7 +27,7 @@ public abstract class CommandMovement : MonoBehaviour {
     }
 
     public virtual void FixedUpdate() {
-        if (++Frame >= duration) {
+        if (++Frame >= Duration) {
             Destroy(gameObject);
         }
     }

@@ -19,8 +19,7 @@ public enum CastableCondition {
     OnExpire
 }
 
-public abstract class Castable: MonoBehaviour, ICasts
-{
+public abstract class Castable : MonoBehaviour, ICasts {
     [SerializeField] public int Duration;
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform Origin;
@@ -49,6 +48,20 @@ public abstract class Castable: MonoBehaviour, ICasts
         Mirror = _mirrored;
     }
 
+    /// <summary>
+    /// To be run right when the Castable is casted by a caster.
+    /// </summary>
+    /// <param name="_caster">The GameObject that created the castable</param>
+    /// <param name="_origin">The Transform about which the castable originated.</param>
+    /// <param name="_target">The Vector3 world position towards which the castable was initially sent.</param>
+    /// <param name="_rotatingClockwise">Whether, according the castable's movement, the trajcetory needs to be mirrored.</param>
+    public virtual void Initialize(ICasts _caster, Transform _origin, Vector3 _target, bool _mirrored) {
+        GameObject go = new("Castable Target");
+        go.transform.parent = transform;
+        go.transform.position = _target;
+        Initialize(_caster, _origin, go.transform, _mirrored);
+    }
+
     /// <summary/>
     /// <param name="CastablePrefab"></param>
     /// <param name="_caster"></param>
@@ -69,7 +82,7 @@ public abstract class Castable: MonoBehaviour, ICasts
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="_target"></param>
-    public virtual void Recast(Transform _target){; }
+    public virtual void Recast(Transform _target) {; }
 
     /* ICasts Methods */
     public bool IsRotatingClockwise() {

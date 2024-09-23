@@ -14,14 +14,8 @@ public class Projectile : Castable, IMoves, ICollidable
     [SerializeField] Positioning Positioning = Positioning.Directional;
     private Quaternion InitialRotation;
 
-    /// </summary/>
-    /// <param name="_caster"></param>
-    /// <param name="_origin"></param>
-    /// <param name="_target"></param>
-    /// <param name="_mirrored"></param>
-    public override void Initialize(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
+    public void Start() {
         InitialRotation = transform.rotation;
-        base.Initialize(_caster, _origin, _target, _mirrored);
         Vector3 Direction = Origin.rotation * Vector3.forward;
         Velocity = MaxSpeed * Direction;
 

@@ -55,6 +55,7 @@ public class Trigger : Castable, ICollidable {
 
         Move();
         HandleCollisions();
+        Debug.Log(Collider.bounds+"but in trigger");
         Frame++;
     }
    

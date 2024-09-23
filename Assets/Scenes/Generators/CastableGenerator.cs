@@ -3,13 +3,21 @@ using UnityEngine;
 public class CastableGenerator : MonoBehaviour, ICasts
 {
     [SerializeField] private Castable CastablePrefab;
-    [SerializeField] public Transform Target;
 
+    /* Timing */
+    [SerializeField] public int ReloadTime = 300;
     [Tooltip("A number of frames for which the cast reload time can jiggle")]
-    [SerializeField] public int TimeJiggle = 50; // the 
+    [SerializeField] public int TimeJiggle = 50;
     private int Timer;
-    private int ReloadTime = 300;
-    
+
+    /* Targeting */
+    [SerializeField] public Transform Target;
+    [SerializeField] public float DistanceFromTargetMin = 20f;
+    [SerializeField] public float DistanceFromTargetMax = 30f;
+    [Tooltip("A maximum number of degrees away from which the generator will cast Castables at the target")]
+    [SerializeField] public float TargetJiggle = 30f;
+
+
     void Start()
     {
         Timer = 0;
@@ -30,9 +38,13 @@ public class CastableGenerator : MonoBehaviour, ICasts
 
     void FixedUpdate()
     {
-        if (++Timer==ReloadTime) {
+        if (++Timer>=ReloadTime) {
             Timer = Random.Range(0, TimeJiggle);
-            transform.position = GetRandomPositionInRing(Target, 20, 30);
+            transform.position = GetRandomPositionInRing(Target, DistanceFromTargetMin, DistanceFromTargetMax);
+            transform.LookAt(Target);
+            transform.rotation = Quaternion.AngleAxis(
+                RandomNegative() * Random.Range(0, TargetJiggle), Vector3.up
+                ) * transform.rotation;
             if (Target != null) {
                 Castable c = Castable.CreateCast(
                     CastablePrefab,

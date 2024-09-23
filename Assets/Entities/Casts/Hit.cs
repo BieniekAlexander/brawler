@@ -55,6 +55,8 @@ public class Hit : Trigger, ICollidable {
             ) {
                 return;
             } else {
+                Debug.Log("hi");
+                Debug.Log(Collider.bounds);
                 OtherDamagable.TakeDamage(
                     hitInfo.point,
                     damage,

@@ -43,7 +43,7 @@ public static class CollisionUtils {
     /// <param name="ThisCollidable"></param>
     /// <param name="CollisionLog"></param>
     public static void HandleCollisions(ICollidable ThisCollidable, HashSet<ICollidable> CollisionLog) {
-        if (ThisCollidable.GetCollider() is Collider collider) {
+        if (ThisCollidable.GetCollider() is Collider collider && collider != null) {
             foreach (Collider otherCollider in GetOverlappingColliders(collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
                     if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {

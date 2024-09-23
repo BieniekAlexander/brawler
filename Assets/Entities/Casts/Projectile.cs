@@ -23,7 +23,8 @@ public class Projectile : Castable, IMoves, ICollidable
             transform.position = Origin.position + InitialOffset*Direction;
         } else { // Positioning == Positioning.Absolute
             float CastDistance = (Target.position - Origin.position).magnitude;
-            transform.position = Mathf.Min(InitialOffset, CastDistance)*Direction;
+            transform.position = Origin.position + Mathf.Min(InitialOffset, CastDistance)*Direction;
+            transform.rotation = Origin.rotation * transform.rotation;
         }
     }
 

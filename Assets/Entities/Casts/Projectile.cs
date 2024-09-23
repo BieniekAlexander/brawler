@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class Projectile : Castable, IMoves, ICollidable
 {
@@ -23,7 +22,7 @@ public class Projectile : Castable, IMoves, ICollidable
     public override void Initialize(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
         InitialRotation = transform.rotation;
         base.Initialize(_caster, _origin, _target, _mirrored);
-        Vector3 Direction = (Target.position - Origin.position).normalized;
+        Vector3 Direction = Origin.rotation * Vector3.forward;
         Velocity = MaxSpeed * Direction;
 
         if (Positioning == Positioning.Directional) {
@@ -39,6 +38,15 @@ public class Projectile : Castable, IMoves, ICollidable
         HandleCollisions();
 
         if (Frame++ == Duration) {
+            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnExpire]) {
+                CreateCast(
+                    Castable,
+                    Caster,
+                    transform,
+                    null,
+                    false
+                );
+            }
             Destroy(gameObject);
         }
     }
@@ -53,6 +61,7 @@ public class Projectile : Castable, IMoves, ICollidable
             // https://www.youtube.com/watch?v=Z6qBeuN-H1M
             Vector3 targetDirection = Target.position - transform.position;
             Quaternion targetRotation = Quaternion.FromToRotation(Velocity, targetDirection);
+            
             Quaternion newRotation = Quaternion.RotateTowards(
                 Quaternion.Euler(Velocity.normalized),
                 targetRotation,
@@ -60,7 +69,7 @@ public class Projectile : Castable, IMoves, ICollidable
 
             Velocity = newRotation * Velocity.normalized * MaxSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240;
             transform.rotation = Quaternion.LookRotation(Velocity.normalized, Vector3.up)*InitialRotation;
-            Velocity.y = 0;
+            Velocity.y = 0; // hack to lock rotation to horizontal plane
         }
 
         transform.position += Velocity * Time.deltaTime;
@@ -86,14 +95,17 @@ public class Projectile : Castable, IMoves, ICollidable
 
     public void OnCollideWith(ICollidable other) {
         if (other is Character Character) {
-            CreateCast(
-                ConditionCastablesMap[CastableCondition.OnCollide][0],
-                Caster,
-                transform,
-                null,
-                false
-            );
+            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollide]) {
+                CreateCast(
+                    Castable,
+                    Caster,
+                    transform,
+                    null,
+                    false
+                );
+            }
 
+            // Might I not want a projectile to Destroy on collision? I can't think of a case, but maybe?
             Destroy(gameObject);
         }
     }

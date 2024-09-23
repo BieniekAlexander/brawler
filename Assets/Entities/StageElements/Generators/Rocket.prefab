@@ -126,8 +126,10 @@ MonoBehaviour:
   Mirror: 0
   Frame: 0
   ConditionCastablesMap:
-    m_keys: 02000000
+    m_keys: 0200000003000000
     m_values:
+    - data:
+      - {fileID: 112980778584238824, guid: 5c37382287f92534a9cc51f241b1791e, type: 3}
     - data:
       - {fileID: 112980778584238824, guid: 5c37382287f92534a9cc51f241b1791e, type: 3}
   MaxSpeed: 15

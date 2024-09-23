@@ -1,9 +1,12 @@
 using UnityEngine;
 
-public class RocketGenerator : MonoBehaviour, ICasts
+public class CastableGenerator : MonoBehaviour, ICasts
 {
-    [SerializeField] private Projectile rocketPrefab;
-    [SerializeField] Transform Target;
+    [SerializeField] private Castable CastablePrefab;
+    [SerializeField] public Transform Target;
+
+    [Tooltip("A number of frames for which the cast reload time can jiggle")]
+    [SerializeField] public int TimeJiggle = 50; // the 
     private int Timer;
     private int ReloadTime = 300;
     
@@ -28,11 +31,11 @@ public class RocketGenerator : MonoBehaviour, ICasts
     void FixedUpdate()
     {
         if (++Timer==ReloadTime) {
-            Timer = 0;
+            Timer = Random.Range(0, TimeJiggle);
+            transform.position = GetRandomPositionInRing(Target, 20, 30);
             if (Target != null) {
-                transform.position = GetRandomPositionInRing(Target.transform, 30f, 50f);
                 Castable c = Castable.CreateCast(
-                    rocketPrefab,
+                    CastablePrefab,
                     this,
                     transform,
                     Target,

@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 public class SceneController : MonoBehaviour
 {
     [SerializeField] List<Character> CharacterPrefabs;
+    [SerializeField] HazardHandler HazardHandlerPrefab;
+    private List<Character> Characters = new();
+    private HazardHandler HazardHandler;
     public static SceneController Instance;
 
     string scene0 = "TempleSummit";
@@ -36,11 +39,17 @@ public class SceneController : MonoBehaviour
 
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
+            Characters.Add(Char);
             if (i == 0) {
                 Char.gameObject.name = "Player";
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             }
+        }
+
+        if (HazardHandlerPrefab != null) {
+            HazardHandler = Instantiate(HazardHandlerPrefab);
+            HazardHandler.Initialize(Characters[0].transform);
         }
     }
 

@@ -134,16 +134,16 @@ MonoBehaviour:
   rotations:
   - {x: 0, y: 0, z: 0, w: 0}
   dimensions:
-  - {x: 0.5, y: 0.5, z: 0.5}
+  - {x: 1, y: 1, z: 1}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 50
+  damage: 100
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 10}
+  BaseKnockbackVector: {x: 0, y: 0, z: 15}
   HitTier: 2
   hitLagDuration: 5
   hitStunDuration: 30

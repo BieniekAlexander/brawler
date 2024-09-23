@@ -94,7 +94,10 @@ public class Projectile : Castable, IMoves, ICollidable
     }
 
     public void OnCollideWith(ICollidable other) {
-        if (other is Character Character) {
+        if (
+            other is Character Character
+            || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<0) // if the rockets are relatively antiparallel, make them collide
+        ) {
             foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollide]) {
                 CreateCast(
                     Castable,

@@ -53,11 +53,15 @@ public static class CollisionUtils {
             }
         }
     }
+
+    public static void HandleCollisions(ICollidable ThisCollidable) {
+        HandleCollisions(ThisCollidable, null);
+    }
 }
 
-/// <summary>
-/// An interface that defines how a given GameObject should behave when it collides with another GameObject
-/// </summary>
+    /// <summary>
+    /// An interface that defines how a given GameObject should behave when it collides with another GameObject
+    /// </summary>
 public interface ICollidable {
     public void OnCollideWith(ICollidable other);
 

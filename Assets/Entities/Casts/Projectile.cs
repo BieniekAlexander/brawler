@@ -1,17 +1,19 @@
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class Projectile : Castable, IMoves, ICollidable
 {
     /* Movement */
     private Vector3 Velocity;
     [SerializeField] float MaxSpeed = 15f;
-    [SerializeField] float InitialOffset = 15f;
+    [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
     // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
     // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
     // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
     [SerializeField] Positioning Positioning = Positioning.Directional;
+    private Quaternion InitialRotation;
 
     /// </summary/>
     /// <param name="_caster"></param>
@@ -19,8 +21,9 @@ public class Projectile : Castable, IMoves, ICollidable
     /// <param name="_target"></param>
     /// <param name="_mirrored"></param>
     public override void Initialize(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
+        InitialRotation = transform.rotation;
         base.Initialize(_caster, _origin, _target, _mirrored);
-        Vector3 Direction = Target.position - Origin.position;
+        Vector3 Direction = (Target.position - Origin.position).normalized;
         Velocity = MaxSpeed * Direction;
 
         if (Positioning == Positioning.Directional) {
@@ -35,11 +38,9 @@ public class Projectile : Castable, IMoves, ICollidable
         Move();
         HandleCollisions();
 
-        if (Frame == Duration) {
+        if (Frame++ == Duration) {
             Destroy(gameObject);
         }
-
-        Frame++;
     }
 
     /* IMoves Methods */
@@ -48,32 +49,22 @@ public class Projectile : Castable, IMoves, ICollidable
     }
 
     public void Move() {
-        transform.position += Velocity;
-    }
-    /* TODO code ported from old Rocket implementation
-    private void FixedUpdate() {
-        if (rotationalControl != 0) {
-            // source: https://www.youtube.com/watch?v=Z6qBeuN-H1M
-            Vector3 targetDirection = target.position - _cc.transform.position;
-            var targetRotation = Quaternion.FromToRotation(velocity, targetDirection);
-            transform.rotation = Quaternion.RotateTowards(
-                Quaternion.Euler(velocity.normalized),
+        if (RotationalControl != 0) {
+            // https://www.youtube.com/watch?v=Z6qBeuN-H1M
+            Vector3 targetDirection = Target.position - transform.position;
+            Quaternion targetRotation = Quaternion.FromToRotation(Velocity, targetDirection);
+            Quaternion newRotation = Quaternion.RotateTowards(
+                Quaternion.Euler(Velocity.normalized),
                 targetRotation,
-                rotationalControl * Time.deltaTime
-            );
+                RotationalControl * Time.deltaTime);
 
-            velocity = transform.rotation * velocity.normalized * maxSpeed * (180 - Quaternion.Angle(transform.rotation, targetRotation)) / 180;
-            velocity.y = 0;
+            Velocity = newRotation * Velocity.normalized * MaxSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240;
+            transform.rotation = Quaternion.LookRotation(Velocity.normalized, Vector3.up)*InitialRotation;
+            Velocity.y = 0;
         }
 
-        _cc.Move(velocity * Time.deltaTime);
-        handleCollisions();
-
-        if (++frame >= duration) {
-            Resolve();
-        }
+        transform.position += Velocity * Time.deltaTime;
     }
-    */
 
     public Transform GetTransform() { return transform; }
 
@@ -93,27 +84,17 @@ public class Projectile : Castable, IMoves, ICollidable
         CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
     }
 
-
-    private void Resolve()
-    {
-        Transform t = new GameObject("HitBox Origin").transform;
-        t.position = transform.position;
-        /*
-        Hit.Initiate(
-            hit,
-            transform.position,
-            transform.rotation,
-            Caster,
-            t,
-            false // TODO mirror this at some point? idk
-        );*/
-
-        Destroy(gameObject);
-    }
-
     public void OnCollideWith(ICollidable other) {
         if (other is Character Character) {
+            CreateCast(
+                ConditionCastablesMap[CastableCondition.OnCollide][0],
+                Caster,
+                transform,
+                null,
+                false
+            );
 
+            Destroy(gameObject);
         }
     }
 

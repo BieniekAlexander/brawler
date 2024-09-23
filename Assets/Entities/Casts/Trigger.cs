@@ -60,7 +60,7 @@ public class Trigger : Castable, ICollidable {
    
     /* IMoves Methods */
     public virtual void Move() {
-        if (Origin==null) return; // TODO if a character dies during grab, this hits null refs, so this is my cheap fix
+        if (Origin==null) return; // If the origin disappears, stop moving
 
         int positionFrame = Mathf.Min(Frame, positions.Length-1);
         int rotationFrame = Mathf.Min(Frame, rotations.Length-1);

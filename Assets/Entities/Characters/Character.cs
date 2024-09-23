@@ -489,6 +489,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
         TickCasts();
         Move();
+        HandleCollisions();
 
         // apply statusEffects
         for (int i = 0; i < statusEffects.Count; i++) {

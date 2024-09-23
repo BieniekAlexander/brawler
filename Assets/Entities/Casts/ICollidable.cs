@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public static class CollisionUtils {
     /// <summary>
@@ -28,7 +27,7 @@ public static class CollisionUtils {
         // - maybe check layer mask and ignore things in specified layers, but then:
         // - will there be clashes? then I need hitbox collisions to do something
         // - Grab techs? Then I'll need grabs to be in a different layer, or let them be hitboxes and collide
-        Collider[] colliders = Object.FindObjectsOfType<Collider>();
+        Collider[] colliders = Object.FindObjectsOfType<Collider>();        
 
         return (
             from c in colliders
@@ -59,9 +58,9 @@ public static class CollisionUtils {
     }
 }
 
-    /// <summary>
-    /// An interface that defines how a given GameObject should behave when it collides with another GameObject
-    /// </summary>
+/// <summary>
+/// An interface that defines how a given GameObject should behave when it collides with another GameObject
+/// </summary>
 public interface ICollidable {
     public void OnCollideWith(ICollidable other);
 

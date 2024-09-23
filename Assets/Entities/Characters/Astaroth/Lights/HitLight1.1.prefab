@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1635544872617382815}
   - component: {fileID: 4918249452027163949}
-  - component: {fileID: 7506723417326245698}
   - component: {fileID: -3587656788900788176}
   - component: {fileID: 7159542288348881807}
+  - component: {fileID: 8826511796677745375}
   m_Layer: 8
   m_Name: HitLight1.1
   m_TagString: Untagged
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 6
+  Duration: 8
   Origin: {fileID: 0}
   Target: {fileID: 0}
   Mirror: 0
@@ -57,18 +57,20 @@ MonoBehaviour:
     m_values: []
   positionCoordinateSystem: 0
   positions:
-  - {x: 0, y: 0, z: 0.4}
-  - {x: 10, y: 0, z: 0.45}
-  - {x: 20, y: 0, z: 0.6}
-  - {x: 20, y: 0, z: 0.7}
+  - {x: -20, y: 0, z: 0.2}
+  - {x: -10, y: 0, z: 0.4}
+  - {x: 0, y: 0, z: 0.6}
+  - {x: 0, y: 0, z: 0.7}
   rotations:
-  - {x: 0.24184477, y: 0.664463, z: -0.664463, w: 0.24184477}
-  - {x: 0.35355335, y: 0.61237246, z: -0.61237246, w: 0.35355335}
-  - {x: 0.43045932, y: 0.5609855, z: -0.5609855, w: 0.43045932}
-  - {x: 0.47757155, y: 0.5214897, z: -0.5211779, w: 0.47785726}
-  - {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - {x: 0, y: 0.8660254, z: 0, w: -0.50000006}
+  - {x: 0, y: -0.1305262, z: 0, w: 0.9914449}
+  - {x: 0, y: -0.043619387, z: 0, w: 0.99904823}
+  - {x: 0, y: 0, z: 0, w: 1}
+  - {x: 0, y: 0, z: 0, w: 1}
+  - {x: 0, y: 0, z: 0, w: 1}
   dimensions:
-  - {x: 10, y: 0.8, z: 0.5}
+  - {x: 1.5, y: 0.2, z: 0.2}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
@@ -81,29 +83,6 @@ MonoBehaviour:
   HitTier: 1
   hitLagDuration: 3
   hitStunDuration: 5
---- !u!136 &7506723417326245698
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3059344016903470191}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -154,3 +133,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!136 &8826511796677745375
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3059344016903470191}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: 0}

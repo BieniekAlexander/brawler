@@ -42,6 +42,7 @@ public class Hit : Trigger, ICollidable {
 
     /* ICollidable Methods */
     public override void OnCollideWith(ICollidable Other) {
+        Debug.Log(Collider.bounds);
         Physics.Raycast(
                 transform.position,
                 Other.GetCollider().transform.position,
@@ -55,8 +56,6 @@ public class Hit : Trigger, ICollidable {
             ) {
                 return;
             } else {
-                Debug.Log("hi");
-                Debug.Log(Collider.bounds);
                 OtherDamagable.TakeDamage(
                     hitInfo.point,
                     damage,

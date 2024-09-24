@@ -41,12 +41,12 @@ public class Hit : Trigger, ICollidable {
 
     /* ICollidable Methods */
     public override void OnCollideWith(ICollidable Other) {
-        Debug.Log(Collider.bounds);
         Physics.Raycast(
                 transform.position,
                 Other.GetCollider().transform.position,
                 out RaycastHit hitInfo,
-                LayerMask.NameToLayer("Characters") // TODO dunno if this will hit shields, but it should
+                (1<<LayerMask.NameToLayer("Characters"))
+                | (1<<LayerMask.NameToLayer("Projectiles")) // TODO dunno if this will hit shields, but it should
             ); // TODO this will also currently ignore other IDamagables and IMovables, but I'll fix this later
 
         if (Other is IDamageable OtherDamagable) {

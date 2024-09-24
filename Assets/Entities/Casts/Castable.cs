@@ -16,7 +16,8 @@ public enum CastableCondition {
     OnRecast,
     OnFinishStartup,
     OnCollide,
-    OnExpire
+    OnExpire,
+    OnDeath
 }
 
 public abstract class Castable : MonoBehaviour, ICasts {

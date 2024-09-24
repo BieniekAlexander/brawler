@@ -66,7 +66,7 @@ MonoBehaviour:
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 5
+  damage: 100
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0

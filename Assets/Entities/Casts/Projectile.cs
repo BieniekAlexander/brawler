@@ -1,12 +1,15 @@
 using UnityEngine;
 
-public class Projectile : Castable, IMoves, ICollidable
+public class Projectile : Castable, IMoves, ICollidable, IDamageable
 {
     /* Movement */
     private Vector3 Velocity;
     [SerializeField] float MaxSpeed = 15f;
     [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
+
+    /* Damage */
+    [SerializeField] int HP = 100;
 
     // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
     // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
@@ -91,7 +94,7 @@ public class Projectile : Castable, IMoves, ICollidable
     public void OnCollideWith(ICollidable other) {
         if (
             other is Character Character
-            || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<0) // if the rockets are relatively antiparallel, make them collide
+            || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
             foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollide]) {
                 CreateCast(
@@ -110,5 +113,32 @@ public class Projectile : Castable, IMoves, ICollidable
 
     public Collider GetCollider() {
         return GetComponent<Collider>();
+    }
+
+    public void TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
+        HP -= damage;
+        Debug.Log("taking damage, hp is now "+HP);
+
+        if (HP <= 0)
+            OnDeath();
+    }
+
+    public void TakeHeal(int damage) {
+        ;
+    }
+
+    public void OnDeath() {
+        if (ConditionCastablesMap.ContainsKey(CastableCondition.OnDeath)) {
+            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnDeath]) {
+                CreateCast(
+                    Castable,
+                    Caster,
+                    transform,
+                    null,
+                    false
+                );
+            }
+        }
+        Destroy(gameObject);
     }
 }

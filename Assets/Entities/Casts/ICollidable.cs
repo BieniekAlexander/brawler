@@ -32,6 +32,14 @@ public static class CollisionUtils {
         return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
     }
 
+    public static void ToWorldSpaceBox(this BoxCollider box, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation) {
+        orientation = box.transform.rotation;
+        center = box.transform.TransformPoint(box.center);
+        var lossyScale = box.transform.lossyScale;
+        var scale = AbsVec3(lossyScale);
+        halfExtents = Vector3.Scale(scale, box.size) * 0.5f;
+    }
+
     public static void ToWorldSpaceCapsule(this CapsuleCollider capsule, out Vector3 point0, out Vector3 point1, out float radius) {
         var center = capsule.transform.TransformPoint(capsule.center);
         radius = 0f;
@@ -89,6 +97,12 @@ public static class CollisionUtils {
             return from c in Physics.OverlapSphere(point, radius)
                 where (c!=collider)
                 select c;
+        } else if (collider is BoxCollider box) {
+            ToWorldSpaceBox(box, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
+
+            return from c in Physics.OverlapBox(center, halfExtents, orientation)
+                   where (c!=collider)
+                   select c;
         } else {
             throw new NotImplementedException("unhandled collider type");
         }

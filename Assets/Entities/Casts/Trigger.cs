@@ -129,6 +129,7 @@ public class Trigger : Castable, ICollidable {
     }
 
     public virtual void OnCollideWith(ICollidable other) {
+        Debug.Log("trying to handle collision");
         if (other is MonoBehaviour mono) {
             for (int i = 0; i < effects.Count; i++) {
                 // TODO what if I don't want the status effect to stack?

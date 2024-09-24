@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6772080316498894301}
   - component: {fileID: 3232137743127149995}
   - component: {fileID: 112980778584238824}
-  - component: {fileID: -8054615080422418563}
+  - component: {fileID: -1384865874681218364}
   m_Layer: 8
   m_Name: LazerHit
   m_TagString: Untagged
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 5
+  Duration: 10
   Origin: {fileID: 0}
   Target: {fileID: 0}
   Mirror: 0
@@ -109,14 +109,14 @@ MonoBehaviour:
   positions:
   - {x: 0, y: 0, z: 0}
   rotations:
-  - {x: 0, y: 0, z: 0, w: 1}
+  - {x: 0.7071067, y: 0, z: 0, w: 0.7071067}
   dimensions:
-  - {x: 0.25, y: 50, z: 0.25}
+  - {x: 0.1, y: 0.1, z: 50}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 1
+  damage: 100
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
@@ -124,8 +124,8 @@ MonoBehaviour:
   HitTier: 0
   hitLagDuration: 0
   hitStunDuration: 0
---- !u!135 &-8054615080422418563
-SphereCollider:
+--- !u!136 &-1384865874681218364
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -142,6 +142,8 @@ SphereCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
+  serializedVersion: 2
   m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}

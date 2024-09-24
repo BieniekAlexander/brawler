@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -22,18 +23,75 @@ public static class CollisionUtils {
         }
     }
 
+    // https://github.com/justonia/UnityExtensions/blob/master/PhysicsExtensions.cs
+    private static Vector3 AbsVec3(Vector3 v) {
+        return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
+    }
+
+    private static float MaxVec3(Vector3 v) {
+        return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
+    }
+
+    public static void ToWorldSpaceCapsule(this CapsuleCollider capsule, out Vector3 point0, out Vector3 point1, out float radius) {
+        var center = capsule.transform.TransformPoint(capsule.center);
+        radius = 0f;
+        float height = 0f;
+        Vector3 lossyScale = AbsVec3(capsule.transform.lossyScale);
+        Vector3 dir = Vector3.zero;
+
+        switch (capsule.direction) {
+            case 0: // x
+                radius = Mathf.Max(lossyScale.y, lossyScale.z) * capsule.radius;
+                height = lossyScale.x * capsule.height;
+                dir = capsule.transform.TransformDirection(Vector3.right);
+                break;
+            case 1: // y
+                radius = Mathf.Max(lossyScale.x, lossyScale.z) * capsule.radius;
+                height = lossyScale.y * capsule.height;
+                dir = capsule.transform.TransformDirection(Vector3.up);
+                break;
+            case 2: // z
+                radius = Mathf.Max(lossyScale.x, lossyScale.y) * capsule.radius;
+                height = lossyScale.z * capsule.height;
+                dir = capsule.transform.TransformDirection(Vector3.forward);
+                break;
+        }
+
+        if (height < radius*2f) {
+            dir = Vector3.zero;
+        }
+
+        point0 = center + dir * (height * 0.5f - radius);
+        point1 = center - dir * (height * 0.5f - radius);
+    }
+
+    public static void ToWorldSpaceSphere(this SphereCollider sphere, out Vector3 center, out float radius) {
+        center = sphere.transform.TransformPoint(sphere.center);
+        radius = sphere.radius * MaxVec3(AbsVec3(sphere.transform.lossyScale));
+    }
+    // END ref utils
+
+
     public static IEnumerable<Collider> GetOverlappingColliders(Collider collider) {
         // TODO I suspect that the performance of this could be improved
         // - maybe check layer mask and ignore things in specified layers, but then:
         // - will there be clashes? then I need hitbox collisions to do something
         // - Grab techs? Then I'll need grabs to be in a different layer, or let them be hitboxes and collide
-        Collider[] colliders = Object.FindObjectsOfType<Collider>();        
+        if (collider is CapsuleCollider capsule) {
+            ToWorldSpaceCapsule(capsule, out Vector3 point0, out Vector3 point1, out float radius);
 
-        return (
-            from c in colliders
-            where (c!=collider && collider.bounds.Intersects(c.bounds))
-            select c
-        );
+            return from c in Physics.OverlapCapsule(point0, point1, radius)
+                where (c!=collider)
+                select c;
+        } else if (collider is SphereCollider sphere) {
+            ToWorldSpaceSphere(sphere, out Vector3 point, out float radius);
+
+            return from c in Physics.OverlapSphere(point, radius)
+                where (c!=collider)
+                select c;
+        } else {
+            throw new NotImplementedException("unhandled collider type");
+        }
     }
 
     /// <summary>

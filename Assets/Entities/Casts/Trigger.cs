@@ -120,6 +120,7 @@ public class Trigger : Castable, ICollidable {
         // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
         int dimensionFrame = Mathf.Min(Frame, dimensions.Length-1);
         transform.localScale = dimensions[dimensionFrame];
+        Debug.Log(Collider.bounds);
     }
 
     public Collider GetCollider() { return Collider; }

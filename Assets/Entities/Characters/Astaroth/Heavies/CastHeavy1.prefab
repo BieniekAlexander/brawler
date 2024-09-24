@@ -44,15 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitEvents:
-  - hit: {fileID: 5084085653392112361, guid: 067767b4065268e43a73323816bce9e1, type: 3}
-    startFrame: 20
-  projectileEvents: []
-  statusEffectPefabs: []
+  effectPefabs: []
   commandMovementPrefab: {fileID: 0}
+  FrameCastablesMap:
+    m_keys: 0f000000
+    m_values:
+    - data:
+      - {fileID: 5084085653392112361, guid: 067767b4065268e43a73323816bce9e1, type: 3}
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
+  Frame: 0
   startupTime: 0
   duration: 30
-  caster: {fileID: 0}
-  hits: []
-  projectiles: []
+  Origin: {fileID: 0}
+  Castables: []
   statusEffects: []

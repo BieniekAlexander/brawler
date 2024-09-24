@@ -46,4 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CastablePrefab: {fileID: 2445238925043839964, guid: 0f2c388e6fac7c04b84d5f3aaec52102,
     type: 3}
+  ReloadTime: 300
+  TimeJiggle: 50
   Target: {fileID: 0}
+  DistanceFromTargetMin: 20
+  DistanceFromTargetMax: 30
+  TargetJiggle: 10

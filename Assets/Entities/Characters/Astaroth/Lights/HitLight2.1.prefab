@@ -47,8 +47,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Caster: {fileID: 0}
+  Duration: 7
   Origin: {fileID: 0}
+  Target: {fileID: 0}
+  Mirror: 0
+  Frame: 0
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
   positionCoordinateSystem: 0
   positions:
   - {x: 0, y: 0, z: 0.5}
@@ -60,16 +66,18 @@ MonoBehaviour:
   - {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
   dimensions:
   - {x: 0.5, y: 0.2, z: 0.2}
+  Collider: {fileID: 0}
   effects: []
-  duration: 5
-  knockbackCoordinateSystem: 1
-  knockbackVector: {x: 0, y: 0, z: 10}
-  HitTier: 1
+  RedundantCollisions: 0
+  DissapearOnTrigger: 0
   damage: 5
-  hitLagDuration: 3
-  hitStunDuration: 5
   HitsEnemies: 1
   HitsFriendlies: 0
+  KnockbackCoordinateSystem: 1
+  BaseKnockbackVector: {x: 0, y: 0, z: 8}
+  HitTier: 1
+  hitLagDuration: 3
+  hitStunDuration: 5
 --- !u!136 &7506723417326245698
 CapsuleCollider:
   m_ObjectHideFlags: 0

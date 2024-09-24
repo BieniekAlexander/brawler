@@ -47,3 +47,5 @@ MonoBehaviour:
   CastableGeneratorsPrefabs:
   - {fileID: 8155377043832476462, guid: ee7b8fe825d4cd043976b8f7b04398ae, type: 3}
   - {fileID: 8155377043832476462, guid: ee7b8fe825d4cd043976b8f7b04398ae, type: 3}
+  - {fileID: 8155377043832476462, guid: 6517cc4a4e88a6b4cb7e83952e4c6067, type: 3}
+  - {fileID: 8155377043832476462, guid: 6517cc4a4e88a6b4cb7e83952e4c6067, type: 3}

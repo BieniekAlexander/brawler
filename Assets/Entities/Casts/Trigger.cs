@@ -10,13 +10,27 @@ public class VectorLabelsAttribute : PropertyAttribute {
     }
 }
 
+[Serializable]
+public class TriggerTransformation {
+    public TriggerTransformation(Vector3 _position, Vector3 _dimension, Quaternion _rotation) {
+        Position = _position;
+        Dimension = _dimension;
+        Rotation = _rotation;
+    }
+
+    public Vector3 Position;
+    public Vector3 Dimension;
+    public Quaternion Rotation;
+}
+
 /// <summary>
 /// Class that generically handles the changing of object states when the object collides with it
 /// </summary>
-public class Trigger : Castable, ICollidable {
+public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     /* Transform */
     public enum CoordinateSystem { Polar, Cartesian };
     [SerializeField] public CoordinateSystem positionCoordinateSystem;
+    [SerializeField] List<TriggerTransformation> TriggerTransformations;
     [SerializeField] public Vector3[] positions;
     [SerializeField] public Quaternion[] rotations;
     [SerializeField] public Vector3[] dimensions;
@@ -72,16 +86,13 @@ public class Trigger : Castable, ICollidable {
     public virtual void Move() {
         if (Origin==null) return; // If the origin disappears, stop moving
 
-        int positionFrame = Mathf.Min(Frame, positions.Length-1);
-        int rotationFrame = Mathf.Min(Frame, rotations.Length-1);
-
         Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
-            ? positions[positionFrame]
-            : Quaternion.Euler(0, positions[positionFrame].x, 0)*Vector3.forward*positions[positionFrame].z;
+            ? TriggerTransformations[Frame].Position
+            : Quaternion.Euler(0, TriggerTransformations[Frame].Position.x, 0)*Vector3.forward*TriggerTransformations[Frame].Position.z;
 
         Quaternion orientation = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? Quaternion.identity
-            : Quaternion.Euler(0, positions[positionFrame].x, 0);
+            : Quaternion.Euler(0, TriggerTransformations[Frame].Position.x, 0);
 
         // TODO make sure that the calculations without an origin are correct
         if (Mirror) {
@@ -89,9 +100,9 @@ public class Trigger : Castable, ICollidable {
             orientation.y *= -1;
         }
 
-        
         transform.position = Origin.position+Origin.rotation*offset;
-        transform.rotation = Origin.rotation*orientation*rotations[rotationFrame];
+        transform.rotation = Origin.rotation*orientation*TriggerTransformations[Frame].Rotation;
+        transform.localScale = TriggerTransformations[Frame].Position;
     }
 
     /// <summary>
@@ -118,8 +129,7 @@ public class Trigger : Castable, ICollidable {
          */
         // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
         // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
-        int dimensionFrame = Mathf.Min(Frame, dimensions.Length-1);
-        transform.localScale = dimensions[dimensionFrame];
+        
     }
 
     public Collider GetCollider() { return Collider; }
@@ -139,5 +149,27 @@ public class Trigger : Castable, ICollidable {
                 effect.Initialize(mono);
             }
         }
+    }
+
+    public void OnBeforeSerialize() {
+        TriggerTransformations = new();
+
+        for (int i = 0; i < Duration; i++) {
+            int positionFrame = Mathf.Min(i, positions.Length-1);
+            int dimensionFrame = Mathf.Min(i, dimensions.Length-1);
+            int rotationFrame = Mathf.Min(i, rotations.Length-1);
+
+            TriggerTransformations.Add(
+                new TriggerTransformation(
+                    positions[positionFrame],
+                    dimensions[dimensionFrame],
+                    rotations[rotationFrame]
+                )
+            );
+        }
+    }
+
+    public void OnAfterDeserialize() {
+        ;
     }
 }

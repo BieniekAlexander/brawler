@@ -62,6 +62,10 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 1}
   dimensions:
   - {x: 0.2, y: 0.2, z: 0.2}
+  TriggerTransformations:
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.2, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0

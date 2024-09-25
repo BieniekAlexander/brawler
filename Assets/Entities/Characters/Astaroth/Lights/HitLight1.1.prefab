@@ -71,6 +71,31 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 1}
   dimensions:
   - {x: 1.5, y: 0.2, z: 0.2}
+  TriggerTransformations:
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
+  - Position: {x: -20, y: 0, z: 0.2}
+    Scale: {x: 1.5, y: 0.2, z: 0.2}
+    Rotation: {x: 0, y: 0.9396926, z: 0, w: -0.34202012}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0

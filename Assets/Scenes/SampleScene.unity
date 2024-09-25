@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -147,6 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a865d4f0cdff4439a7b4c8435f8326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShieldTier: 0
 --- !u!1 &267608524
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,9 +177,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa22380c2b0deea49bbdfedcfe2812a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rocketPrefab: {fileID: 1370712460824804173, guid: 50f0460e03f2fb441add661fd333069c,
-    type: 3}
-  target: {fileID: 0}
+  CastablePrefab: {fileID: 0}
+  ReloadTime: 300
+  TimeJiggle: 50
+  Target: {fileID: 0}
+  DistanceFromTargetMin: 20
+  DistanceFromTargetMax: 30
+  TargetJiggle: 30
 --- !u!4 &267608526
 Transform:
   m_ObjectHideFlags: 0
@@ -380,7 +385,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 702cdca6b2f2f144d800f7d82f5b843d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transTarget: {fileID: 853515784}
 --- !u!4 &341742616 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3296230962023549339, guid: 051060fc87c418b4faa438bae9156f2f,
@@ -851,8 +855,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859b7d49af855a844b68b393592f18f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nukePrefab: {fileID: 5744924090263052418, guid: d01c1a282085eb243865e5c7a7fc0ac5,
-    type: 3}
 --- !u!1001 &1167323051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1075,6 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8a865d4f0cdff4439a7b4c8435f8326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShieldTier: 0
 --- !u!1001 &1560145506
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1397,7 +1400,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d588db6ee04e2bf4aae41dab556bc1f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransformToFollow: {fileID: 853515784}
 --- !u!4 &1713037796 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
@@ -1416,7 +1418,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d588db6ee04e2bf4aae41dab556bc1f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransformToFollow: {fileID: 1713037796}
 --- !u!114 &1713037803
 MonoBehaviour:
   m_ObjectHideFlags: 0

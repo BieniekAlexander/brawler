@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1762,10 +1762,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afab953a169b7264aa242dba2fcbaecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Caster: {fileID: 0}
+  Duration: 0
   Origin: {fileID: 1738803652}
+  Target: {fileID: 0}
   Mirror: 0
+  Frame: 0
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
   positionCoordinateSystem: 0
+  TriggerTransformations: []
   positions:
   - {x: 0, y: 0, z: 0}
   rotations:
@@ -1777,8 +1783,6 @@ MonoBehaviour:
   - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  duration: 21600000
-  frame: 0
 --- !u!4 &1758044506 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3004614548787239401, guid: db0f6882d4c4aa9428dee713aee7e4ab,
@@ -2040,6 +2044,7 @@ MonoBehaviour:
   CharacterPrefabs:
   - {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
   - {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
+  HazardHandlerPrefab: {fileID: 0}
 --- !u!1 &1908858132
 GameObject:
   m_ObjectHideFlags: 0

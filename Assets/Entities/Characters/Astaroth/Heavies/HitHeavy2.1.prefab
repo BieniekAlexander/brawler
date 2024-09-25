@@ -56,6 +56,31 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   positionCoordinateSystem: 0
+  TriggerTransformations:
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+  - Position: {x: 0, y: 0, z: 2}
+    Dimension: {x: 2, y: 0, z: 2}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
   positions:
   - {x: 0, y: 0, z: 2}
   rotations:

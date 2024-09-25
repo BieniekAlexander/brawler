@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class VectorLabelsAttribute : PropertyAttribute {
@@ -31,9 +32,6 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     public enum CoordinateSystem { Polar, Cartesian };
     [SerializeField] public CoordinateSystem positionCoordinateSystem;
     [SerializeField] List<TriggerTransformation> TriggerTransformations;
-    [SerializeField] public Vector3[] positions;
-    [SerializeField] public Quaternion[] rotations;
-    [SerializeField] public Vector3[] dimensions;
 
     /* Collision */
     [HideInInspector] public Collider Collider;
@@ -152,7 +150,7 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     }
 
     public void OnBeforeSerialize() {
-        TriggerTransformations = new();
+        /*TriggerTransformations = new();
 
         for (int i = 0; i < Duration; i++) {
             int positionFrame = Mathf.Min(i, positions.Length-1);
@@ -166,7 +164,9 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
                     rotations[rotationFrame]
                 )
             );
-        }
+        }*/
+        /*  AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);*/
     }
 
     public void OnAfterDeserialize() {

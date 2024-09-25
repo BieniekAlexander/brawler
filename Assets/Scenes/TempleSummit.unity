@@ -161,6 +161,7 @@ MonoBehaviour:
   CharacterPrefabs:
   - {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
   - {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
+  HazardHandlerPrefab: {fileID: 0}
 --- !u!4 &101345385
 Transform:
   m_ObjectHideFlags: 0

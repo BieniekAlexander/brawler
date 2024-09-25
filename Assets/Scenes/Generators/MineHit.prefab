@@ -33,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &6772080316498894301
 MeshRenderer:
@@ -127,6 +127,22 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   positionCoordinateSystem: 0
+  TriggerTransformations:
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.5, y: 0.5, z: 0.5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.5, y: 0.5, z: 0.5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.5, y: 0.5, z: 0.5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.5, y: 0.5, z: 0.5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+  - Position: {x: 0, y: 0, z: 0}
+    Dimension: {x: 0.5, y: 0.5, z: 0.5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
   positions:
   - {x: 0, y: 0, z: 0}
   rotations:

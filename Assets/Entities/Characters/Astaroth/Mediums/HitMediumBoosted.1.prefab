@@ -56,6 +56,67 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   positionCoordinateSystem: 0
+  TriggerTransformations:
+  - Position: {x: -35, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.24184477, y: 0.664463, z: -0.664463, w: 0.24184477}
+  - Position: {x: -10, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.35355335, y: 0.61237246, z: -0.61237246, w: 0.35355335}
+  - Position: {x: 10, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.43045932, y: 0.5609855, z: -0.5609855, w: 0.43045932}
+  - Position: {x: 30, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.47757155, y: 0.5214897, z: -0.5211779, w: 0.47785726}
+  - Position: {x: 50, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 70, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 90, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 110, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 130, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 150, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 170, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 190, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 210, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 230, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 250, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 270, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 270, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 270, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 270, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - Position: {x: 270, y: 0, z: 1.3}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
   positions:
   - {x: -35, y: 0, z: 1.3}
   - {x: -10, y: 0, z: 1.3}

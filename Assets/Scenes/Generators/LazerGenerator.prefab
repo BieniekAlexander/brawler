@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8155377043832476462
 MonoBehaviour:
@@ -46,8 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CastablePrefab: {fileID: 2445238925043839964, guid: 05b6a7e479c6ac7419747fd1ed98c18c,
     type: 3}
-  TimeJiggle: 300
   ReloadTime: 300
+  TimeJiggle: 300
   Target: {fileID: 0}
   DistanceFromTargetMin: 0
   DistanceFromTargetMax: 5
+  TargetJiggle: 30

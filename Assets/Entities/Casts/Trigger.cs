@@ -84,6 +84,7 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     public virtual void Move() {
         if (Origin==null) return; // If the origin disappears, stop moving
 
+        int index = Math.Min(Frame, TriggerTransformations.Count-1);
         Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? TriggerTransformations[Frame].Position
             : Quaternion.Euler(0, TriggerTransformations[Frame].Position.x, 0)*Vector3.forward*TriggerTransformations[Frame].Position.z;
@@ -150,26 +151,8 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     }
 
     public void OnBeforeSerialize() {
-        /*TriggerTransformations = new();
-
-        for (int i = 0; i < Duration; i++) {
-            int positionFrame = Mathf.Min(i, positions.Length-1);
-            int dimensionFrame = Mathf.Min(i, dimensions.Length-1);
-            int rotationFrame = Mathf.Min(i, rotations.Length-1);
-
-            TriggerTransformations.Add(
-                new TriggerTransformation(
-                    positions[positionFrame],
-                    dimensions[dimensionFrame],
-                    rotations[rotationFrame]
-                )
-            );
-        }*/
-        /*  AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);*/
     }
 
     public void OnAfterDeserialize() {
-        ;
     }
 }

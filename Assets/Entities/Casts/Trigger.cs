@@ -86,12 +86,12 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
 
         int index = Math.Min(Frame, TriggerTransformations.Count-1);
         Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
-            ? TriggerTransformations[Frame].Position
-            : Quaternion.Euler(0, TriggerTransformations[Frame].Position.x, 0)*Vector3.forward*TriggerTransformations[Frame].Position.z;
+            ? TriggerTransformations[index].Position
+            : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0)*Vector3.forward*TriggerTransformations[index].Position.z;
 
         Quaternion orientation = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? Quaternion.identity
-            : Quaternion.Euler(0, TriggerTransformations[Frame].Position.x, 0);
+            : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0);
 
         // TODO make sure that the calculations without an origin are correct
         if (Mirror) {
@@ -100,8 +100,8 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
         }
 
         transform.position = Origin.position+Origin.rotation*offset;
-        transform.rotation = Origin.rotation*orientation*TriggerTransformations[Frame].Rotation;
-        transform.localScale = TriggerTransformations[Frame].Position;
+        transform.rotation = Origin.rotation*orientation*TriggerTransformations[index].Rotation;
+        transform.localScale = TriggerTransformations[index].Dimension;
     }
 
     /// <summary>

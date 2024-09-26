@@ -3,7 +3,7 @@ using System;
 
 [Serializable]
 public enum HitTier {
-    Feather = 0, // TODO I have absoutely no idea what to call this right now
+    Soft = 0,
     Light = 1,
     Medium = 2,
     Heavy = 3,

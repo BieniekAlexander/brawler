@@ -27,9 +27,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -81,15 +81,6 @@ MonoBehaviour:
   - Position: {x: 0, y: 0, z: 1}
     Dimension: {x: 0.3, y: 0.3, z: 0.3}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  positions:
-  - {x: 0, y: 0, z: 0.5}
-  - {x: 0, y: 0, z: 0.75}
-  - {x: 0, y: 0, z: 0.9}
-  - {x: 0, y: 0, z: 1}
-  rotations:
-  - {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  dimensions:
-  - {x: 0.3, y: 0.3, z: 0.3}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0

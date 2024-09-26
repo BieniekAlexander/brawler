@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : Castable, IMoves, ICollidable, IDamageable
@@ -36,14 +37,16 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable
         HandleCollisions();
 
         if (Frame++ == Duration) {
-            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnExpire]) {
-                CreateCast(
-                    Castable,
-                    Caster,
-                    transform,
-                    null,
-                    false
-                );
+            if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
+                foreach (Castable Castable in value) {
+                    CreateCast(
+                        Castable,
+                        Caster,
+                        transform,
+                        null,
+                        false
+                    );
+                }
             }
             Destroy(gameObject);
         }
@@ -117,7 +120,6 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable
 
     public void TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
         HP -= damage;
-        Debug.Log("taking damage, hp is now "+HP);
 
         if (HP <= 0)
             OnDeath();

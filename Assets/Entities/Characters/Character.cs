@@ -61,18 +61,21 @@ public enum CastId {
     Ultimate = 19
 }
 
-public enum CharacterState {
-
-}
-
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
 
     // is this me? TODO better way to do this
     [SerializeField] public bool me { get; set; } = false;
 
+    /* State WIP */
+    CharacterState _state;
+    public CharacterState State { get { return _state; } set { _state = value; } }
+    CharacterStateFactory StateFactory;
+
     /* Movement */
-    private CharacterController cc;
-    [HideInInspector] public Vector3 Velocity = new();
+    public CharacterController cc;
+    private Vector3 _velocity = new();
+    public Vector3 Velocity { get { return _velocity; } set { _velocity = value; } }
+
     public CommandMovement CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
@@ -92,10 +95,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private float runRotationalSpeed = 2.5f;
 
     // Bolt
-    private int boostTimer = 0;
-    private int boostMaxDuration = 20;
-    private float boostSpeedBump = 2.5f;
-    private float boostDecay;
+
 
     /* Visuals */
     // Bolt Visualization
@@ -108,9 +108,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     [SerializeField] public float MinimumRotationThreshold = 1f;
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
-    private Vector3 movementDirection = new();
-    private bool boost = false;
-    private bool running = false;
+    public Vector3 InputMoveDirection = new();
+    public bool InputDash = false;
+    public bool InputRunning = false;
 
     /* Abilities */
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
@@ -125,7 +125,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public bool Reflects { get; set; } = false;
     private int healMax; private int healMaxOffset = 100;
     private int maxCharges = 5;
-    private int charges = 3;
+    public int Charges = 3;
     private int chargeCooldownMax = 60;
     private int chargeCooldown = 0;
     private int rechargeRate = 300;
@@ -149,20 +149,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     //movement
     public void OnMovement(InputAction.CallbackContext context) {
         var direction = context.ReadValue<Vector2>();
-        movementDirection = (direction.x==0 && direction.y==0) ? Vector3.zero : new Vector3(direction.x, 0, direction.y).normalized;
+        InputMoveDirection = (direction.x==0 && direction.y==0) ? Vector3.zero : new Vector3(direction.x, 0, direction.y).normalized;
     }
     public void OnRunning(InputAction.CallbackContext context) {
         // TODO fix tihs - shielding sets running to false
-        running=context.ReadValueAsButton();
+        InputRunning=context.ReadValueAsButton();
     }
     public void OnBoost(InputAction.CallbackContext context) {
-        boost=context.ReadValueAsButton();
+        InputDash=context.ReadValueAsButton();
     }
 
     // attacks
     public void OnLight1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Light1;
@@ -170,7 +170,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnLight2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Light2;
@@ -178,7 +178,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.BoostedLight;
@@ -186,7 +186,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnMedium1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Medium1;
@@ -194,7 +194,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnMedium2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Medium2;
@@ -202,7 +202,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.BoostedMedium;
@@ -210,7 +210,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnHeavy1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Heavy1;
@@ -218,7 +218,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnHeavy2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.Heavy2;
@@ -226,7 +226,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (boostTimer > 0)
+            if (State is CharacterStateDashing)
                 CastIdBuffer = (int)CastId.DashAttack;
             else
                 CastIdBuffer = (int)CastId.BoostedHeavy;
@@ -255,7 +255,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()){
+        if (context.ReadValueAsButton()) {
             CastIdBuffer = (int)CastId.Throw1;
         }
     }
@@ -344,12 +344,12 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     return true;
                 }
                 if (
-                    (charges>0 || !boostedIds.Contains(castId))
+                    (Charges>0 || !boostedIds.Contains(castId))
                     && (energy >= 50 || !specialIds.Contains(castId))
                     && (energy >= 100 || castId!=(int)CastId.Ultimate)
                 ) {
                     if (boostedIds.Contains(castId)) {
-                        charges--;
+                        Charges--;
                     } else if (specialIds.Contains(castId)) {
                         energy -= 50;
                     } else if (castId == (int)CastId.Ultimate) {
@@ -415,6 +415,12 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
+    /* State Machine */
+    public void SwitchState(CharacterState state) {
+        State = state;
+        State.EnterState();
+    }
+
     /* MonoBehavior */
     private void Awake() {
         // Controls
@@ -423,8 +429,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         CursorTransform = cursorGameObject.transform;
         aimPlane = new Plane(Vector3.up, transform.position);
 
-        // State
-        cc=GetComponent<CharacterController>();
+        // State WIP
+        StateFactory = new(this);
+        SwitchState(StateFactory.Idle());
+
+        cc =GetComponent<CharacterController>();
         standingY = transform.position.y + standingOffset;
         healMax = HP;
 
@@ -452,7 +461,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Material.color=Color.blue;
         else if (inputCastId >= 0)
             Material.color=Color.magenta;
-        else if (chargeCooldown<0&&charges>0)
+        else if (chargeCooldown<0&&Charges>0)
             Material.color=Color.green;
         else
             Material.color=Color.gray;
@@ -460,7 +469,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         /*
          * Trail Renderer
          */
-        tr.emitting=(Velocity.magnitude>(WalkSpeedMax+boostSpeedBump*2));
+        tr.emitting=(Velocity.magnitude>12.6f); // TODO return to this later
     }
 
     private void Update() {
@@ -470,9 +479,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     private void HandleCharges() {
-        rechargeTimer=(charges>=maxCharges) ? rechargeRate : rechargeTimer-1;
+        rechargeTimer=(Charges>=maxCharges) ? rechargeRate : rechargeTimer-1;
         if (rechargeTimer<=0) {
-            charges+=1;
+            Charges+=1;
             rechargeTimer=rechargeRate;
         }
 
@@ -481,6 +490,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     void FixedUpdate() {
         // Handle Casts
+        State.FixedUpdateStates();
         HandleCharges();
         if (CastIdBuffer >= 0) {
             if (StartCast(CastIdBuffer)) {
@@ -488,7 +498,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
         TickCasts();
-        Move();
+        //Move();
         HandleCollisions();
 
         // apply statusEffects
@@ -500,25 +510,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     // Movement evaluations
-    private Vector3 GetLookDirection() {
+    public Vector3 GetLookDirection() {
         Vector3 LookDirection = CursorTransform.position-cc.transform.position;
         LookDirection.y = 0;
         return LookDirection.normalized;
-    }
-
-    /// <summary>
-    /// Boost
-    /// </summary>
-    private Vector3 Boost(Vector3 currentVelocity) {
-        //charges--;
-        chargeCooldown = chargeCooldownMax;
-        boostTimer = boostMaxDuration;
-        float boostSpeedEnd = Mathf.Max(Velocity.magnitude, WalkSpeedMax)+boostSpeedBump;
-        float boostSpeedStart = boostSpeedEnd + 2*boostSpeedBump;
-        boostDecay = (boostSpeedEnd-boostSpeedStart)/boostMaxDuration;
-
-        Vector3 v = GetLookDirection();
-        return new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
     }
 
     public void SetCommandMovement(CommandMovement _commandMovement) {
@@ -556,51 +551,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         } else return 0;
     }
 
-    private Vector3 GetHorizontalVelocity(Vector3 horizontalVelocity, Vector3 biasDirection) {
-        horizontalVelocity.y = 0f;
-
-        if (boost&&charges>0&&chargeCooldown<=0) {
-            return Boost(horizontalVelocity);
-        } else if (boostTimer-->0) {
-            horizontalVelocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
-            return horizontalVelocity;
-        } else if (running && IsAboveWalkSpeed()) {
-            float rotationalSpeed = runRotationalSpeed;
-            if (Shield.ShieldTier==ShieldTier.Boosted) {
-                Vector3 lookDirection = GetLookDirection();
-                biasDirection = -GetLookDirection();
-                rotationalSpeed += GetShieldRotationFactor(Shield.ShieldTier, horizontalVelocity, GetLookDirection());
-            }
-
-            return (biasDirection==Vector3.zero)
-                ? horizontalVelocity
-                : Vector3.ClampMagnitude(
-                    Vector3.RotateTowards(
-                        horizontalVelocity, // current velocity
-                        biasDirection, // update direction if it was supplied
-                        rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
-                        0),
-                    Mathf.Max(WalkSpeedMax, Velocity.magnitude));
-        } else { // not running
-            float shieldAccelerationFactor = GetShieldAccelerationFactor(Shield.ShieldTier, horizontalVelocity, GetLookDirection());
-            float accerleration = Mathf.Max(WalkAcceleration-(3/(1+shieldAccelerationFactor))*horizontalVelocity.magnitude, 20f);
-            float dSpeed = Mathf.Clamp(
-                WalkSpeedMax - Vector3.Dot(horizontalVelocity, biasDirection),
-                0, accerleration*Time.deltaTime);
-
-            Vector3 newVelocity = Vector3.ClampMagnitude(
-                horizontalVelocity + dSpeed*(
-                    (biasDirection == Vector3.zero)
-                    ? (running ? Vector3.zero : (-horizontalVelocity.normalized))
-                    : biasDirection
-                ),
-                Mathf.Max(WalkSpeedMax, horizontalVelocity.magnitude)
-            );
-
-            return (Vector3.Dot(horizontalVelocity, newVelocity)<0) ? Vector3.zero : newVelocity;
-        }
-    }
-
     private float GetVerticalVelocity(float currentYVelocity, float gravity) {
         int excludeAllButTerrainLayer = 1<<LayerMask.NameToLayer("Terrain");
         Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, excludeAllButTerrainLayer);
@@ -628,18 +578,21 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         GameObject collisionObject = hit.collider.gameObject;
 
         if (collisionObject.layer==LayerMask.NameToLayer("Terrain")) {
-            if (running) { // if you hit a 
+            if (InputRunning) { // if you hit a 
                 if (IsAboveWalkSpeed()) {
                     Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
                     Vector3 bounceDirection = (Velocity-2*Vector3.Project(Velocity, mirror)).normalized;
+                    Debug.Log("I pray you're not here");
                     Velocity = bounceDirection*Velocity.magnitude;
                 } else {
+                    Debug.Log("nor here");
                     Velocity.Set(0f, 0f, 0f);
                 }
                 HitLagTimer = 2;
                 // TODO add something here:
                 // - stop for some frames
             } else {
+                Debug.Log("or even here please");
                 Velocity=Vector3.zero;
             }
         } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
@@ -649,7 +602,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             if (otherCharacter.Velocity.magnitude<Velocity.magnitude) {
                 // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
-                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-boostDecay)*Time.deltaTime*30;
+                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
+                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-(5f/20))*Time.deltaTime*30;
                 dvNormal.y = 0f;
                 Velocity-=dvNormal;
                 otherCharacter.Velocity=Velocity+dvNormal;
@@ -671,6 +625,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform GetTransform() { return transform; }
     public Vector3 GetVelocity() { return Velocity; }
 
+    /*
     public void Move() {
         if (CommandMovement != null) {
             cc.Move(CommandMovement.GetDPosition());
@@ -686,16 +641,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
                 HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
             } else { // normal movement
-                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, movementDirection);
+                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, InputMoveDirection);
             }
 
             Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
             cc.Move(Velocity*Time.deltaTime);
         }
-    }
+    }*/
 
     public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
-        if (HitTier==HitTier.Feather) return 0;
+        if (HitTier==HitTier.Soft) return 0;
         else if (HitTier==HitTier.Pure) return 1;
         else return ((int)HitTier - (int)ShieldTier)/(float)HitTier;
     }
@@ -755,7 +710,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         if (HP<=0) {
             OnDeath();
-        } 
+        }
     }
 
     public void TakeHeal(int damage) {
@@ -770,7 +725,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // TODO remove: here for debugging
         if (!me) return;
         GUI.Label(new Rect(20, 40, 80, 20), Velocity.magnitude+"m/s");
-        GUI.Label(new Rect(20, 70, 80, 20), charges+"/"+maxCharges);
+        GUI.Label(new Rect(20, 70, 80, 20), Charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 80, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);
     }

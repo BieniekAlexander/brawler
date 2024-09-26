@@ -64,8 +64,7 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
 
     public void Start() {
         // Evaluate the position of the Trigger before it's accounted for in game logic
-        Move();
-        RescaleCollider();
+        UpdateTransform(0);
     }
 
     public void FixedUpdate() {
@@ -74,17 +73,33 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
             Destroy(gameObject);
         }
 
-        Move();
-        RescaleCollider();
+        UpdateTransform(Frame);
         HandleCollisions();
         Frame++;
     }
    
     /* IMoves Methods */
-    public virtual void Move() {
+    public virtual void UpdateTransform(int _frame) {
+        /*
+         * I almost pulled my hair out over trying to understand the Collider handling again, so
+         * I'll save the following notes here. I don't know that my current Collision implementation is great,
+         * but it seems okay for now. One of the big difficulties has been handling hitbox scale,
+         * and to keep the implementation clean, I need to consider the following:
+         * - A Collider's shape is only an approximation of the transform's scale, given the following:
+         *   - A sphere collider's shape is a centered circle with r = Max(localScale)
+         *   - a Capsule Collider's shape:
+         *     - h = localScale along a specified major axis
+         *     - r = Max(localScale of minor axes)
+         *     - then, rotation is only meaningful on minor axes
+         * - Additionally, confusing things happen when the collider size fields are nondefault:
+         *   - make sure sphere r=.5
+         *   - make sure capsule h=1, r=.5
+         */
+        // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
+        // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
         if (Origin==null) return; // If the origin disappears, stop moving
 
-        int index = Math.Min(Frame, TriggerTransformations.Count-1);
+        int index = Math.Min(_frame, TriggerTransformations.Count-1);
         Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? TriggerTransformations[index].Position
             : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0)*Vector3.forward*TriggerTransformations[index].Position.z;
@@ -110,27 +125,6 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f;}
 
     /* ICollidable Methods */
-    public void RescaleCollider() {
-        /*
-         * I almost pulled my hair out over trying to understand the Collider handling again, so
-         * I'll save the following notes here. I don't know that my current Collision implementation is great,
-         * but it seems okay for now. One of the big difficulties has been handling hitbox scale,
-         * and to keep the implementation clean, I need to consider the following:
-         * - A Collider's shape is only an approximation of the transform's scale, given the following:
-         *   - A sphere collider's shape is a centered circle with r = Max(localScale)
-         *   - a Capsule Collider's shape:
-         *     - h = localScale along a specified major axis
-         *     - r = Max(localScale of minor axes)
-         *     - then, rotation is only meaningful on minor axes
-         * - Additionally, confusing things happen when the collider size fields are nondefault:
-         *   - make sure sphere r=.5
-         *   - make sure capsule h=1, r=.5
-         */
-        // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
-        // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
-        
-    }
-
     public Collider GetCollider() { return Collider; }
 
     public void HandleCollisions() {
@@ -151,6 +145,11 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     }
 
     public void OnBeforeSerialize() {
+        if (TriggerTransformations!=null && TriggerTransformations.Count > 0) {
+            transform.position = TriggerTransformations[0].Position;
+            transform.rotation = TriggerTransformations[0].Rotation;
+            transform.localScale = TriggerTransformations[0].Dimension;
+        }
     }
 
     public void OnAfterDeserialize() {

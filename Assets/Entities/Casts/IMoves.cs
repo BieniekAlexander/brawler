@@ -1,11 +1,6 @@
 using UnityEngine;
 
 public interface IMoves {
-    /// <summary>
-    /// Move during a frame, considering some internal calculations for movement.
-    /// </summary>
-    public void Move();
-
     /// <summary/>
     /// <returns>the <typeparamref name="Transform"/></returns>
     public Transform GetTransform();

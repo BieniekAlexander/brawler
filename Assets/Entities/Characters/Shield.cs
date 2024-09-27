@@ -1,13 +1,13 @@
 using UnityEngine;
 
 public enum ShieldTier {
-    None = 0,
-    Normal = 1,
-    Boosted = 2
+    Exposed = 0,
+    Blocking = 1,
+    Shielding = 2
 }
 
 public class Shield : MonoBehaviour, ICollidable {
-    [HideInInspector] public ShieldTier ShieldTier = ShieldTier.None;
+    [HideInInspector] public ShieldTier ShieldTier = ShieldTier.Exposed;
     [HideInInspector] Collider Collider;
     public Material Material { get; set; }
     
@@ -27,9 +27,9 @@ public class Shield : MonoBehaviour, ICollidable {
          * Bolt Indicator
          */
         // duration
-        if (ShieldTier == ShieldTier.Boosted)
+        if (ShieldTier == ShieldTier.Shielding)
             Material.color=Color.blue;
-        else if (ShieldTier == ShieldTier.Normal)
+        else if (ShieldTier == ShieldTier.Blocking)
             Material.color=Color.cyan;
         else
             Material.color=Color.white;

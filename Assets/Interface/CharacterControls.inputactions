@@ -24,7 +24,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "boost",
+                    "name": "dash",
                     "type": "PassThrough",
                     "id": "03841b82-074c-4841-af00-16aa08a8a2ac",
                     "expectedControlType": "Button",
@@ -33,7 +33,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "shield",
+                    "name": "block",
                     "type": "Button",
                     "id": "6799233d-eda8-4a5c-a64d-cf710a687472",
                     "expectedControlType": "Button",
@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "boostedShield",
+                    "name": "shield",
                     "type": "Button",
                     "id": "43efeb36-47c0-4ffc-8969-7f7968afa0d4",
                     "expectedControlType": "Button",
@@ -274,7 +274,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boost",
+                    "action": "dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -494,7 +494,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -505,7 +505,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -516,7 +516,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -527,7 +527,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -538,7 +538,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -549,7 +549,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -560,7 +560,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "shield",
+                    "action": "block",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -934,7 +934,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "boostedShield",
+                    "action": "shield",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

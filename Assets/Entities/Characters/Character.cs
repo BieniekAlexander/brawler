@@ -86,16 +86,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int HitLagTimer { get; private set; } = 0;
 
     // Walking
-    private float WalkAcceleration = 75f;
     public float WalkSpeedMax { get; set; } = 7.5f;
     private float gravity = -.5f;
-
-    // Running
-    private float runDeceleration = 10f;
-    private float runRotationalSpeed = 2.5f;
-
-    // Bolt
-
 
     /* Visuals */
     // Bolt Visualization
@@ -108,9 +100,12 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     [SerializeField] public float MinimumRotationThreshold = 1f;
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
-    public Vector3 InputMoveDirection = new();
+    private Vector3 _inputMoveDirection = new();
+    public Vector3 InputMoveDirection { get { return _inputMoveDirection;  } set { _inputMoveDirection = value; } }
     public bool InputDash = false;
     public bool InputRunning = false;
+    public bool InputBlocking = false;
+    public bool InputShielding = false;
 
     /* Abilities */
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
@@ -155,7 +150,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // TODO fix tihs - shielding sets running to false
         InputRunning=context.ReadValueAsButton();
     }
-    public void OnBoost(InputAction.CallbackContext context) {
+    public void OnDash(InputAction.CallbackContext context) {
         InputDash=context.ReadValueAsButton();
     }
 
@@ -234,23 +229,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     // shields
-    public void OnShield(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            Shield.gameObject.SetActive(true);
-            Shield.ShieldTier = ShieldTier.Normal;
-        } else {
-            Shield.gameObject.SetActive(false);
-            Shield.ShieldTier = ShieldTier.None;
-        }
+    public void OnBlock(InputAction.CallbackContext context) {
+        InputBlocking = context.ReadValueAsButton();
     }
-    public void OnBoostedShield(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            Shield.gameObject.SetActive(true);
-            Shield.ShieldTier = ShieldTier.Boosted;
-        } else {
-            Shield.gameObject.SetActive(false);
-            Shield.ShieldTier = ShieldTier.None;
-        }
+    public void OnShield(InputAction.CallbackContext context) {
+        InputShielding = context.ReadValueAsButton();
     }
 
     // throws
@@ -491,6 +474,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void FixedUpdate() {
         // Handle Casts
         State.FixedUpdateStates();
+        cc.Move(Velocity*Time.deltaTime);
         HandleCharges();
         if (CastIdBuffer >= 0) {
             if (StartCast(CastIdBuffer)) {
@@ -530,7 +514,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <param name="lookVector"></param>
     /// <returns></returns>
     private float GetShieldAccelerationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
-        if (Shield.ShieldTier == ShieldTier.None) return 0;
+        if (Shield.ShieldTier == ShieldTier.Exposed) return 0;
         else {
             float x = (int)Shield.ShieldTier * Vector3.Dot(velocity.normalized, lookVector.normalized);
             return Mathf.Pow(x, (int)Shield.ShieldTier);
@@ -545,7 +529,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <param name="lookVector"></param>
     /// <returns></returns>
     private float GetShieldRotationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
-        if (Shield.ShieldTier == ShieldTier.Boosted) {
+        if (Shield.ShieldTier == ShieldTier.Shielding) {
 
             return 2.5f * (1-Vector3.Dot(velocity.normalized, lookVector.normalized));
         } else return 0;

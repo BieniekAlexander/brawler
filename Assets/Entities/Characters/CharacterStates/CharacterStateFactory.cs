@@ -12,5 +12,10 @@ public class CharacterStateFactory {
     public CharacterState Running() { return new CharacterStateRunning(_character, this); }
     public CharacterState Dashing() { return new CharacterStateDashing(_character, this); }
 
+    // defense
+    public CharacterState Exposed() { return new CharacterStateExposed(_character, this); }
+    public CharacterState Blocking() { return new CharacterStateBlocking(_character, this); }
+    public CharacterState Shielding() { return new CharacterStateShielding(_character, this); }
+
     // disadvantage
 }

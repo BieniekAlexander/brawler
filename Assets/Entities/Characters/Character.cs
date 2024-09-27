@@ -81,9 +81,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private float standingY; private float standingOffset = .1f;
 
     // knockback
-    private int hitStunTimer = 0;
+    public HitTier KnockBackHitTier;
+    public int HitStunTimer = 0;
     public float KnockBackDecay { get; private set; } = 1f;
-    public int HitLagTimer { get; private set; } = 0;
+    public Vector3 KnockBack = new();
+    public int HitStopTimer { get; set; } = 0;
 
     // Walking
     public float WalkSpeedMax { get; set; } = 7.5f;
@@ -438,7 +440,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
          * Bolt Indicator
          */
         // duration
-        if (HitLagTimer>0)
+        if (HitStopTimer>0)
             Material.color=Color.red;
         else if (Reflects)
             Material.color=Color.blue;
@@ -474,7 +476,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void FixedUpdate() {
         // Handle Casts
         State.FixedUpdateStates();
-        cc.Move(Velocity*Time.deltaTime);
+
+        if (HitStopTimer==0) {
+            cc.Move(Velocity*Time.deltaTime);
+        }
+        
         HandleCharges();
         if (CastIdBuffer >= 0) {
             if (StartCast(CastIdBuffer)) {
@@ -547,11 +553,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         } else {
             return currentYVelocity + gravity;
         }
-
-    }
-
-    private bool IsAboveWalkSpeed() {
-        return (Velocity.magnitude>(WalkSpeedMax+.25));
     }
 
     private Vector3 GetDecayedVector(Vector3 vector, float decayRate) {
@@ -560,38 +561,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
-
-        if (collisionObject.layer==LayerMask.NameToLayer("Terrain")) {
-            if (InputRunning) { // if you hit a 
-                if (IsAboveWalkSpeed()) {
-                    Vector3 mirror = new Vector3(hit.normal.x, 0, hit.normal.z);
-                    Vector3 bounceDirection = (Velocity-2*Vector3.Project(Velocity, mirror)).normalized;
-                    Debug.Log("I pray you're not here");
-                    Velocity = bounceDirection*Velocity.magnitude;
-                } else {
-                    Debug.Log("nor here");
-                    Velocity.Set(0f, 0f, 0f);
-                }
-                HitLagTimer = 2;
-                // TODO add something here:
-                // - stop for some frames
-            } else {
-                Debug.Log("or even here please");
-                Velocity=Vector3.zero;
-            }
-        } else if (collisionObject.layer==LayerMask.NameToLayer("Characters")&&IsAboveWalkSpeed()) {
-
-            Character otherCharacter = collisionObject.GetComponent<Character>();
-
-            if (otherCharacter.Velocity.magnitude<Velocity.magnitude) {
-                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
-                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
-                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
-                Vector3 dvNormal = Vector3.Project(Velocity-otherCharacter.Velocity, hit.normal)*(-(5f/20))*Time.deltaTime*30;
-                dvNormal.y = 0f;
-                Velocity-=dvNormal;
-                otherCharacter.Velocity=Velocity+dvNormal;
-            }
+        
+        if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
+            OnCollideWith(collidable, new CollisionInfo(hit.normal));
+        } else {
+            throw new Exception("Unhandled collision type");
         }
     }
 
@@ -608,30 +582,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* IMoves Methods */
     public Transform GetTransform() { return transform; }
     public Vector3 GetVelocity() { return Velocity; }
-
-    /*
-    public void Move() {
-        if (CommandMovement != null) {
-            cc.Move(CommandMovement.GetDPosition());
-            transform.rotation = CommandMovement.GetRotation(transform.position, transform.rotation);
-        } else {
-            Vector3 horizontalPlane = new Vector3(1, 0, 1);
-            Vector3 HorizontalVelocity = Vector3.Scale(horizontalPlane, Velocity);
-            float verticalVelocity = GetVerticalVelocity(Velocity.y, gravity);
-
-            if (HitLagTimer-- > 0) {
-                return; // no-op - don't move, don't update velocity, no nothing
-            } else if (hitStunTimer-- > 0) {
-                float acceleration = (verticalVelocity==0f) ? KnockBackDecay : 0f;
-                HorizontalVelocity = GetDecayedVector(HorizontalVelocity, acceleration);
-            } else { // normal movement
-                HorizontalVelocity = GetHorizontalVelocity(HorizontalVelocity, InputMoveDirection);
-            }
-
-            Velocity = HorizontalVelocity + Vector3.up * verticalVelocity;
-            cc.Move(Velocity*Time.deltaTime);
-        }
-    }*/
 
     public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
         if (HitTier==HitTier.Soft) return 0;
@@ -658,21 +608,31 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
+    public float TakeKnockBack(Vector3 contactPoint, int hitStopDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
         float knockBackFactor = HitsShield(contactPoint)
             ? GetKnockBackFactor(hitTier, (Shield.isActiveAndEnabled ? Shield.ShieldTier : 0))
             : 1f;
 
+        // TODO account for pushback of HitTier.Soft
+        KnockBackHitTier = hitTier;
+
         if (knockBackFactor > 0) {
             Destroy(CommandMovement);
             CommandMovement = null;
+            KnockBack = knockBackFactor*knockBackVector;
+            HitStunTimer = hitStunDuration;
+        }
 
-            // hit lag, hit stun
-            HitLagTimer = hitLagDuration;
-            hitStunTimer = hitStunDuration;
-
-            if (knockBackVector != Vector3.zero) {
-                Velocity = knockBackFactor*knockBackVector;
+        if (hitStopDuration > 0) {
+            HitStopTimer = hitStopDuration;
+            SwitchState(StateFactory.HitStopped());
+        } else if (KnockBack != Vector3.zero) {
+            if (hitTier >= HitTier.Heavy) {
+                SwitchState(StateFactory.BlownBack());
+            } else if (hitTier == HitTier.Medium) {
+                SwitchState(StateFactory.KnockedBack());
+            } else if (hitTier == HitTier.Light) {
+                SwitchState(StateFactory.PushedBack());
             }
         }
 
@@ -715,8 +675,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* ICollidable */
-    public void OnCollideWith(ICollidable other) {
-        ; // TODO noop for now - maybe the Character never has to be the one to handle their own collisions? I don't know yet
+    public void OnCollideWith(ICollidable other, CollisionInfo info) {
+        _state.OnCollideWith(other, info);
     }
 
     public void HandleCollisions() {

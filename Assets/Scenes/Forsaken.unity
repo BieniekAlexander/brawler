@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1772,12 +1772,6 @@ MonoBehaviour:
     m_values: []
   positionCoordinateSystem: 0
   TriggerTransformations: []
-  positions:
-  - {x: 0, y: 0, z: 0}
-  rotations:
-  - {x: 0, y: 0, z: 0, w: 0}
-  dimensions:
-  - {x: 100, y: 1, z: 100}
   Collider: {fileID: 0}
   effects:
   - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}

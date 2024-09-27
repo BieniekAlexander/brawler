@@ -15,7 +15,7 @@ public static class MovementUtils {
 }
 
 public class CharacterStateIdle : CharacterState {
-    private float _acceleration = 20f;
+    private float _acceleration = 50f;
 
     public CharacterStateIdle(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -55,13 +55,11 @@ public class CharacterStateIdle : CharacterState {
         }
     }
 
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
 }
 
 public class CharacterStateWalking : CharacterState {
-    private float _acceleration = 20f;
+    private float _acceleration = 50f;
 
     public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -119,9 +117,7 @@ public class CharacterStateWalking : CharacterState {
         }
     }
 
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
 }
 
 
@@ -169,9 +165,23 @@ public class CharacterStateRunning : CharacterState {
         SetSubState(Factory.Exposed());
     }
 
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (collidable is Character otherCharacter) {
+            if (otherCharacter.Velocity.magnitude<Character.Velocity.magnitude) {
+                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
+                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
+                Vector3 dvNormal = Vector3.Project(Character.Velocity-otherCharacter.Velocity, info.Normal)*(-(5f/20))*Time.deltaTime*30;
+                dvNormal.y = 0f;
+                Character.Velocity-=dvNormal;
+                otherCharacter.Velocity=Character.Velocity+dvNormal;
+            }
+        } else if (collidable is StageTerrain terrain) {
+            Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.Velocity = bounceDirection*Character.Velocity.magnitude;
+        }
+    }
 }
 
 public class CharacterStateDashing : CharacterState {
@@ -231,7 +241,22 @@ public class CharacterStateDashing : CharacterState {
         }
     }
 
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        // TODO I copied the implementation from the Running state, and I'm not sure if that's what I want
+        if (collidable is Character otherCharacter) {
+            if (otherCharacter.Velocity.magnitude<Character.Velocity.magnitude) {
+                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
+                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
+                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
+                Vector3 dvNormal = Vector3.Project(Character.Velocity-otherCharacter.Velocity, info.Normal)*(-(5f/20))*Time.deltaTime*30;
+                dvNormal.y = 0f;
+                Character.Velocity-=dvNormal;
+                otherCharacter.Velocity=Character.Velocity+dvNormal;
+            }
+        } else if (collidable is StageTerrain terrain) {
+            Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.Velocity = bounceDirection*Character.Velocity.magnitude;
+        }
+    }
 }

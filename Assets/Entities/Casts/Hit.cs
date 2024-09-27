@@ -40,7 +40,7 @@ public class Hit : Trigger, ICollidable {
     }
 
     /* ICollidable Methods */
-    public override void OnCollideWith(ICollidable Other) {
+    public override void OnCollideWith(ICollidable Other, CollisionInfo info) {
         Physics.Raycast(
                 transform.position,
                 Other.GetCollider().transform.position,

@@ -3,26 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public static class CollisionUtils {
-    /// <summary>
-    /// Adds an <typeparamref name="ICollidable"/> to the <paramref name="CollisionLog"/>, returning whether the <typeparamref name="ICollidable"/> was not previously in the set.
-    /// </summary>
-    /// <remark>
-    /// Struggling to think of a good naming for this :(
-    /// </remark>
-    /// <param name="CollisionLog"></param>
-    /// <param name="ICollidable"></param>
-    /// <returns></returns>
-    public static bool CollisionLogPushUpdated(HashSet<ICollidable> CollisionLog, ICollidable ICollidable) {
-        // TODO maybe this should go to Castable? 
-        if (CollisionLog.Contains(ICollidable)) {
-            return false;
-        } else {
-            CollisionLog.Add(ICollidable);
-            return true;
-        }
-    }
-
+public static class ColliderPhysicsUtils {
     // https://github.com/justonia/UnityExtensions/blob/master/PhysicsExtensions.cs
     private static Vector3 AbsVec3(Vector3 v) {
         return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
@@ -77,28 +58,46 @@ public static class CollisionUtils {
         center = sphere.transform.TransformPoint(sphere.center);
         radius = sphere.radius * MaxVec3(AbsVec3(sphere.transform.lossyScale));
     }
-    // END ref utils
+}
 
-
+public static class CollisionUtils {
+    /// <summary>
+    /// Adds an <typeparamref name="ICollidable"/> to the <paramref name="CollisionLog"/>, returning whether the <typeparamref name="ICollidable"/> was not previously in the set.
+    /// </summary>
+    /// <remark>
+    /// Struggling to think of a good naming for this :(
+    /// </remark>
+    /// <param name="CollisionLog"></param>
+    /// <param name="ICollidable"></param>
+    /// <returns></returns>
+    public static bool CollisionLogPushUpdated(HashSet<ICollidable> CollisionLog, ICollidable ICollidable) {
+        // TODO maybe this should go to Castable? 
+        if (CollisionLog.Contains(ICollidable)) {
+            return false;
+        } else {
+            CollisionLog.Add(ICollidable);
+            return true;
+        }
+    }
     public static IEnumerable<Collider> GetOverlappingColliders(Collider collider) {
         // TODO I suspect that the performance of this could be improved
         // - maybe check layer mask and ignore things in specified layers, but then:
         // - will there be clashes? then I need hitbox collisions to do something
         // - Grab techs? Then I'll need grabs to be in a different layer, or let them be hitboxes and collide
         if (collider is CapsuleCollider capsule) {
-            ToWorldSpaceCapsule(capsule, out Vector3 point0, out Vector3 point1, out float radius);
+            ColliderPhysicsUtils.ToWorldSpaceCapsule(capsule, out Vector3 point0, out Vector3 point1, out float radius);
 
             return from c in Physics.OverlapCapsule(point0, point1, radius)
-                where (c!=collider)
-                select c;
+                   where (c!=collider)
+                   select c;
         } else if (collider is SphereCollider sphere) {
-            ToWorldSpaceSphere(sphere, out Vector3 point, out float radius);
+            ColliderPhysicsUtils.ToWorldSpaceSphere(sphere, out Vector3 point, out float radius);
 
             return from c in Physics.OverlapSphere(point, radius)
-                where (c!=collider)
-                select c;
+                   where (c!=collider)
+                   select c;
         } else if (collider is BoxCollider box) {
-            ToWorldSpaceBox(box, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
+            ColliderPhysicsUtils.ToWorldSpaceBox(box, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
 
             return from c in Physics.OverlapBox(center, halfExtents, orientation)
                    where (c!=collider)
@@ -118,7 +117,7 @@ public static class CollisionUtils {
             foreach (Collider otherCollider in GetOverlappingColliders(collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
                     if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {
-                        ThisCollidable.OnCollideWith(OtherCollidable);
+                        ThisCollidable.OnCollideWith(OtherCollidable, null);
                     }
                 }
             }
@@ -130,11 +129,20 @@ public static class CollisionUtils {
     }
 }
 
+public class CollisionInfo {
+    public Vector3 Normal;
+    
+    public CollisionInfo(Vector3 _normal) {
+        Normal = _normal;
+    }
+    
+}
+
 /// <summary>
 /// An interface that defines how a given GameObject should behave when it collides with another GameObject
 /// </summary>
 public interface ICollidable {
-    public void OnCollideWith(ICollidable other);
+    public void OnCollideWith(ICollidable other, CollisionInfo info);
 
     public void HandleCollisions();
 

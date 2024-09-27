@@ -33,7 +33,6 @@ public abstract class CharacterState {
                 _subState.FixedUpdateStates();
             }
         }
-
     }
 
     protected void SwitchState(CharacterState newState) {
@@ -55,4 +54,6 @@ public abstract class CharacterState {
         _subState = newSubState;
         newSubState.SetSuperState(this);
     }
+
+    public abstract void OnCollideWith(ICollidable collidable, CollisionInfo info);
 }

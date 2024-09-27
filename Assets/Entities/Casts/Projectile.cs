@@ -94,7 +94,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable
         CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
     }
 
-    public void OnCollideWith(ICollidable other) {
+    public void OnCollideWith(ICollidable other, CollisionInfo info) {
         if (
             other is Character Character
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide

@@ -36,7 +36,7 @@ public class Shield : MonoBehaviour, ICollidable {
     }
 
     /* ICollidable Methods */
-    public void OnCollideWith(ICollidable other) {
+    public void OnCollideWith(ICollidable other, CollisionInfo info) {
         ;
         // TODO currently no-op
         // have this reflect projectiles on Parry, and maybe hitstun attackers on parry

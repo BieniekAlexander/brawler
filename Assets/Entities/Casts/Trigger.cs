@@ -131,8 +131,7 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
         CollisionUtils.HandleCollisions(this, CollisionLog);
     }
 
-    public virtual void OnCollideWith(ICollidable other) {
-        Debug.Log("trying to handle collision");
+    public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
         if (other is MonoBehaviour mono) {
             for (int i = 0; i < effects.Count; i++) {
                 // TODO what if I don't want the status effect to stack?

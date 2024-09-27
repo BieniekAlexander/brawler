@@ -153,5 +153,5 @@ MonoBehaviour:
   KnockbackCoordinateSystem: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 15}
   HitTier: 3
-  hitLagDuration: 5
+  hitLagDuration: 30
   hitStunDuration: 30

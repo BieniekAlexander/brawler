@@ -12,7 +12,7 @@ public class Grab : Trigger, ICollidable {
     [SerializeField] public bool HitsFriendlies = false;
     [SerializeField] HitTier HitTier;
 
-    public override void OnCollideWith(ICollidable other) {
+    public override void OnCollideWith(ICollidable other, CollisionInfo info) {
         // TODO probably hardcode Caster not grabbing oneself
 
         if (other is IMoves OtherMover) {

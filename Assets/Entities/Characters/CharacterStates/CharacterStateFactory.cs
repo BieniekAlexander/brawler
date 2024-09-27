@@ -18,4 +18,8 @@ public class CharacterStateFactory {
     public CharacterState Shielding() { return new CharacterStateShielding(_character, this); }
 
     // disadvantage
+    public CharacterState HitStopped() { return new CharacterStateHitStopped(_character, this); }
+    public CharacterState PushedBack() { return new CharacterStatePushedBack(_character, this); }
+    public CharacterState KnockedBack() { return new CharacterStateKnockedBack(_character, this); }
+    public CharacterState BlownBack() { return new CharacterStateBlownBack(_character, this); }
 }

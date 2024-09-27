@@ -27,20 +27,10 @@ public class CharacterStateExposed : CharacterState {
         Character.Shield.gameObject.SetActive(false);
     }
 
-    public override void ExitState() {
-    }
-
-    public override void FixedUpdateState() {
-        ;
-    }
-
-    public override void InitializeSubState() {
-        ;
-    }
-
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void ExitState(){}
+    public override void FixedUpdateState(){}
+    public override void InitializeSubState(){}
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
 public class CharacterStateBlocking : CharacterState {
@@ -67,8 +57,7 @@ public class CharacterStateBlocking : CharacterState {
         Character.Shield.ShieldTier = ShieldTier.Blocking;
     }
 
-    public override void ExitState() {
-    }
+    public override void ExitState(){}
 
     public override void FixedUpdateState() {
         // TODO slow down movement if the player is looking (and therefore blocking)
@@ -94,13 +83,8 @@ public class CharacterStateBlocking : CharacterState {
         }
     }
 
-    public override void InitializeSubState() {
-        ;
-    }
-
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void InitializeSubState(){}
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
 
@@ -129,8 +113,6 @@ public class CharacterStateShielding : CharacterState {
         Character.Shield.ShieldTier = ShieldTier.Shielding;
     }
 
-    public override void ExitState() {
-    }
 
     public override void FixedUpdateState() {
         // TODO return to this implementation because I don't know how to make it more elegant,
@@ -164,11 +146,7 @@ public class CharacterStateShielding : CharacterState {
         );
     }
 
-    public override void InitializeSubState() {
-        ;
-    }
-
-    /*public override void OnCollisionEnter(CharacterStateMachine _machine) {
-        // write stuff 
-    }*/
+    public override void ExitState(){}
+    public override void InitializeSubState(){}
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }

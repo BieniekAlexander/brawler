@@ -145,10 +145,10 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 0}
-  HitTier: 0
-  hitLagDuration: 0
-  hitStunDuration: 0
+  BaseKnockbackVector: {x: 0, y: 0, z: 5}
+  HitTier: 1
+  hitLagDuration: 3
+  hitStunDuration: 15
 --- !u!136 &-1384865874681218364
 CapsuleCollider:
   m_ObjectHideFlags: 0

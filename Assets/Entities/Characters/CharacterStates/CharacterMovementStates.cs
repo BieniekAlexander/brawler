@@ -2,8 +2,16 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 public static class MovementUtils {
-    public static Vector3 ChangeMagnitude(Vector3 vector, float changeInMagnitude) {
-        return vector.normalized * (vector.magnitude + changeInMagnitude);
+    public static Vector3 ChangeMagnitude(Vector3 vector, float changeInMagnitude, bool clampToZero = true) {
+        if ((vector.magnitude+changeInMagnitude)<0) {
+            changeInMagnitude=-vector.magnitude;
+        }
+
+        return ClampMagnitude(
+                vector.normalized * (vector.magnitude + changeInMagnitude),
+                clampToZero?0:Mathf.NegativeInfinity,
+                Mathf.Infinity
+            );
     }
 
     public static Vector3 ClampMagnitude(Vector3 v, float min, float max) {

@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using UnityEngine;
 
 public class CharacterStateHitStopped : CharacterState {
@@ -32,7 +31,7 @@ public class CharacterStateHitStopped : CharacterState {
 }
 
 public class CharacterStatePushedBack : CharacterState {
-    private float _knockBackDecay = 1f;
+    private float _knockBackDecay = 5f;
 
     public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -55,19 +54,19 @@ public class CharacterStatePushedBack : CharacterState {
 
     public override void FixedUpdateState() {
         Character.HitStunTimer--;
-        MovementUtils.ChangeMagnitude(
+        Character.Velocity = MovementUtils.ChangeMagnitude(
             Character.Velocity, -_knockBackDecay*Time.deltaTime
         );
     }
 
-    public override void ExitState() { }
-    public override void InitializeSubState() { }
+    public override void ExitState(){}
+    public override void InitializeSubState(){}
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }
 
 public class CharacterStateKnockedBack : CharacterState {
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
-    private float _knockBackDecay = 1f;
+    private float _knockBackDecay = 5f;
 
     public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -77,7 +76,7 @@ public class CharacterStateKnockedBack : CharacterState {
     public override CharacterState CheckGetNewState() {
         // TODO implement knockdown, teching
         if (Character.HitStunTimer==0) {
-            return Factory.Idle();
+            return Factory.Tumbling();
         } else {
             return null;
         }
@@ -100,7 +99,7 @@ public class CharacterStateKnockedBack : CharacterState {
 
     public override void FixedUpdateState() {
         Character.HitStunTimer--;
-        MovementUtils.ChangeMagnitude(
+        Character.Velocity = MovementUtils.ChangeMagnitude(
             Character.Velocity, -_knockBackDecay * Time.deltaTime
         );
     }
@@ -111,7 +110,7 @@ public class CharacterStateKnockedBack : CharacterState {
 }
 
 public class CharacterStateBlownBack : CharacterState {
-    private float _knockBackDecay = 1f;
+    private float _knockBackDecay = 5f;
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
     public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory)
@@ -121,7 +120,7 @@ public class CharacterStateBlownBack : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO implement knockdown
-        if (Character.HitStunTimer==0) {
+        if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.Idle();
         } else {
             return null;
@@ -145,7 +144,7 @@ public class CharacterStateBlownBack : CharacterState {
 
     public override void FixedUpdateState() {
         Character.HitStunTimer--;
-        MovementUtils.ChangeMagnitude(
+        Character.Velocity = MovementUtils.ChangeMagnitude(
             Character.Velocity, -_knockBackDecay*Time.deltaTime
         );
     }

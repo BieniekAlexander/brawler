@@ -86,6 +86,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public float KnockBackDecay { get; private set; } = 1f;
     public Vector3 KnockBack = new();
     public int HitStopTimer { get; set; } = 0;
+    public int RecoveryTimer = 0;
 
     // Walking
     public float WalkSpeedMax { get; set; } = 7.5f;
@@ -441,9 +442,17 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
          */
         // duration
         if (HitStopTimer>0)
-            Material.color=Color.red;
-        else if (Reflects)
-            Material.color=Color.blue;
+            Material.color=new Color(0, 0, 0); // deep red
+        else if (_state is CharacterStateBlownBack
+            || _state is CharacterStateKnockedBack
+            || _state is CharacterStatePushedBack)
+            Material.color=new Color(255, 0, 0);
+        else if (_state is CharacterStateTumbling)
+            Material.color=new Color(125, 125, 0);
+        else if (_state is CharacterStateRolling
+            || _state is CharacterStateGettingUp
+            || _state is CharacterStateKnockedDown)
+            Material.color=new Color(255, 255, 0);
         else if (inputCastId >= 0)
             Material.color=Color.magenta;
         else if (chargeCooldown<0&&Charges>0)
@@ -668,10 +677,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void OnGUI() {
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20, 40, 80, 20), Velocity.magnitude+"m/s");
-        GUI.Label(new Rect(20, 70, 80, 20), Charges+"/"+maxCharges);
-        GUI.Label(new Rect(20, 100, 80, 20), "HP: "+HP);
-        GUI.Label(new Rect(20, 130, 80, 20), "Energy: "+energy);
+        GUI.Label(new Rect(20, 40, 200, 20), Velocity.magnitude+"m/s");
+        GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
+        GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
+        GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);
+        GUI.Label(new Rect(20, 160, 200, 20), _state.GetType().Name);
     }
 
     /* ICollidable */

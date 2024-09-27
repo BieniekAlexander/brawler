@@ -143,12 +143,6 @@ MonoBehaviour:
   - Position: {x: 0, y: 0, z: 0}
     Dimension: {x: 1, y: 1, z: 1}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  positions:
-  - {x: 0, y: 0, z: 0}
-  rotations:
-  - {x: 0, y: 0, z: 0, w: 0}
-  dimensions:
-  - {x: 1, y: 1, z: 1}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
@@ -157,7 +151,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 15}
+  BaseKnockbackVector: {x: 0, y: 0, z: 10}
   HitTier: 2
   hitLagDuration: 5
-  hitStunDuration: 30
+  hitStunDuration: 20

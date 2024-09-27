@@ -22,4 +22,11 @@ public class CharacterStateFactory {
     public CharacterState PushedBack() { return new CharacterStatePushedBack(_character, this); }
     public CharacterState KnockedBack() { return new CharacterStateKnockedBack(_character, this); }
     public CharacterState BlownBack() { return new CharacterStateBlownBack(_character, this); }
+
+    // recovery
+    public CharacterState Tumbling() { return new CharacterStateTumbling(_character, this); }
+    public CharacterState KnockedDown() { return new CharacterStateKnockedDown(_character, this); }
+    public CharacterState GettingUp() { return new CharacterStateGettingUp(_character, this); }
+    public CharacterState Rolling() { return new CharacterStateRolling(_character, this); }
+    public CharacterState GetUpAttacking() { return new CharacterStateGetUpAttacking(_character, this); }
 }

@@ -121,7 +121,7 @@ public class CharacterStateBlownBack : CharacterState {
     public override CharacterState CheckGetNewState() {
         // TODO implement knockdown
         if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
-            return Factory.Idle();
+            return Factory.KnockedDown();
         } else {
             return null;
         }

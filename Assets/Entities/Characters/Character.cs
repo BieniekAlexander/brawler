@@ -442,16 +442,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
          */
         // duration
         if (HitStopTimer>0)
-            Material.color=new Color(0, 0, 0); // deep red
+            Material.color=new Color(0, 0, 0);
         else if (_state is CharacterStateBlownBack
             || _state is CharacterStateKnockedBack
             || _state is CharacterStatePushedBack)
             Material.color=new Color(255, 0, 0);
-        else if (_state is CharacterStateTumbling)
+        else if (_state is CharacterStateTumbling
+            || _state is CharacterStateKnockedDown)
             Material.color=new Color(125, 125, 0);
         else if (_state is CharacterStateRolling
-            || _state is CharacterStateGettingUp
-            || _state is CharacterStateKnockedDown)
+            || _state is CharacterStateGettingUp)
             Material.color=new Color(255, 255, 0);
         else if (inputCastId >= 0)
             Material.color=Color.magenta;

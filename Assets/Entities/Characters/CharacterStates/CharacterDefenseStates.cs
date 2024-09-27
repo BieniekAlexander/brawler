@@ -5,8 +5,8 @@ public static class DefenseUtils {
 
 }
 
-public class CharacterStateExposed : CharacterState {
-    public CharacterStateExposed(Character _machine, CharacterStateFactory _factory)
+public class CharacterStateReady : CharacterState {
+    public CharacterStateReady(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
         InitializeSubState();
@@ -33,6 +33,37 @@ public class CharacterStateExposed : CharacterState {
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
+public class CharacterStateExposed : CharacterState {
+    private int _exposedDuration = 10;
+
+    public CharacterStateExposed(Character _machine, CharacterStateFactory _factory)
+    : base(_machine, _factory) {
+        _isRootState = false;
+        InitializeSubState();
+    }
+
+    public override CharacterState CheckGetNewState() {
+        // TODO make sure that you can't shield if you're dashing, in disadvantage, etc.
+        if (Character.ExposedTimer==0) {
+            return Factory.Ready();
+        } else {
+            return null;
+        }
+    }
+
+    public override void EnterState() {
+        Character.ExposedTimer = _exposedDuration;
+    }
+    
+    public override void FixedUpdateState() {
+        Character.ExposedTimer--;
+    }
+
+    public override void ExitState() { }
+    public override void InitializeSubState() { }
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+}
+
 public class CharacterStateBlocking : CharacterState {
     private float _maxAcceleration = 10f;
 
@@ -57,7 +88,9 @@ public class CharacterStateBlocking : CharacterState {
         Character.Shield.ShieldTier = ShieldTier.Blocking;
     }
 
-    public override void ExitState(){}
+    public override void ExitState() {
+        Character.Shield.gameObject.SetActive(false);
+    }
 
     public override void FixedUpdateState() {
         // TODO slow down movement if the player is looking (and therefore blocking)
@@ -146,7 +179,10 @@ public class CharacterStateShielding : CharacterState {
         );
     }
 
-    public override void ExitState(){}
+    public override void ExitState(){
+        Character.Shield.gameObject.SetActive(false);
+    }
+
     public override void InitializeSubState(){}
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }

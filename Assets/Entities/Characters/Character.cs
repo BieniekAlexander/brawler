@@ -87,6 +87,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector3 KnockBack = new();
     public int HitStopTimer { get; set; } = 0;
     public int RecoveryTimer = 0;
+    public int ExposedTimer = 0;
 
     // Walking
     public float WalkSpeedMax { get; set; } = 7.5f;
@@ -443,14 +444,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // duration
         if (HitStopTimer>0)
             Material.color=new Color(0, 0, 0);
-        else if (_state is CharacterStateBlownBack
+        else if (_state is CharacterStateBlownBack // disadvantage
             || _state is CharacterStateKnockedBack
             || _state is CharacterStatePushedBack)
             Material.color=new Color(255, 0, 0);
-        else if (_state is CharacterStateTumbling
+        else if (_state is CharacterStateTumbling // vulnerable
             || _state is CharacterStateKnockedDown)
             Material.color=new Color(125, 125, 0);
-        else if (_state is CharacterStateRolling
+        else if (_state is CharacterStateRolling // recovering
             || _state is CharacterStateGettingUp)
             Material.color=new Color(255, 255, 0);
         else if (inputCastId >= 0)

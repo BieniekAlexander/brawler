@@ -59,7 +59,7 @@ public class CharacterStateIdle : CharacterState {
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
         } else {
-            SetSubState(Factory.Exposed());
+            SetSubState(Factory.Ready());
         }
     }
 
@@ -121,7 +121,7 @@ public class CharacterStateWalking : CharacterState {
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
         } else {
-            SetSubState(Factory.Exposed());
+            SetSubState(Factory.Ready());
         }
     }
 
@@ -170,7 +170,7 @@ public class CharacterStateRunning : CharacterState {
     }
 
     public override void InitializeSubState() {
-        SetSubState(Factory.Exposed());
+        SetSubState(Factory.Ready());
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
@@ -245,7 +245,7 @@ public class CharacterStateDashing : CharacterState {
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
         } else {
-            SetSubState(Factory.Exposed());
+            SetSubState(Factory.Ready());
         }
     }
 

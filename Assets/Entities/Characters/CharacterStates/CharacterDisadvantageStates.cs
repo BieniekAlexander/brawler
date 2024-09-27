@@ -4,6 +4,7 @@ public class CharacterStateHitStopped : CharacterState {
     public CharacterStateHitStopped(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
+        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -21,7 +22,10 @@ public class CharacterStateHitStopped : CharacterState {
 
     public override void EnterState() { }
     public override void ExitState() { }
-    public override void InitializeSubState() { }
+    public override void InitializeSubState() {
+        _subState = null;
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 
     public override void FixedUpdateState() {
@@ -36,6 +40,7 @@ public class CharacterStatePushedBack : CharacterState {
     public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
+        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -60,7 +65,10 @@ public class CharacterStatePushedBack : CharacterState {
     }
 
     public override void ExitState(){}
-    public override void InitializeSubState(){}
+    public override void InitializeSubState(){
+        _subState = null;
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }
 
@@ -71,6 +79,7 @@ public class CharacterStateKnockedBack : CharacterState {
     public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
+        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -103,9 +112,12 @@ public class CharacterStateKnockedBack : CharacterState {
             Character.Velocity, -_knockBackDecay * Time.deltaTime
         );
     }
+    
+    public override void InitializeSubState() {
+        _subState = null;
+    }
 
     public override void ExitState() { }
-    public override void InitializeSubState() { }
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }
 
@@ -116,6 +128,7 @@ public class CharacterStateBlownBack : CharacterState {
     public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
+        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -148,8 +161,11 @@ public class CharacterStateBlownBack : CharacterState {
             Character.Velocity, -_knockBackDecay*Time.deltaTime
         );
     }
+    
+    public override void InitializeSubState() {
+        _subState = null;
+    }
 
     public override void ExitState() { }
-    public override void InitializeSubState() { }
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }

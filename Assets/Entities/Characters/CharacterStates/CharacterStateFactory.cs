@@ -12,10 +12,12 @@ public class CharacterStateFactory {
     public CharacterState Running() { return new CharacterStateRunning(_character, this); }
     public CharacterState Dashing() { return new CharacterStateDashing(_character, this); }
 
-    // defense
-    public CharacterState Exposed() { return new CharacterStateExposed(_character, this); }
+    // action
+    public CharacterState Ready() { return new CharacterStateReady(_character, this); }
     public CharacterState Blocking() { return new CharacterStateBlocking(_character, this); }
     public CharacterState Shielding() { return new CharacterStateShielding(_character, this); }
+    public CharacterState Casting() { return new CharacterStateShielding(_character, this); }
+    public CharacterState Exposed() { return new CharacterStateExposed(_character, this); }
 
     // disadvantage
     public CharacterState HitStopped() { return new CharacterStateHitStopped(_character, this); }

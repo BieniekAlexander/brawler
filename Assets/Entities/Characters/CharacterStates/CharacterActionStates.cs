@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public static class DefenseUtils {
@@ -25,6 +24,7 @@ public class CharacterStateReady : CharacterState {
 
     public override void EnterState() {
         Character.Shield.gameObject.SetActive(false);
+
     }
 
     public override void ExitState(){}
@@ -33,10 +33,10 @@ public class CharacterStateReady : CharacterState {
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
-public class CharacterStateExposed : CharacterState {
+public class CharacterStateBusy : CharacterState {
     private int _exposedDuration = 10;
 
-    public CharacterStateExposed(Character _machine, CharacterStateFactory _factory)
+    public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
         InitializeSubState();
@@ -44,7 +44,7 @@ public class CharacterStateExposed : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO make sure that you can't shield if you're dashing, in disadvantage, etc.
-        if (Character.ExposedTimer==0) {
+        if (Character.BusyTimer==0) {
             return Factory.Ready();
         } else {
             return null;
@@ -52,20 +52,24 @@ public class CharacterStateExposed : CharacterState {
     }
 
     public override void EnterState() {
-        Character.ExposedTimer = _exposedDuration;
+        Character.BusyTimer = _exposedDuration;
     }
     
     public override void FixedUpdateState() {
-        Character.ExposedTimer--;
+        Character.BusyTimer--;
     }
 
-    public override void ExitState() { }
+    public override void ExitState() {
+        Character.BusyTimer = 0;
+    }
+
     public override void InitializeSubState() { }
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }
 
 public class CharacterStateBlocking : CharacterState {
     private float _maxAcceleration = 10f;
+    private int _exposedDuration = 10;
 
     public CharacterStateBlocking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -79,7 +83,8 @@ public class CharacterStateBlocking : CharacterState {
         } else if (Character.InputBlocking) {
             return null;
         } else {
-            return Factory.Exposed();
+            Character.BusyTimer = _exposedDuration;
+            return Factory.Busy();
         }
     }
 
@@ -124,6 +129,7 @@ public class CharacterStateBlocking : CharacterState {
 public class CharacterStateShielding : CharacterState {
     private float _maxAcceleration = 29f;
     private float _rotationalSpeed = 300f*Mathf.Deg2Rad;
+    private int _exposedDuration = 10;
 
     public CharacterStateShielding(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -137,7 +143,8 @@ public class CharacterStateShielding : CharacterState {
         } else if (Character.InputBlocking) {
             return Factory.Blocking();
         } else {
-            return Factory.Exposed();
+            Character.BusyTimer = _exposedDuration;
+            return Factory.Busy();
         }
     }
 

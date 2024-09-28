@@ -28,6 +28,7 @@ public class Cast: MonoBehaviour, ICastMessage {
     
     [HideInInspector] public int Frame = 0;
     [SerializeField] public int startupTime = 0;
+    [SerializeField] public bool Encumbering = false;
     [SerializeField] public int duration;
     private bool rotatingClockwise = true;
     public Transform CastAimPositionTransform { get; private set; }

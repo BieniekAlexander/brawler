@@ -75,19 +75,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public CharacterController cc;
     private Vector3 _velocity = new();
     public Vector3 Velocity { get { return _velocity; } set { _velocity = value; } }
+    public bool CastEncumbered = false;
 
     public CommandMovement CommandMovement { get; private set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
 
     // knockback
-    public HitTier KnockBackHitTier;
-    public int HitStunTimer = 0;
+    public HitTier KnockBackHitTier { get; set; }
     public float KnockBackDecay { get; private set; } = 1f;
-    public Vector3 KnockBack = new();
+    public Vector3 KnockBack { get; set; } = new();
+    public int HitStunTimer { get; set; } = 0;
     public int HitStopTimer { get; set; } = 0;
-    public int RecoveryTimer = 0;
-    public int ExposedTimer = 0;
+    public int RecoveryTimer { get; set; } = 0;
+    public int BusyTimer { get; set; } = 0;
 
     // Walking
     public float WalkSpeedMax { get; set; } = 7.5f;
@@ -105,7 +106,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
     private Vector3 _inputMoveDirection = new();
-    public Vector3 InputMoveDirection { get { return _inputMoveDirection;  } set { _inputMoveDirection = value; } }
+    public Vector3 InputMoveDirection {
+        get {
+            return CastEncumbered ? Vector3.zero : _inputMoveDirection;
+        }
+        set {
+            _inputMoveDirection = value;
+        }
+    }
     public bool InputDash = false;
     public bool InputRunning = false;
     public bool InputBlocking = false;
@@ -161,74 +169,47 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     // attacks
     public void OnLight1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Light1;
+            CastIdBuffer = (int)CastId.Light1;
         }
     }
     public void OnLight2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Light2;
+            CastIdBuffer = (int)CastId.Light2;
         }
     }
     public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.BoostedLight;
+            CastIdBuffer = (int)CastId.BoostedLight;
         }
     }
     public void OnMedium1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Medium1;
+            CastIdBuffer = (int)CastId.Medium1;
         }
     }
     public void OnMedium2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Medium2;
+            CastIdBuffer = (int)CastId.Medium2;
         }
     }
     public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.BoostedMedium;
+            CastIdBuffer = (int)CastId.BoostedMedium;
         }
     }
     public void OnHeavy1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Heavy1;
+            CastIdBuffer = (int)CastId.Heavy1;
         }
     }
     public void OnHeavy2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.Heavy2;
+            CastIdBuffer = (int)CastId.Heavy2;
         }
     }
     public void OnBoostedHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            if (State is CharacterStateDashing)
-                CastIdBuffer = (int)CastId.DashAttack;
-            else
-                CastIdBuffer = (int)CastId.BoostedHeavy;
+            CastIdBuffer = (int)CastId.BoostedHeavy;
         }
     }
 
@@ -352,6 +333,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
                     castContainer.charges--;
                     castContainer.timer = castContainer.cooldown;
+                    CastEncumbered = castContainer.castPrefab.Encumbering;
+                    BusyTimer = castContainer.castPrefab.startupTime;
                     return true;
                 } else {
                     return false;
@@ -490,7 +473,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (HitStopTimer==0) {
             cc.Move(Velocity*Time.deltaTime);
         }
-        
+
         HandleCharges();
         if (CastIdBuffer >= 0) {
             if (StartCast(CastIdBuffer)) {
@@ -571,7 +554,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     void OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
-        
+
         if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
             OnCollideWith(collidable, new CollisionInfo(hit.normal));
         } else {

@@ -17,7 +17,7 @@ public class CharacterStateFactory {
     public CharacterState Blocking() { return new CharacterStateBlocking(_character, this); }
     public CharacterState Shielding() { return new CharacterStateShielding(_character, this); }
     public CharacterState Casting() { return new CharacterStateShielding(_character, this); }
-    public CharacterState Exposed() { return new CharacterStateExposed(_character, this); }
+    public CharacterState Busy() { return new CharacterStateBusy(_character, this); }
 
     // disadvantage
     public CharacterState HitStopped() { return new CharacterStateHitStopped(_character, this); }

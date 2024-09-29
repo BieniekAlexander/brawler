@@ -13,7 +13,7 @@ public class CommandMovementLock : CommandMovement {
     public override Vector3 GetDPosition() {
         if (Lock.gameObject.CompareTag("Character")) {
             Character character = Lock.GetComponent<Character>();
-            return character.Velocity * Time.deltaTime;
+            return character.HorizontalVelocity * Time.deltaTime;
         } else {
             throw new NotImplementedException("Don't know how to handle movement if not tied to char"); // TODO pending refactor, make movability interface
         }

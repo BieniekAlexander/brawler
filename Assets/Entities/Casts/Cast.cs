@@ -14,18 +14,19 @@ public interface ICastMessage : IEventSystemHandler {
 /// Default object for evaluating cast behavior
 /// Extend this object for more particular cast logic
 /// </summary>
-public class Cast: MonoBehaviour, ICastMessage {
+public class Cast : MonoBehaviour, ICastMessage {
     // Start is called before the first frame update
     [SerializeField] List<Effect> effectPefabs;
     [SerializeField] public CommandMovement commandMovementPrefab;
     [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
-    [SerializeField] public ConditionCastablesDictionary ConditionCastablesMap = (
+    [SerializeField]
+    public ConditionCastablesDictionary ConditionCastablesMap = (
         Enum.GetValues(typeof(CastableCondition))
             .Cast<CastableCondition>()
-            .ToDictionary(t => t,t => new Castable[0])
+            .ToDictionary(t => t, t => new Castable[0])
         as ConditionCastablesDictionary
     );
-    
+
     [HideInInspector] public int Frame = 0;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public bool Encumbering = false;
@@ -64,7 +65,7 @@ public class Cast: MonoBehaviour, ICastMessage {
             }
 
             if (commandMovementPrefab != null) {
-                if ((Caster as MonoBehaviour) is IMoves Mover){
+                if ((Caster as MonoBehaviour) is IMoves Mover) {
                     CommandMovement commandMovement = Instantiate(commandMovementPrefab, Mover.GetTransform());
                     commandMovement.Initialize(Mover, Caster.GetTargetTransform());
                     Mover.SetCommandMovement(commandMovement);
@@ -133,6 +134,6 @@ public class Cast: MonoBehaviour, ICastMessage {
     }
 
     public void OnDestroy() {
-        
+
     }
 }

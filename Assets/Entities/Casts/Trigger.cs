@@ -134,11 +134,13 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
         if (other is MonoBehaviour mono) {
             for (int i = 0; i < effects.Count; i++) {
+                if (effects[i].CanEffect(mono)){
                 // TODO what if I don't want the status effect to stack?
                 // maybe check if an effect of the same type is active, and if so, do some sort of resolution
                 // e.g. if two slows are applied, refresh slow
                 Effect effect = Instantiate(effects[i]);
-                effect.Initialize(mono);
+                    effect.Initialize(mono);
+                }
             }
         }
     }

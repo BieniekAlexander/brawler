@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
     path: Assets/Scenes/TempleSummit.unity
     guid: 112db0a509d1dc643a81a7f8690ee8db
   - enabled: 1
@@ -18,8 +15,14 @@ EditorBuildSettings:
     path: Assets/Scenes/Forsaken.unity
     guid: c36739f9d72ebef4bbab07c7dbb6a150
   - enabled: 1
-    path: Assets/Scenes/devArea.unity
-    guid: a573ab9a76ac60d4989edd2bcc469568
+    path: Assets/Scenes/HitTimelineStuff/HitEditor.unity
+    guid: f49c99cffe23d184caae9dddf799f616
+  - enabled: 1
+    path: Assets/Scenes/TestArea.unity
+    guid: 1373a26c243513e4c89bb31bb7992fe9
+  - enabled: 1
+    path: Assets/Scenes/HazardTrainer.unity
+    guid: a1c2167bd87799540b0361c5653ba033
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: a6da16170968901438636a596bc3986b,
       type: 2}

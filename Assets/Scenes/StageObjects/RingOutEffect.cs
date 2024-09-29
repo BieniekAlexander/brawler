@@ -9,18 +9,15 @@ public class RingOutEffect : Effect
 
     public override void Initialize(MonoBehaviour _target) {
         base.Initialize(_target);
-        
-        if (Target.CompareTag("Character")) {
-            Character = Target.GetComponent<Character>();
+        Character = Target.GetComponent<Character>();
 
-            Character.TakeDamage(Character.transform.position, RingOutDamage, HitTier.Pure);
-            Character.Velocity = Vector3.zero;
+        Character.TakeDamage(Character.transform.position, RingOutDamage, HitTier.Pure);
+        Character.HorizontalVelocity = Vector3.zero;
 
-            if (Character == null) {
-                Destroy(gameObject);
-            } else {
-                Character.gameObject.SetActive(false);
-            }
+        if (Character == null) {
+            Destroy(gameObject);
+        } else {
+            Character.gameObject.SetActive(false);
         }
     }
 
@@ -31,5 +28,9 @@ public class RingOutEffect : Effect
             Character.transform.position = randomSpawn.transform.position;
             Character.gameObject.SetActive(true);
         }
+    }
+
+    public override bool CanEffect(MonoBehaviour _target) {
+        return _target.CompareTag("Character");
     }
 }

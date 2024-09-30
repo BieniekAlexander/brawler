@@ -17,7 +17,7 @@ public class RingOutEffect : Effect
         if (Character == null) {
             Destroy(gameObject);
         } else {
-            Character.gameObject.SetActive(false);
+            Character.enabled = false;
         }
     }
 
@@ -26,7 +26,7 @@ public class RingOutEffect : Effect
             GameObject[] spawns = SceneController.GetSceneSpawns();
             GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
             Character.transform.position = randomSpawn.transform.position;
-            Character.gameObject.SetActive(true);
+            Character.enabled = true;
         }
     }
 

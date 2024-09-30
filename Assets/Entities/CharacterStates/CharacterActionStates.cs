@@ -104,7 +104,7 @@ public class CharacterStateBlocking : CharacterState {
             float dSpeed = Mathf.Max(
             Vector3.Dot(
                 Character.HorizontalVelocity.normalized,
-                Character.GetLookDirection()
+                Character.LookDirection
             ),
             0
         ) * _maxAcceleration;
@@ -162,7 +162,7 @@ public class CharacterStateShielding : CharacterState {
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
         Vector3 characterDirection = Character.HorizontalVelocity.normalized;
-        Vector3 shieldDirection = Character.GetLookDirection();
+        Vector3 shieldDirection = Character.LookDirection;
         float acceleration = _maxAcceleration*Mathf.Max(
             Vector3.Dot(
                 characterDirection,

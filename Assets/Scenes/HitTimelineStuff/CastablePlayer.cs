@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -6,12 +7,14 @@ public class CastablePlayer : MonoBehaviour
     [SerializeField] Character Caster;
     [SerializeField] Transform Target;
     [SerializeField] Castable Castable;
-    public int f;
+    private Castable casted;
+    private int f = 0;
 
     private void Awake() {
+        Time.timeScale = 0;
         // WIP
 
-        Castable.CreateCast(
+        casted = Castable.CreateCast(
             Castable,
             Caster,
             Caster.GetOriginTransform(),
@@ -27,7 +30,22 @@ public class CastablePlayer : MonoBehaviour
     }*/
 
     private void SetKeyFrame(int _frame) {
-        if (Castable is Trigger trigger)
+        if (casted is Hit trigger){
+            Debug.Log("trying to update");
             trigger.UpdateTransform(_frame);
+        }
     }
+
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.PageDown) && f<(Castable.Duration-2)) {
+            f++;
+            Debug.Log($"--> frame {f}");
+            SetKeyFrame(f);
+        } else if (Input.GetKeyDown(KeyCode.PageUp) && f>0) {
+            f--;
+            Debug.Log($"<-- frame {f}");
+            SetKeyFrame(f);
+        }
+    }
+
 }

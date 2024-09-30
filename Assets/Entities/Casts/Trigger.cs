@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class VectorLabelsAttribute : PropertyAttribute {
@@ -97,9 +96,11 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
          */
         // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
         // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
-        if (Origin==null) return; // If the origin disappears, stop moving
+        if (Origin==null) {
+            return; // If the origin disappears, stop moving
+        }
 
-        int index = Math.Min(_frame, TriggerTransformations.Count-1);
+            int index = Math.Min(_frame, TriggerTransformations.Count-1);
         Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
             ? TriggerTransformations[index].Position
             : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0)*Vector3.forward*TriggerTransformations[index].Position.z;
@@ -128,11 +129,11 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     public Collider GetCollider() { return Collider; }
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this, CollisionLog);
+        CollisionUtils.HandleCollisions(this, RedundantCollisions?null:CollisionLog);
     }
 
     public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
-        if (other is MonoBehaviour mono) {
+        if (other is MonoBehaviour mono && mono.enabled) {
             for (int i = 0; i < effects.Count; i++) {
                 if (effects[i].CanEffect(mono)){
                 // TODO what if I don't want the status effect to stack?
@@ -146,11 +147,12 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     }
 
     public void OnBeforeSerialize() {
+        /*
         if (TriggerTransformations!=null && TriggerTransformations.Count > 0) {
             transform.position = TriggerTransformations[0].Position;
             transform.rotation = TriggerTransformations[0].Rotation;
             transform.localScale = TriggerTransformations[0].Dimension;
-        }
+        }*/
     }
 
     public void OnAfterDeserialize() {

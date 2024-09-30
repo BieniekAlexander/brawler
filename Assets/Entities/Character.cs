@@ -64,7 +64,7 @@ public enum CastId {
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
 
     // is this me? TODO better way to do this
-    [SerializeField] public bool me { get; set; } = false;
+    [SerializeField] public bool me = false;
 
     /* State WIP */
     CharacterState _state;
@@ -129,7 +129,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int CastIdBuffer { get; set; } = -1;
 
     /* Resources */
-    public int HP { get; private set; } = HPMax; public static int HPMax = 1000;
+    public int HP { get; set; } = HPMax;
+    public static int HPMax = 1000;
     public bool Reflects { get; set; } = false;
     private int healMax; private int healMaxOffset = 100;
     private int maxCharges = 5;
@@ -142,6 +143,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private int parryWindow = 30;
     private int energy = 100;
     private int maxEnergy = 100;
+
+    /* Signals */
+    // this is probably not a very good way to implement this, but I just want to propagate damage dealt by my RL agent to learning
+    private int _damageDealt;
+    public int DamageDealt {
+        get { int temp = _damageDealt; _damageDealt=0; return temp; } // so, when the value is read, it's set to zero
+        set {
+            _damageDealt=value;
+        }
+    }
 
     /* Status Effects */
     private List<Effect> statusEffects = new();
@@ -395,6 +406,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* MonoBehavior */
     private void Awake() {
         // Controls
+        if (me) SetMe(); // TODO lazy way to set up controls
         GameObject cursorGameObject = new GameObject("Player Cursor Object");
         cursorGameObject.transform.parent = transform;
         CursorTransform = cursorGameObject.transform;
@@ -498,10 +510,17 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     // Movement evaluations
-    public Vector3 GetLookDirection() {
-        Vector3 LookDirection = CursorTransform.position-cc.transform.position;
-        LookDirection.y = 0;
-        return LookDirection.normalized;
+    public Vector3 LookDirection {
+        get {
+            Vector3 LookDirection = CursorTransform.position-cc.transform.position;
+            LookDirection.y = 0;
+            return LookDirection.normalized;
+        }
+        set {
+            // used for AI
+            CursorTransform.position = cc.transform.position+value;
+            transform.rotation = Quaternion.LookRotation(value, Vector3.up);
+        }
     }
 
     public void SetCommandMovement(CommandMovement _commandMovement) {
@@ -580,12 +599,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void UpdateCursorTransformWorldPosition() {
+        if (me){
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (aimPlane.Raycast(ray, out float distance)) {
-            CursorTransform.position = ray.GetPoint(distance);
-        } else {
-            CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self
+            if (aimPlane.Raycast(ray, out float distance)) {
+                CursorTransform.position = ray.GetPoint(distance);
+            } else {
+                CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self
+            }
         }
     }
 
@@ -657,24 +678,27 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <param name="_contactPoint"></param>
     /// <param name="damage"></param>
-    public void TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
+    public int TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
         // TODO add some sort of implementation to ignore shield
-        if ((hitTier!=HitTier.Pure) && (invincible || HitsShield(_contactPoint))) return;
+        if ((hitTier!=HitTier.Pure) && (invincible || HitsShield(_contactPoint))) return 0;
 
-        HP = (HP-damage<HP) ? (HP-damage) : Mathf.Min(HP-damage, healMax);
+        HP -= damage;
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
 
         if (HP<=0) {
             OnDeath();
         }
+
+        return damage-Math.Min(HP, 0);
     }
 
-    public void TakeHeal(int damage) {
+    public int TakeHeal(int damage) {
         HP = Math.Max(HP+damage, healMax);
+        return Math.Min(damage, healMax-damage); // TODO I think this calculation is correct, but I'm not positive :)
     }
 
     public void OnDeath() {
-        Destroy(gameObject);
+        // Destroy(gameObject); // TODO disabling for RL
     }
 
     void OnGUI() {

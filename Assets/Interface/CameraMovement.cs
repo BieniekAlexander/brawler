@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public Transform TransTarget { get; set; }
+    public Transform TransTarget;
     private static Vector3 relativePosition = new Vector3(0, 15.0f, -5.0f);
     private static Quaternion rotation = Quaternion.Euler(-Mathf.Atan(relativePosition.y/relativePosition.z)*Mathf.Rad2Deg, 0, 0);
     private int cameraLockFactor;

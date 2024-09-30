@@ -63,7 +63,9 @@ public class CharacterStateIdle : CharacterState {
         }
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        Debug.Log("here");
+    }
 }
 
 public class CharacterStateWalking : CharacterState {
@@ -185,7 +187,8 @@ public class CharacterStateRunning : CharacterState {
                 otherCharacter.HorizontalVelocity=Character.HorizontalVelocity+dvNormal;
             }
         } else if (collidable is StageTerrain terrain) {
-            Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
+            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
+            Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.HorizontalVelocity-2*Vector3.Project(Character.HorizontalVelocity, mirror)).normalized;
             Character.HorizontalVelocity = bounceDirection*Character.HorizontalVelocity.magnitude;
         }
@@ -222,7 +225,7 @@ public class CharacterStateDashing : CharacterState {
         float boostSpeedStart = _boostSpeedEnd + 2*_boostSpeedBump;
         boostDecay = (_boostSpeedEnd-boostSpeedStart)/_boostMaxDuration;
 
-        Vector3 v = Character.GetLookDirection();
+        Vector3 v = Character.LookDirection;
         Character.HorizontalVelocity = new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
         // TODO I think I'm losing the vertical velocity implementation here
 

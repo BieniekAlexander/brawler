@@ -78,7 +78,7 @@ public class CharacterStateRolling : CharacterState {
 
     public override void EnterState() {
         Character.RecoveryTimer = _recoveryDuration;
-        Character.HorizontalVelocity = Character.GetLookDirection() * _rollSpeed;
+        Character.HorizontalVelocity = Character.LookDirection * _rollSpeed;
         // add invincibility
     }
 

@@ -19,6 +19,8 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable
     private Quaternion InitialRotation;
 
     public void Start() {
+        // TODO maybe make use of the Target transform instead? I took a while to debug this when trying to get the AI Agent to shoot,
+        // because I was updating the Aim Cursor position, but not the transform's rotation, and so there's some redundancy in this implementation
         InitialRotation = transform.rotation;
         Vector3 Direction = Origin.rotation * Vector3.forward;
         Velocity = MaxSpeed * Direction;
@@ -118,15 +120,17 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable
         return GetComponent<Collider>();
     }
 
-    public void TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
+    public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
         HP -= damage;
 
         if (HP <= 0)
             OnDeath();
+
+        return damage;
     }
 
-    public void TakeHeal(int damage) {
-        ;
+    public int TakeHeal(int damage) {
+        return 0;
     }
 
     public void OnDeath() {

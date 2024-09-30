@@ -55,11 +55,15 @@ public class Hit : Trigger, ICollidable {
             ) {
                 return;
             } else {
-                OtherDamagable.TakeDamage(
+                int damageTaken = OtherDamagable.TakeDamage(
                     hitInfo.point,
                     damage,
                     HitTier
                 );
+
+                if (Caster is Character c) { // Throwing this in for RL agent - TODO clean this up
+                    c.DamageDealt = damageTaken;
+                }
             }
         }
 

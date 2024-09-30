@@ -47,12 +47,12 @@ public class CharacterAI : Agent
         sensor.AddObservation(character.GetVelocity()+UnityEngine.Vector3.up*character.VerticalVelocity); // +3 = 9
     }
 
-    public virtual void Heuristic(in ActionBuffers actionsOut) {
+    public override void Heuristic(in ActionBuffers actionsOut) {
         // set Heuristic actions
         var discreteActionsOut = actionsOut.DiscreteActions;
         discreteActionsOut[0] = 1; // don't move
         discreteActionsOut[1] = 1; // don't move
-        discreteActionsOut[1] = 0; // don't shoot
+        discreteActionsOut[2] = 0; // don't shoot
 
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[0] = 1;
@@ -103,6 +103,7 @@ public class CharacterAI : Agent
         episodeTimer = maxEpisodeTimer;
         character.HP = Character.HPMax;
         lastFrameHP = Character.HPMax;
+        character.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
         enemy.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
     }
 }

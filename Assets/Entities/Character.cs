@@ -73,7 +73,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* Movement */
     public CharacterController cc { get; set; }
-    private Vector3 _velocity = new();
+    public Vector3 Velocity { get { return HorizontalVelocity + Vector3.up*VerticalVelocity; } private set { throw new NotImplementedException("TODO don't set this directly"); } }
     public Vector3 HorizontalVelocity = new();
     public float VerticalVelocity = new();
     public bool CastEncumbered { get; set; } = false;

@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.UIElements;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using static UnityEngine.UI.Image;
 
 public class VectorLabelsAttribute : PropertyAttribute {
     public readonly string[] Labels;
@@ -10,17 +15,63 @@ public class VectorLabelsAttribute : PropertyAttribute {
     }
 }
 
+public enum CoordinateSystem { Polar, Cartesian };
+
+[Serializable]
+public class TransformCoordinates {
+public TransformCoordinates(Vector3 _position, Quaternion _rotation, Vector3 _dimension) {
+        Position = _position;
+        Rotation = _rotation;
+        Dimension = _dimension;
+    }
+
+    public void Apply(Transform transform) {
+        transform.position = Position;
+        transform.rotation = Rotation;
+        transform.localScale = Dimension;
+    }
+
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Dimension;
+}
+
 [Serializable]
 public class TriggerTransformation {
-    public TriggerTransformation(Vector3 _position, Vector3 _dimension, Quaternion _rotation) {
-        Position = _position;
+    public Vector2 PolarPosition;
+    public Vector3 Dimension;
+    public Quaternion Rotation;
+    private Vector3 axis = Vector3.up;
+
+    public TriggerTransformation(Vector2 _polarPosition, Vector3 _dimension, Quaternion _rotation) {
+        PolarPosition = _polarPosition;
         Dimension = _dimension;
         Rotation = _rotation;
     }
 
-    public Vector3 Position;
-    public Vector3 Dimension;
-    public Quaternion Rotation;
+    public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
+        Quaternion orientation = Quaternion.Euler(0, PolarPosition.x, 0);
+        Vector3 offset = Quaternion.AngleAxis( // TODO maybe generalize this to different axes?
+            PolarPosition.x,
+            axis
+        )*Vector3.forward*PolarPosition.y;
+
+        // TODO make sure that the calculations without an origin are correct
+        if (mirror) {
+            offset.x *= -1;
+            orientation.y *= -1;
+        }
+
+        return new(
+            origin.position+origin.rotation*offset,
+            origin.rotation*orientation*Rotation,
+            Dimension
+        );
+    }
+
+    /*public TriggerTransformation FromTransformCoordinates(TransformCoordinates origin, bool mirror) {
+        return new();
+    }*/
 }
 
 /// <summary>
@@ -28,8 +79,6 @@ public class TriggerTransformation {
 /// </summary>
 public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     /* Transform */
-    public enum CoordinateSystem { Polar, Cartesian };
-    [SerializeField] public CoordinateSystem positionCoordinateSystem;
     [SerializeField] List<TriggerTransformation> TriggerTransformations;
 
     /* Collision */
@@ -52,6 +101,11 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     /* State Handling */
     public void Awake() {
         Collider=GetComponent<Collider>();
+
+        if (Collider is CapsuleCollider cc) {
+            // https://discussions.unity.com/t/capsule-collider-how-direction-change-to-z-axis-c/225672/2
+            Assert.IsTrue(cc.direction==0);
+        }
     }
 
     public void Initiate(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
@@ -100,24 +154,8 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
             return; // If the origin disappears, stop moving
         }
 
-            int index = Math.Min(_frame, TriggerTransformations.Count-1);
-        Vector3 offset = (positionCoordinateSystem==CoordinateSystem.Cartesian)
-            ? TriggerTransformations[index].Position
-            : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0)*Vector3.forward*TriggerTransformations[index].Position.z;
-
-        Quaternion orientation = (positionCoordinateSystem==CoordinateSystem.Cartesian)
-            ? Quaternion.identity
-            : Quaternion.Euler(0, TriggerTransformations[index].Position.x, 0);
-
-        // TODO make sure that the calculations without an origin are correct
-        if (Mirror) {
-            offset.x *= -1;
-            orientation.y *= -1;
-        }
-
-        transform.position = Origin.position+Origin.rotation*offset;
-        transform.rotation = Origin.rotation*orientation*TriggerTransformations[index].Rotation;
-        transform.localScale = TriggerTransformations[index].Dimension;
+        int index = Math.Min(_frame, TriggerTransformations.Count-1);
+        TriggerTransformations[index].ToTransformCoordinates(Origin, Mirror).Apply(transform);
     }
 
     /// <summary>

@@ -9,5 +9,11 @@ In brief, I really enjoyed [Battlerite](https://store.steampowered.com/app/50437
 ## Initializing Project in Unity
 [See documentation here!](https://unityatscale.com/unity-version-control-guide/how-to-setup-unity-project-on-github/)
 
+## Installing Packages
+Some of the packages that I'm using in this project aren't easily accessible with the Unity package manager - see the packages listed below:
+- https://github.com/pshtif/RuntimeTransformHandle
+    - [Zip available here](https://github.com/DA-LAB-Tutorials/YouTube-Unity-Tutorials/tree/main)
+    - Unzip the file somewhere onto your machine and import it into your project [as described here](https://docs.unity3d.com/Manual/upm-ui-local.html)
+
 ## Development Workflow
 Check out [this tutorial](https://www.youtube.com/watch?v=XtQMytORBmM) to get started with the development loop.

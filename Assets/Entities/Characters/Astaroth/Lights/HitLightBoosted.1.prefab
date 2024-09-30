@@ -55,18 +55,17 @@ MonoBehaviour:
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  positionCoordinateSystem: 0
   TriggerTransformations:
-  - Position: {x: 0, y: 0, z: 1.8}
+  - PolarPosition: {x: 0, y: 1.5}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  - Position: {x: 0, y: 0, z: 1.8}
+  - PolarPosition: {x: 0, y: 1.5}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  - Position: {x: 0, y: 0, z: 1.8}
+  - PolarPosition: {x: 0, y: 1.5}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  - Position: {x: 0, y: 0, z: 1.8}
+  - PolarPosition: {x: 0, y: 1.5}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
   Collider: {fileID: 0}
@@ -102,7 +101,7 @@ CapsuleCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 1
-  m_Direction: 1
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &-3587656788900788176
 MeshRenderer:

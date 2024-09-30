@@ -34,7 +34,7 @@ public class CharacterStateIdle : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.InputDash) {
             return Factory.Dashing();
-        } else if (!Mathf.Approximately(Character.HorizontalVelocity.magnitude, 0f)) {
+        } else if (!Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.Walking();
         } else {
             return null;
@@ -64,7 +64,12 @@ public class CharacterStateIdle : CharacterState {
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        Debug.Log("here");
+        if (collidable is StageTerrain terrain) {
+            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+            Vector3 mirror = info.Normal;
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.HorizontalVelocity = Vector3.Project(bounceDirection*Character.Velocity.magnitude, new Vector3(1, 0, 1));
+        }
     }
 }
 
@@ -80,9 +85,9 @@ public class CharacterStateWalking : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.InputDash) {
             return Factory.Dashing();
-        } else if (Mathf.Approximately(Character.HorizontalVelocity.magnitude, 0f)) {
+        } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.Idle();
-        } else if (Character.HorizontalVelocity.magnitude>Character.WalkSpeedMax+.1f) {
+        } else if (Character.Velocity.magnitude>Character.WalkSpeedMax+.1f) {
             return Factory.Running();
         } else {
             return null;
@@ -127,7 +132,14 @@ public class CharacterStateWalking : CharacterState {
         }
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (collidable is StageTerrain terrain) {
+            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+            Vector3 mirror = info.Normal;
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.HorizontalVelocity = Vector3.Project(bounceDirection*Character.Velocity.magnitude, new Vector3(1, 0, 1));
+        }
+    }
 }
 
 
@@ -144,7 +156,7 @@ public class CharacterStateRunning : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.InputDash) {
             return Factory.Dashing();
-        } else if (Character.HorizontalVelocity.magnitude<=7.51f) {
+        } else if (Character.Velocity.magnitude<=7.51f) {
             return Factory.Walking();
         } else {
             return null;
@@ -187,10 +199,10 @@ public class CharacterStateRunning : CharacterState {
                 otherCharacter.HorizontalVelocity=Character.HorizontalVelocity+dvNormal;
             }
         } else if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
+            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
             Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.HorizontalVelocity-2*Vector3.Project(Character.HorizontalVelocity, mirror)).normalized;
-            Character.HorizontalVelocity = bounceDirection*Character.HorizontalVelocity.magnitude;
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.HorizontalVelocity = Vector3.Project(bounceDirection*Character.Velocity.magnitude, new Vector3(1,0,1));
         }
     }
 }
@@ -265,9 +277,10 @@ public class CharacterStateDashing : CharacterState {
                 otherCharacter.HorizontalVelocity=Character.HorizontalVelocity+dvNormal;
             }
         } else if (collidable is StageTerrain terrain) {
-            Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z);
-            Vector3 bounceDirection = (Character.HorizontalVelocity-2*Vector3.Project(Character.HorizontalVelocity, mirror)).normalized;
-            Character.HorizontalVelocity = bounceDirection*Character.HorizontalVelocity.magnitude;
+            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+            Vector3 mirror = info.Normal;
+            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
+            Character.HorizontalVelocity = Vector3.Project(bounceDirection*Character.Velocity.magnitude, new Vector3(1, 0, 1));
         }
     }
 }

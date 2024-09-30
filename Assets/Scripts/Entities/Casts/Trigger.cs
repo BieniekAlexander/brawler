@@ -4,8 +4,6 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEngine.UI.Image;
 
 public class VectorLabelsAttribute : PropertyAttribute {
     public readonly string[] Labels;
@@ -18,11 +16,18 @@ public class VectorLabelsAttribute : PropertyAttribute {
 public enum CoordinateSystem { Polar, Cartesian };
 
 [Serializable]
-public class TransformCoordinates {
-public TransformCoordinates(Vector3 _position, Quaternion _rotation, Vector3 _dimension) {
+public class TransformCoordinates : IEquatable<TransformCoordinates> {
+    public Vector3 Position;
+    public Quaternion Rotation;
+    public Vector3 Dimension;
+
+    public TransformCoordinates(Vector3 _position, Quaternion _rotation, Vector3 _dimension) {
         Position = _position;
         Rotation = _rotation;
         Dimension = _dimension;
+    }
+    public override string ToString() {
+        return $"Position: {Position}\nDimension: {Dimension}\nRotation {Rotation}";
     }
 
     public void Apply(Transform transform) {
@@ -31,22 +36,41 @@ public TransformCoordinates(Vector3 _position, Quaternion _rotation, Vector3 _di
         transform.localScale = Dimension;
     }
 
-    public Vector3 Position;
-    public Quaternion Rotation;
-    public Vector3 Dimension;
+    public bool Equals(TransformCoordinates other) {
+        return 
+            Position == other.Position
+            && Rotation == other.Rotation
+            && Dimension == other.Dimension;
+    }
+
+    public static bool operator !=(TransformCoordinates obj1, TransformCoordinates obj2) => !(obj1 == obj2);
+    public static bool operator ==(TransformCoordinates obj1, TransformCoordinates obj2) {
+        if (ReferenceEquals(obj1, obj2))
+            return true;
+        else if (ReferenceEquals(obj1, null))
+            return false;
+        else if (ReferenceEquals(obj2, null))
+            return false;
+        else
+            return obj1.Equals(obj2);
+    }
 }
 
 [Serializable]
-public class TriggerTransformation {
+public class TriggerTransformation : IEquatable<TriggerTransformation> {
     public Vector2 PolarPosition;
     public Vector3 Dimension;
     public Quaternion Rotation;
     private Vector3 axis = Vector3.up;
 
-    public TriggerTransformation(Vector2 _polarPosition, Vector3 _dimension, Quaternion _rotation) {
+    public TriggerTransformation(Vector2 _polarPosition, Quaternion _rotation, Vector3 _dimension) {
         PolarPosition = _polarPosition;
         Dimension = _dimension;
         Rotation = _rotation;
+    }
+
+    public override string ToString() {
+        return $"PolarPosition: {PolarPosition}\nDimension: {Dimension}\nRotation: {Rotation}Axis: {axis}";
     }
 
     public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
@@ -69,9 +93,45 @@ public class TriggerTransformation {
         );
     }
 
-    /*public TriggerTransformation FromTransformCoordinates(TransformCoordinates origin, bool mirror) {
-        return new();
-    }*/
+    public static TriggerTransformation FromTransformCoordinates(TransformCoordinates coordinates, Transform origin, bool mirror) {
+        Vector3 globalOrientedRelativePosition = coordinates.Position-origin.position;
+        Vector3 relativelyOrientedRelativePosition = Quaternion.Inverse(origin.rotation)*globalOrientedRelativePosition;
+        Vector2 PolarPosition = new Vector2(
+            Vector3.Angle(Vector3.forward, relativelyOrientedRelativePosition),
+            relativelyOrientedRelativePosition.magnitude
+        );
+
+        Quaternion orientation = Quaternion.Euler(0, PolarPosition.x, 0);
+        Quaternion transformationRotation =
+            Quaternion.Inverse(orientation)
+            *Quaternion.Inverse(origin.rotation)
+            *coordinates.Rotation;
+
+        return new(
+            PolarPosition,
+            transformationRotation,
+            coordinates.Dimension
+        );
+    }
+
+    public bool Equals(TriggerTransformation other) {
+        bool samePolarPosition = PolarPosition == other.PolarPosition;
+        bool sameRotation = Rotation == other.Rotation;
+        bool sameDimension = Dimension == other.Dimension;
+        return samePolarPosition && sameRotation && sameDimension;
+    }
+
+    public static bool operator !=(TriggerTransformation obj1, TriggerTransformation obj2) => !(obj1 == obj2);
+    public static bool operator ==(TriggerTransformation obj1, TriggerTransformation obj2) {
+        if (ReferenceEquals(obj1, obj2))
+            return true;
+        else if (ReferenceEquals(obj1, null))
+            return false;
+        else if (ReferenceEquals(obj2, null))
+            return false;
+        else 
+            return obj1.Equals(obj2);
+    }
 }
 
 /// <summary>
@@ -130,7 +190,7 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
         HandleCollisions();
         Frame++;
     }
-   
+
     /* IMoves Methods */
     public virtual void UpdateTransform(int _frame) {
         /*
@@ -161,23 +221,23 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     /// <summary>
     /// No-op for Triggers
     /// </summary>
-    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f;}
+    public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f; }
 
     /* ICollidable Methods */
     public Collider GetCollider() { return Collider; }
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this, RedundantCollisions?null:CollisionLog);
+        CollisionUtils.HandleCollisions(this, RedundantCollisions ? null : CollisionLog);
     }
 
     public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
         if (other is MonoBehaviour mono && mono.enabled) {
             for (int i = 0; i < effects.Count; i++) {
-                if (effects[i].CanEffect(mono)){
-                // TODO what if I don't want the status effect to stack?
-                // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                // e.g. if two slows are applied, refresh slow
-                Effect effect = Instantiate(effects[i]);
+                if (effects[i].CanEffect(mono)) {
+                    // TODO what if I don't want the status effect to stack?
+                    // maybe check if an effect of the same type is active, and if so, do some sort of resolution
+                    // e.g. if two slows are applied, refresh slow
+                    Effect effect = Instantiate(effects[i]);
                     effect.Initialize(mono);
                 }
             }

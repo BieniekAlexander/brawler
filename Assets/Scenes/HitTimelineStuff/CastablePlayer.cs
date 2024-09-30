@@ -46,6 +46,14 @@ public class CastablePlayer : MonoBehaviour
             Debug.Log($"<-- frame {f}");
             SetKeyFrame(f);
         }
+
+        if (Input.GetKeyDown(KeyCode.Backspace)) { // TODO find better button
+            if (casted is Trigger t) {
+                // TODO apply changes to each frame
+                t.UpdatePrefab(f, Castable as Trigger);
+                Debug.Log("saving changes");
+            }
+        }
     }
 
 }

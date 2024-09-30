@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor.PackageManager;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UIElements;
@@ -91,6 +92,14 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
             origin.rotation*orientation*Rotation,
             Dimension
         );
+    }
+
+    public static TriggerTransformation FromTransformCoordinates(Transform transform, Transform origin, bool mirror) {
+        return FromTransformCoordinates(
+            new TransformCoordinates(transform.position, transform.rotation, transform.localScale),
+            origin,
+            mirror
+        );    
     }
 
     public static TriggerTransformation FromTransformCoordinates(TransformCoordinates coordinates, Transform origin, bool mirror) {
@@ -254,5 +263,10 @@ public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
     }
 
     public void OnAfterDeserialize() {
+    }
+
+    public void UpdatePrefab(int frame, Trigger prefab) {
+        TriggerTransformations[frame] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
+        prefab.TriggerTransformations[frame] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
     }
 }

@@ -123,34 +123,36 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  FrameCastablesMap:
+    m_keys: 
+    m_values: []
   ConditionCastablesMap:
     m_keys: 02000000
     m_values:
     - data: []
-  positionCoordinateSystem: 0
   TriggerTransformations:
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  - Position: {x: 0, y: 0, z: 1}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   Collider: {fileID: 0}

@@ -237,6 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff29245a97187da4b80e22df503139dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  me: 0
   HorizontalVelocity: {x: 0, y: 0, z: 0}
   VerticalVelocity: 0
   castSlots:

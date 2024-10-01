@@ -54,7 +54,7 @@ MonoBehaviour:
     m_values: []
   Frame: 0
   startupTime: 0
+  Encumbering: 0
   duration: 180
   Origin: {fileID: 0}
-  Castables: []
   statusEffects: []

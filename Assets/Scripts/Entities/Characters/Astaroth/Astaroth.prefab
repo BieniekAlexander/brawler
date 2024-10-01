@@ -237,8 +237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff29245a97187da4b80e22df503139dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Velocity: {x: 0, y: 0, z: 0}
-  MinimumRotationThreshold: 0
+  me: 0
+  HorizontalVelocity: {x: 0, y: 0, z: 0}
+  VerticalVelocity: 0
   castSlots:
   - name: Light1
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
@@ -340,6 +341,5 @@ MonoBehaviour:
       type: 3}
     cooldown: -1
     defaultChargeCount: 1
-  CastIdBuffer: -1
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}

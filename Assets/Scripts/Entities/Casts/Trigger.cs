@@ -146,7 +146,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 /// <summary>
 /// Class that generically handles the changing of object states when the object collides with it
 /// </summary>
-public class Trigger : Castable, ICollidable, ISerializationCallbackReceiver {
+public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackReceiver {
     /* Transform */
     [SerializeField] List<TriggerTransformation> TriggerTransformations;
 

@@ -385,6 +385,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* ICasts Methods */
+    // TODO bake these into getters
     public bool IsRotatingClockwise() {
         return RotatingClockwise;
     }
@@ -395,6 +396,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public Transform GetTargetTransform() {
         return CursorTransform;
+    }
+
+    public IEnumerable<Castable> ActiveCastables {
+        get {
+            return (
+                from castContainer in castContainers
+                where castContainer.cast != null
+                select castContainer.cast.ActiveCastables
+            ).SelectMany(castable => castable);
+        }
     }
 
     /* State Machine */

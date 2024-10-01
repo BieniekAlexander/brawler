@@ -59,5 +59,4 @@ MonoBehaviour:
   Encumbering: 0
   duration: 30
   Origin: {fileID: 0}
-  Castables: []
   statusEffects: []

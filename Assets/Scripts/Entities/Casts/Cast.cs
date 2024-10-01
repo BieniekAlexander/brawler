@@ -36,7 +36,7 @@ public class Cast : MonoBehaviour, ICastMessage {
 
     [HideInInspector] private ICasts Caster;
     [HideInInspector] public Transform Origin;
-    [HideInInspector] public List<Castable> Castables;
+    [HideInInspector] public List<Castable> ActiveCastables { get; set; } = new();
     [HideInInspector] public List<Effect> statusEffects;
 
     public static Cast Initiate(Cast _cast, ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
@@ -77,7 +77,7 @@ public class Cast : MonoBehaviour, ICastMessage {
     void FixedUpdate() {
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Castable Castable in FrameCastablesMap[Frame]) {
-                Castables.Add(
+                ActiveCastables.Add(
                     Castable.CreateCast(
                         Castable,
                         Caster,
@@ -95,7 +95,7 @@ public class Cast : MonoBehaviour, ICastMessage {
                 // the idea is, if I start a cast (say it takes 120 frames to run), and I run the cast to completion,
                 // create the casts
                 foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnFinishStartup]) {
-                    Castables.Add(
+                    ActiveCastables.Add(
                         Castable.CreateCast(
                             Castable,
                             Caster,
@@ -117,7 +117,7 @@ public class Cast : MonoBehaviour, ICastMessage {
     /// <summary/>
     /// <param name="worldPosition"></param>
     public virtual void Recast(Transform worldPosition) {
-        foreach (Castable Castable in Castables) {
+        foreach (Castable Castable in ActiveCastables) {
             Castable.Recast(worldPosition);
         }
     }
@@ -128,8 +128,8 @@ public class Cast : MonoBehaviour, ICastMessage {
         // it would call the cast to say it was done
         // maybe this can get reimplemented without events, maybe not, I'm not sure,
         // but I'll leave this here for now
-        for (int i = 0; i < Castables.Count; i++) {
-            Castables[i].Duration = 0;
+        for (int i = 0; i < ActiveCastables.Count; i++) {
+            ActiveCastables[i].Duration = 0;
         }
     }
 

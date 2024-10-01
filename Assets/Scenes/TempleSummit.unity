@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -181,12 +181,14 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  FrameCastablesMap:
+    m_keys: 
+    m_values: []
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  positionCoordinateSystem: 0
   TriggerTransformations:
-  - Position: {x: 0, y: -5, z: 0}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 100, y: 0, z: 100}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   Collider: {fileID: 0}
@@ -2437,6 +2439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 702cdca6b2f2f144d800f7d82f5b843d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TransTarget: {fileID: 0}
 --- !u!1 &1475231152 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7475591361572153908, guid: 051060fc87c418b4faa438bae9156f2f,

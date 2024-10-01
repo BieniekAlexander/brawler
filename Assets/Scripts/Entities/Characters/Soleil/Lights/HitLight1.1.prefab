@@ -52,24 +52,26 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  FrameCastablesMap:
+    m_keys: 
+    m_values: []
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  positionCoordinateSystem: 0
   TriggerTransformations:
-  - Position: {x: 0, y: 0, z: 0.5}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - Position: {x: 0, y: 0, z: 0.75}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - Position: {x: 0, y: 0, z: 0.85}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - Position: {x: 0, y: 0, z: 0.85}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - Position: {x: 0, y: 0, z: 0.85}
+  - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
   Collider: {fileID: 0}

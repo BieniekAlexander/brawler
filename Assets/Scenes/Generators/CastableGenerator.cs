@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class CastableGenerator : MonoBehaviour, ICasts
-{
+public class CastableGenerator : MonoBehaviour, ICasts {
     [SerializeField] private Castable CastablePrefab;
 
     /* Timing */
@@ -17,14 +17,14 @@ public class CastableGenerator : MonoBehaviour, ICasts
     [Tooltip("A maximum number of degrees away from which the generator will cast Castables at the target")]
     [SerializeField] public float TargetJiggle = 30f;
 
+    /* Castables */
+    public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
 
-    void Start()
-    {
+    void Start() {
         Timer = 0;
     }
 
-    public static int RandomNegative()
-    {
+    public static int RandomNegative() {
         int num = Random.Range(0, 2);
         if (num == 0) return -1;
         else return 1;
@@ -36,8 +36,7 @@ public class CastableGenerator : MonoBehaviour, ICasts
         return center.position + distance*randomHorizontalDirection;
     }
 
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         if (++Timer>=ReloadTime) {
             Timer = Random.Range(0, TimeJiggle);
             transform.position = GetRandomPositionInRing(Target, DistanceFromTargetMin, DistanceFromTargetMax);
@@ -46,12 +45,14 @@ public class CastableGenerator : MonoBehaviour, ICasts
                 RandomNegative() * Random.Range(0, TargetJiggle), Vector3.up
                 ) * transform.rotation;
             if (Target != null) {
-                Castable c = Castable.CreateCast(
-                    CastablePrefab,
-                    this,
-                    transform,
-                    Target,
-                    IsRotatingClockwise()
+                (ActiveCastables as List<Castable>).Add(
+                    Castable.CreateCast(
+                        CastablePrefab,
+                        this,
+                        transform,
+                        Target,
+                        IsRotatingClockwise()
+                    )
                 );
             }
         }

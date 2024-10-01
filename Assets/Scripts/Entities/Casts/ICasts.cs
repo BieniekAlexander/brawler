@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // TODO move the RotatingClockwise code from Character to here
@@ -15,4 +16,10 @@ public interface ICasts {
     /// <remarks>Used to flip the casting direction of <typeparamref name="Castable"/>s</remarks>
     /// <returns>true, if the Caster is rotating clockwise</returns>
     public bool IsRotatingClockwise();
+
+    /// <summary>
+    /// Get a list of all of the things that the ICasts has casted
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<Castable> ActiveCastables { get; }
 }

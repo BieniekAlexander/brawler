@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : Castable, IMoves, ICollidable, IDamageable
+public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
 {
     /* Movement */
     private Vector3 Velocity;

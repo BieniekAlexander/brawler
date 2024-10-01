@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -27,6 +28,8 @@ public abstract class Castable : MonoBehaviour, ICasts {
     [HideInInspector] public Transform Target; // TODO do I need this?
     [HideInInspector] public bool Mirror = false;
     [HideInInspector] public int Frame = 0;
+    [HideInInspector] public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
+    [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
     [SerializeField]
     public ConditionCastablesDictionary ConditionCastablesMap = (
         Enum.GetValues(typeof(CastableCondition))
@@ -99,6 +102,20 @@ public abstract class Castable : MonoBehaviour, ICasts {
     }
 
     public virtual void FixedUpdate() {
+        if (FrameCastablesMap.ContainsKey(Frame)) {
+            foreach (Castable Castable in FrameCastablesMap[Frame]) {
+                (ActiveCastables as List<Castable>).Add(
+                    CreateCast(
+                        Castable,
+                        Caster,
+                        Origin,
+                        Caster.GetTargetTransform(),
+                        !Caster.IsRotatingClockwise()
+                    )
+                );
+            }
+        }
+
         if (Frame++ == Duration) {
             Destroy(gameObject);
         }

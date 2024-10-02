@@ -87,7 +87,6 @@ public class CastPlayer : MonoBehaviour {
                 TriggerTransformation newTransformation = TriggerTransformation.FromTransformCoordinates(activeTrigger.transform, Caster.transform, !Caster.IsRotatingClockwise());
 
                 if (newTransformation != activeTrigger.TriggerTransformations[activeTrigger.Frame]) {
-                    Debug.Log("Updating transformation");
                     activeTrigger.TriggerTransformations[activeTrigger.Frame] = newTransformation;
                 }
             }

@@ -1,30 +1,15 @@
-using System.Collections;
-using System.Drawing.Text;
-using System.Net.NetworkInformation;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
-using UnityEngine.XR;
-using static UnityEngine.UI.Image;
 
-public class TransformTests {
+public class TransformationTests {
     // A Test behaves as an ordinary method
     [Test]
-    public void TransformTestsSimplePasses() {
+    public void SimplePasses() {
         // Use the Assert class to test conditions
     }
 
-    // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-    // `yield return null;` to skip a frame.
-    [UnityTest]
-    public IEnumerator TransformTestsWithEnumeratorPasses() {
-        // Use the Assert class to test conditions.
-        // Use yield to skip a frame.
-        yield return null;
-    }
-
     [Test]
-    public void TransformTestsTransformationEqualsPasses() {
+    public void TransformationEqualsPasses() {
         TriggerTransformation transformation0 = new(
             new Vector2(0, 1),
             Quaternion.identity,
@@ -41,7 +26,47 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesEqualsPasses() {
+    public void TransformationMirrorPasses() {
+        TriggerTransformation transformation0 = new(
+            new Vector2(120, 1),
+            Quaternion.AngleAxis(15, Vector3.up),
+            Vector3.one
+        );
+
+        TriggerTransformation transformation1 = new(
+            new Vector2(-120, 1),
+            Quaternion.AngleAxis(-15, Vector3.up),
+            Vector3.one
+        );
+        transformation1.Mirror();
+
+        Debug.Log($"transformation0: {transformation0}");
+        Debug.Log($"transformation1: {transformation1}");
+        Assert.IsTrue(transformation0 == transformation1);
+    }
+
+    [Test]
+    public void TransformationMirrorInversionPasses() {
+        TriggerTransformation transformation0 = new(
+            new Vector2(23, 1),
+            Quaternion.AngleAxis(37, Vector3.up),
+            Vector3.one
+        );
+
+        TriggerTransformation transformation1 = transformation0.GetHardCopy();
+        transformation1.Mirror();
+        transformation1.Mirror();
+
+        Debug.Log($"transformation0: {transformation0}");
+        Debug.Log($"transformation1: {transformation1}");
+        Assert.IsTrue(transformation0 == transformation1);
+    }
+
+}
+
+public class TransformCoordinateTests {
+    [Test]
+    public void CoordinatesEqualsPasses() {
         TransformCoordinates coords0 = new(
             Vector3.zero,
             Quaternion.identity,
@@ -56,9 +81,11 @@ public class TransformTests {
 
         Assert.IsTrue(coords0 == coords1);
     }
+}
 
+public class TransformationCoordinateConversionTests {
     [Test]
-    public void TransformTestsTransformationToCoordinatesTrivialPasses() {
+    public void TransformationToCoordinatesTrivialPasses() {
         Transform origin = new GameObject().transform;
         TriggerTransformation transformation = new(
             new Vector2(0, 1),
@@ -76,7 +103,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesToTransformationTrivialPasses() {
+    public void CoordinatesToTransformationTrivialPasses() {
         Transform origin = new GameObject().transform;
         TriggerTransformation transformation = new(
             new Vector2(0, 1),
@@ -94,7 +121,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsTransformationToCoordinatesPasses() {
+    public void TransformationToCoordinatesPasses() {
         float offsetLength = 2;
         float scaleMultiplier = 5;
         float originRotation = 11f;
@@ -129,7 +156,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsTransformationToCoordinatesWithMirrorPasses() {
+    public void TransformationToCoordinatesWithMirrorPasses() {
         float offsetLength = 2;
         float scaleMultiplier = 5;
         float originRotation = 11f;
@@ -164,7 +191,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesToTransformationPasses() {
+    public void CoordinatesToTransformationPasses() {
         float offsetLength = 2;
         float scaleMultiplier = 5;
         float originRotation = 11f;
@@ -201,7 +228,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesToTransformationWithMirrorPasses() {
+    public void CoordinatesToTransformationWithMirrorPasses() {
         float offsetLength = 2;
         float scaleMultiplier = 5;
         float originRotation = 11f;
@@ -240,7 +267,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsTransformToTransformPasses() {
+    public void TransformToTransformPasses() {
         float offsetLength = 3;
         float scaleMultiplier = 20;
         float originRotation = 11f;
@@ -269,7 +296,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsTransformationToTransformationWithMirrorPasses() {
+    public void TransformationToTransformationWithMirrorPasses() {
         float offsetLength = 3;
         float scaleMultiplier = 20;
         float originRotation = 11f;
@@ -298,7 +325,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesToCoordinatesPasses() {
+    public void CoordinatesToCoordinatesPasses() {
         float offsetLength = 3;
         float scaleMultiplier = 20;
         float originRotation = 11f;
@@ -331,7 +358,7 @@ public class TransformTests {
     }
 
     [Test]
-    public void TransformTestsCoordinatesToCoordinatesWithMirrorPasses() {
+    public void CoordinatesToCoordinatesWithMirrorPasses() {
         float offsetLength = 3;
         float scaleMultiplier = 20;
         float originRotation = 11f;

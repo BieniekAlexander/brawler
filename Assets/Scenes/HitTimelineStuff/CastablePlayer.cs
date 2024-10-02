@@ -1,7 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+
+public enum CastEditorControls {
+    StepBackward,
+    StepForward,
+    CopyOnStep,
+    Mirror,
+    Save
+}
 
 public class CastPlayer : MonoBehaviour {
     // TODO if the user changes the prefab allocated to the prefab, propagate some kind of change to the CastPlayer
@@ -15,6 +24,24 @@ public class CastPlayer : MonoBehaviour {
     private Cast cast;
     private int frame;
     private int duration;
+
+    private Dictionary<CastEditorControls, KeyCode[]> EditorControlMapping = new Dictionary<CastEditorControls, KeyCode[]>(){
+        {CastEditorControls.StepBackward, new KeyCode[]{KeyCode.Z, KeyCode.PageUp } },
+        {CastEditorControls.StepForward, new KeyCode[]{KeyCode.X, KeyCode.PageDown} },
+        {CastEditorControls.CopyOnStep, new KeyCode[]{KeyCode.LeftShift, KeyCode.RightShift} },
+        {CastEditorControls.Mirror, new KeyCode[]{KeyCode.Space} },
+        {CastEditorControls.Save, new KeyCode[]{KeyCode.Backspace} }, // TODO find better button
+    };
+
+    private bool CheckControl(CastEditorControls control, Func<KeyCode, bool> checker) {
+        for (int i = 0; i < EditorControlMapping[control].Length; i++) {
+            if (checker(EditorControlMapping[control][i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private void Awake() {
         Time.timeScale = 0;
@@ -135,7 +162,6 @@ public class CastPlayer : MonoBehaviour {
                     )
                 ) {
                     // copy the frame we just stepped from to this frame
-                    Debug.Log($"Copying {trigger.Frame-direction} to {trigger.Frame}");
                     trigger.TriggerTransformations[trigger.Frame] = trigger.TriggerTransformations[trigger.Frame-direction].GetHardCopy();
                 }
 
@@ -148,17 +174,22 @@ public class CastPlayer : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.PageDown) && frame<(duration-1)) {
-            MoveKeyFrame(1, Input.GetKey(KeyCode.RightShift)||Input.GetKey(KeyCode.LeftShift));
-        } else if (Input.GetKeyDown(KeyCode.PageUp) && frame>0) {
-            MoveKeyFrame(-1, Input.GetKey(KeyCode.RightShift)||Input.GetKey(KeyCode.LeftShift));
-        }
-
         // TODO what if multiple frames have the same castable?
         // presumably, the update is applied to the given prefab and all active instances in the editor
-
-        // TODO save updates to the Cast prefab, as well as updates to its castables
-        if (Input.GetKeyDown(KeyCode.Backspace)) { // TODO find better button
+        // TODO my eyes are BLEEDING right now - I need to organize this code better
+        if (CheckControl(CastEditorControls.StepForward, Input.GetKeyDown) && frame<(duration-1)) {
+            MoveKeyFrame(1, CheckControl(CastEditorControls.CopyOnStep, Input.GetKey));
+        } else if (CheckControl(CastEditorControls.StepBackward, Input.GetKeyDown) && frame>0) {
+            MoveKeyFrame(-1, CheckControl(CastEditorControls.CopyOnStep, Input.GetKey));
+        } else if (CheckControl(CastEditorControls.Mirror, Input.GetKeyDown)) {
+            Debug.Log("mirrorinG?");
+            foreach (Castable activeCastable in ActiveCastables) {
+                if (activeCastable is Trigger activeTrigger) {
+                    activeTrigger.TriggerTransformations[activeTrigger.Frame].Mirror();
+                    activeTrigger.UpdateTransform(activeTrigger.Frame);
+                }
+            }
+        } else if (CheckControl(CastEditorControls.Save, Input.GetKeyDown)) {
             UpdateCastableTransformations();
 
             for (int i = 0; i < duration; i++) {
@@ -167,7 +198,7 @@ public class CastPlayer : MonoBehaviour {
 
                 // https://discussions.unity.com/t/test-if-prefab-is-an-instance/716592/3
                 List<Castable> startFrameCastables = StartFrameCastablesMap[i];
-                Castable[] prefabMap =  CastPrefab.FrameCastablesMap[i];
+                Castable[] prefabMap = CastPrefab.FrameCastablesMap[i];
 
                 for (int j = 0; j < prefabMap.Length; j++) {
                     Castable toCopy = startFrameCastables[j];

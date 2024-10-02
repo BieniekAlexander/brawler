@@ -83,6 +83,14 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 
     }
 
+    /// <summary>
+    /// Mirrors the transformation
+    /// </summary>
+    public void Mirror() {
+        PolarPosition.x *= -1;
+        Rotation = MirrorQuaternion(Rotation, Vector3.up);
+    }
+
     public TriggerTransformation(Vector2 _polarPosition, Quaternion _rotation, Vector3 _dimension) {
         axis = Vector3.up;
         PolarPosition = _polarPosition;

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -710,7 +710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Caster: {fileID: 820023767}
   Target: {fileID: 833509156}
-  CastPrefab: {fileID: 5634063031192742342, guid: 0065c3400bb5f4c448dff42c636c40ab,
+  CastPrefab: {fileID: 5634063031192742342, guid: 516f5603d9c56f641bd4a89306d10c34,
     type: 3}
 --- !u!33 &2088108659
 MeshFilter:

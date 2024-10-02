@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -93,7 +92,7 @@ public class CastPlayer : MonoBehaviour {
         }
     }
 
-    private void MoveKeyFrame(int direction) {
+    private void MoveKeyFrame(int direction, bool copyAdjacentFrame) {
         Assert.IsTrue(direction==1 || direction==-1);
 
         UpdateCastableTransformations();
@@ -126,7 +125,20 @@ public class CastPlayer : MonoBehaviour {
 
         foreach (Castable castable in ActiveCastables) {
             if (castable is Trigger trigger) {
+                // NOTE - this will apply to all active casts - I don't have a means of selecting hits for copying, yet
                 trigger.Frame += direction;
+
+                if (copyAdjacentFrame
+                    && (
+                        (direction>0 && trigger.Frame!=0) // time stepping forward, and frame didn't just start
+                        || (direction<0 && trigger.Frame!=trigger.Duration-1) // time stepping backwards, and the frame will not have expired
+                    )
+                ) {
+                    // copy the frame we just stepped from to this frame
+                    Debug.Log($"Copying {trigger.Frame-direction} to {trigger.Frame}");
+                    trigger.TriggerTransformations[trigger.Frame] = trigger.TriggerTransformations[trigger.Frame-direction].GetHardCopy();
+                }
+
                 trigger.UpdateTransform(trigger.Frame);
             } else {
                 // TODO what will I do for projectiles and such?
@@ -137,9 +149,9 @@ public class CastPlayer : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKeyDown(KeyCode.PageDown) && frame<(duration-1)) {
-            MoveKeyFrame(1);
+            MoveKeyFrame(1, Input.GetKey(KeyCode.RightShift)||Input.GetKey(KeyCode.LeftShift));
         } else if (Input.GetKeyDown(KeyCode.PageUp) && frame>0) {
-            MoveKeyFrame(-1);
+            MoveKeyFrame(-1, Input.GetKey(KeyCode.RightShift)||Input.GetKey(KeyCode.LeftShift));
         }
 
         // TODO what if multiple frames have the same castable?

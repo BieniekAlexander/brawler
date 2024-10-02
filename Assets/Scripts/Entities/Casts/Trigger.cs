@@ -157,6 +157,14 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
         return samePolarPosition && sameRotation && sameDimension;
     }
 
+    public TriggerTransformation GetHardCopy() {
+        return new TriggerTransformation(
+            this.PolarPosition,
+            this.Rotation,
+            this.Dimension
+        );
+    }
+
     public static bool operator !=(TriggerTransformation obj1, TriggerTransformation obj2) => !(obj1 == obj2);
     public static bool operator ==(TriggerTransformation obj1, TriggerTransformation obj2) {
         if (ReferenceEquals(obj1, obj2))

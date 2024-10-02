@@ -59,10 +59,10 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -20, y: 0.6}
+  - PolarPosition: {x: -30, y: 0.6}
     Dimension: {x: 0.3, y: 0.3, z: 0.3}
     Rotation: {x: 0.5416752, y: 0.45451945, z: -0.45451945, w: 0.5416752}
-  - PolarPosition: {x: -10, y: 0.75}
+  - PolarPosition: {x: -15, y: 0.75}
     Dimension: {x: 0.3, y: 0.3, z: 0.3}
     Rotation: {x: 0.5213338, y: 0.47771436, z: -0.47771436, w: 0.5213338}
   - PolarPosition: {x: -5, y: 0.85}

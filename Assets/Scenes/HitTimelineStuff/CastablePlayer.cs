@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -42,7 +43,7 @@ public class CastPlayer : MonoBehaviour {
                         Caster,
                         Caster.transform,
                         Target,
-                        false // Caster.IsRotatingClockwise()
+                        !Caster.IsRotatingClockwise()
                     );
 
                     newCastable.gameObject.SetActive(false);
@@ -51,7 +52,7 @@ public class CastPlayer : MonoBehaviour {
                     if (f+newCastable.Duration < duration){
                         expireFrameCastablesMap[f+newCastable.Duration].Add(newCastable);
                     } else if (f+newCastable.Duration > duration) {
-                        Debug.Log($"Warning: hitbox extends past cast duration\nstart frame: {f}\ncastable duration: {newCastable.Duration}\ncast duration: {duration}");
+                        Debug.LogWarning($"Hitbox extends past cast duration\nstart frame: {f}\ncastable duration: {newCastable.Duration}\ncast duration: {duration}");
                     } // NOTE: it's okay if the Castable lasts as long as the Cast, I think!
                 }
             }
@@ -70,6 +71,7 @@ public class CastPlayer : MonoBehaviour {
 
         StartFrameCastablesMap = starts;
         ExpireFrameCastablesMap = expirations;
+        frame = 0;
 
         // enable any initial casts
         for (int i = 0; i < StartFrameCastablesMap[0].Count; i++) {
@@ -79,12 +81,25 @@ public class CastPlayer : MonoBehaviour {
         }
     }
 
+    private void UpdateCastableTransformations() {
+        foreach (Castable activeCastable in ActiveCastables) {
+            if (activeCastable is Trigger activeTrigger) {
+                TriggerTransformation newTransformation = TriggerTransformation.FromTransformCoordinates(activeTrigger.transform, Caster.transform, !Caster.IsRotatingClockwise());
+
+                if (newTransformation != activeTrigger.TriggerTransformations[activeTrigger.Frame]) {
+                    Debug.Log("Updating transformation");
+                    activeTrigger.TriggerTransformations[activeTrigger.Frame] = newTransformation;
+                }
+            }
+        }
+    }
+
     private void MoveKeyFrame(int direction) {
         Assert.IsTrue(direction==1 || direction==-1);
 
+        UpdateCastableTransformations();
         frame += direction;
 
-        
         if (direction == 1) { // enable, disable castables as defined per frame
             // playing forward
             for (int i = 0; i < StartFrameCastablesMap[frame].Count; i++) {
@@ -132,14 +147,34 @@ public class CastPlayer : MonoBehaviour {
         // presumably, the update is applied to the given prefab and all active instances in the editor
 
         // TODO save updates to the Cast prefab, as well as updates to its castables
-        /*
         if (Input.GetKeyDown(KeyCode.Backspace)) { // TODO find better button
-            if (casted is Trigger t) {
-                // TODO apply changes to each frame
-                t.UpdatePrefab(f, Castable as Trigger);
-                Debug.Log("saving changes");
+            UpdateCastableTransformations();
+
+            for (int i = 0; i < duration; i++) {
+                if (!CastPrefab.FrameCastablesMap.ContainsKey(i))
+                    continue;
+
+                // https://discussions.unity.com/t/test-if-prefab-is-an-instance/716592/3
+                List<Castable> startFrameCastables = StartFrameCastablesMap[i];
+                Castable[] prefabMap =  CastPrefab.FrameCastablesMap[i];
+
+                for (int j = 0; j < prefabMap.Length; j++) {
+                    Castable toCopy = startFrameCastables[j];
+                    Castable copyToPrefab = prefabMap[j];
+
+                    Assert.IsTrue(toCopy.Duration==copyToPrefab.Duration); // TODO not sure how to check that these refer to the same hit
+
+                    if (toCopy is Trigger toCopyTrigger && copyToPrefab is Trigger copyToPrefabTrigger) {
+                        toCopyTrigger.UpdatePrefabTransformations(copyToPrefabTrigger);
+                        Destroy(toCopyTrigger.gameObject);
+                        Debug.Log("saving changes");
+                    }
+                }
             }
-        }*/
+
+            InitializeCast(CastPrefab);
+        }
+        
     }
 
     void OnGUI() {

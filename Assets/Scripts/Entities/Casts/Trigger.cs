@@ -38,10 +38,18 @@ public class TransformCoordinates : IEquatable<TransformCoordinates> {
     }
 
     public bool Equals(TransformCoordinates other) {
-        return 
+        return
             Position == other.Position
             && Rotation == other.Rotation
             && Dimension == other.Dimension;
+    }
+
+    public static TransformCoordinates FromTransform(Transform t) {
+        return new(
+            t.position,
+            t.rotation,
+            t.localScale
+        );
     }
 
     public static bool operator !=(TransformCoordinates obj1, TransformCoordinates obj2) => !(obj1 == obj2);
@@ -62,34 +70,37 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
     public Vector2 PolarPosition;
     public Vector3 Dimension;
     public Quaternion Rotation;
-    private Vector3 axis = Vector3.up;
+    private Vector3 axis;
+
+    public static Func<Quaternion, Quaternion> inv = x => Quaternion.Inverse(x);
+
+    public static int NegativeFactor(bool isNegative) {
+        return isNegative ? -1 : 1;
+    }
 
     public TriggerTransformation(Vector2 _polarPosition, Quaternion _rotation, Vector3 _dimension) {
+        axis = Vector3.up;
         PolarPosition = _polarPosition;
         Dimension = _dimension;
         Rotation = _rotation;
     }
 
     public override string ToString() {
-        return $"PolarPosition: {PolarPosition}\nDimension: {Dimension}\nRotation: {Rotation}Axis: {axis}";
+        return $"PolarPosition: {PolarPosition}\nDimension: {Dimension}\nRotation: {Rotation}\nAxis: {axis}";
     }
 
     public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
-        Quaternion orientation = Quaternion.Euler(0, PolarPosition.x, 0);
-        Vector3 offset = Quaternion.AngleAxis( // TODO maybe generalize this to different axes?
-            PolarPosition.x,
-            axis
-        )*Vector3.forward*PolarPosition.y;
+        axis = Vector3.up;
+        Quaternion rot = mirror ? inv(Rotation) : Rotation;
 
-        // TODO make sure that the calculations without an origin are correct
-        if (mirror) {
-            offset.x *= -1;
-            orientation.y *= -1;
-        }
+        Quaternion orientation = Quaternion.AngleAxis( // TODO maybe generalize this to different axes? I hardcoded it here because I think the serialized instances were set to 0, breaking this function
+            NegativeFactor(mirror)*PolarPosition.x,
+            axis
+        );
 
         return new(
-            origin.position+origin.rotation*offset,
-            origin.rotation*orientation*Rotation,
+            origin.position+origin.rotation*orientation*Vector3.forward*PolarPosition.y,
+            origin.rotation*orientation*rot,
             Dimension
         );
     }
@@ -103,22 +114,29 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
     }
 
     public static TriggerTransformation FromTransformCoordinates(TransformCoordinates coordinates, Transform origin, bool mirror) {
+        Vector3 axis = Vector3.up; // TODO hardcoded
         Vector3 globalOrientedRelativePosition = coordinates.Position-origin.position;
         Vector3 relativelyOrientedRelativePosition = Quaternion.Inverse(origin.rotation)*globalOrientedRelativePosition;
+
         Vector2 PolarPosition = new Vector2(
-            Vector3.Angle(Vector3.forward, relativelyOrientedRelativePosition),
+            NegativeFactor(mirror)*Vector3.Angle(Vector3.forward, relativelyOrientedRelativePosition),
             relativelyOrientedRelativePosition.magnitude
         );
 
-        Quaternion orientation = Quaternion.Euler(0, PolarPosition.x, 0);
+        Quaternion orientation = Quaternion.AngleAxis(
+            NegativeFactor(mirror)*PolarPosition.x,
+            axis
+        );
+
+        Quaternion rot = coordinates.Rotation;
         Quaternion transformationRotation =
-            Quaternion.Inverse(orientation)
-            *Quaternion.Inverse(origin.rotation)
-            *coordinates.Rotation;
+            inv(origin.rotation)
+            * inv(orientation)
+            * rot;
 
         return new(
             PolarPosition,
-            transformationRotation,
+            mirror ? inv(transformationRotation): transformationRotation,
             coordinates.Dimension
         );
     }
@@ -148,7 +166,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 /// </summary>
 public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackReceiver {
     /* Transform */
-    [SerializeField] List<TriggerTransformation> TriggerTransformations;
+    [SerializeField] public List<TriggerTransformation> TriggerTransformations;
 
     /* Collision */
     [HideInInspector] public Collider Collider;
@@ -224,7 +242,8 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
         }
 
         int index = Math.Min(_frame, TriggerTransformations.Count-1);
-        TriggerTransformations[index].ToTransformCoordinates(Origin, Mirror).Apply(transform);
+        TransformCoordinates tc = TriggerTransformations[index].ToTransformCoordinates(Origin, Mirror);
+        tc.Apply(transform);
     }
 
     /// <summary>
@@ -265,8 +284,11 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     public void OnAfterDeserialize() {
     }
 
-    public void UpdatePrefab(int frame, Trigger prefab) {
-        TriggerTransformations[frame] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
-        prefab.TriggerTransformations[frame] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
+    public void UpdatePrefabTransformations(Trigger prefab) {
+        for (int i = 0; i < Duration; i++) {
+            UpdateTransform(i);
+            prefab.TriggerTransformations[i] = TriggerTransformation.FromTransformCoordinates(transform, Origin, !Caster.IsRotatingClockwise());
+            // TODO hardcoding mirrored=false - I'm worried that the Caster is getting rotated in the CastablePlayer edit process
+        }
     }
 }

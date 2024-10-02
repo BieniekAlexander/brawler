@@ -47,10 +47,10 @@ MonoBehaviour:
   effectPefabs: []
   commandMovementPrefab: {fileID: 0}
   FrameCastablesMap:
-    m_keys: 04000000
+    m_keys: 03000000
     m_values:
     - data:
-      - {fileID: 4918249452027163949, guid: 3d40f986d80b312479aac475ec71cb43, type: 3}
+      - {fileID: 4918249452027163949, guid: 958ef770e5582554b9881b7711e1b24f, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []

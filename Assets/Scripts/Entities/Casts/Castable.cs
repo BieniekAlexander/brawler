@@ -110,7 +110,7 @@ public abstract class Castable : MonoBehaviour, ICasts {
                         Caster,
                         Origin,
                         Caster.GetTargetTransform(),
-                        !Caster.IsRotatingClockwise()
+                        Mirror
                     )
                 );
             }

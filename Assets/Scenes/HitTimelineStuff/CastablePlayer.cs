@@ -22,6 +22,7 @@ public class CastPlayer : MonoBehaviour {
     private Dictionary<int, List<Castable>> ExpireFrameCastablesMap = null;
     private List<Castable> ActiveCastables = null;
     private Cast cast;
+    private bool _rotatingClockwise = true; // let's assume that all editing assumes a cast direction of clockwise
     private int frame;
     private int duration;
 
@@ -69,7 +70,7 @@ public class CastPlayer : MonoBehaviour {
                         Caster,
                         Caster.transform,
                         Target,
-                        !Caster.IsRotatingClockwise()
+                        !_rotatingClockwise
                     );
 
                     newCastable.gameObject.SetActive(false);
@@ -110,7 +111,7 @@ public class CastPlayer : MonoBehaviour {
     private void UpdateCastableTransformations() {
         foreach (Castable activeCastable in ActiveCastables) {
             if (activeCastable is Trigger activeTrigger) {
-                TriggerTransformation newTransformation = TriggerTransformation.FromTransformCoordinates(activeTrigger.transform, Caster.transform, !Caster.IsRotatingClockwise());
+                TriggerTransformation newTransformation = TriggerTransformation.FromTransformCoordinates(activeTrigger.transform, Caster.transform, !_rotatingClockwise);
 
                 if (newTransformation != activeTrigger.TriggerTransformations[activeTrigger.Frame]) {
                     activeTrigger.TriggerTransformations[activeTrigger.Frame] = newTransformation;

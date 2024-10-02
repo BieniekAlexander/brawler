@@ -312,7 +312,7 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     public void UpdatePrefabTransformations(Trigger prefab) {
         for (int i = 0; i < Duration; i++) {
             UpdateTransform(i);
-            prefab.TriggerTransformations[i] = TriggerTransformation.FromTransformCoordinates(transform, Origin, !Caster.IsRotatingClockwise());
+            prefab.TriggerTransformations[i] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
             // TODO hardcoding mirrored=false - I'm worried that the Caster is getting rotated in the CastablePlayer edit process
         }
     }

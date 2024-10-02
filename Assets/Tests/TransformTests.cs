@@ -99,7 +99,7 @@ public class TransformTests {
         float scaleMultiplier = 5;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = false;
 
         Transform origin = new GameObject().transform;
@@ -134,7 +134,7 @@ public class TransformTests {
         float scaleMultiplier = 5;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = true;
 
         Transform origin = new GameObject().transform;
@@ -169,7 +169,7 @@ public class TransformTests {
         float scaleMultiplier = 5;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = false;
 
         Transform origin = new GameObject().transform;
@@ -206,7 +206,7 @@ public class TransformTests {
         float scaleMultiplier = 5;
         float originRotation = 11f;
         float offsetAngle = 27f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = true;
 
         Transform origin = new GameObject().transform;
@@ -245,7 +245,7 @@ public class TransformTests {
         float scaleMultiplier = 20;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = false;
 
         Transform origin = new GameObject().transform;
@@ -274,7 +274,7 @@ public class TransformTests {
         float scaleMultiplier = 20;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = true;
 
         Transform origin = new GameObject().transform;
@@ -303,7 +303,7 @@ public class TransformTests {
         float scaleMultiplier = 20;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 37f;
         bool mirror = false;
 
         Transform origin = new GameObject().transform;
@@ -336,7 +336,7 @@ public class TransformTests {
         float scaleMultiplier = 20;
         float originRotation = 11f;
         float offsetAngle = 17f;
-        float finalRotation = 34f;
+        float finalRotation = 38f;
         bool mirror = true;
 
         Transform origin = new GameObject().transform;

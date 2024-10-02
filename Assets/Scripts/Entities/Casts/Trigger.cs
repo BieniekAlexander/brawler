@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UIElements;
 
 public class VectorLabelsAttribute : PropertyAttribute {
     public readonly string[] Labels;
@@ -78,6 +75,14 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
         return isNegative ? -1 : 1;
     }
 
+    public static Quaternion MirrorQuaternion(Quaternion q, Vector3 axis) {
+        // ref: https://discussions.unity.com/t/mirroring-a-quaternion/189704/2
+        q.ToAngleAxis(out float angle, out Vector3 qAxis); // get angle and axis
+        qAxis = Vector3.Scale(-1*axis, qAxis); // mirror the axis about the plane through the supplied axis
+        return Quaternion.AngleAxis(angle, qAxis); // assign it back
+
+    }
+
     public TriggerTransformation(Vector2 _polarPosition, Quaternion _rotation, Vector3 _dimension) {
         axis = Vector3.up;
         PolarPosition = _polarPosition;
@@ -91,7 +96,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 
     public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
         axis = Vector3.up;
-        Quaternion rot = mirror ? inv(Rotation) : Rotation;
+        Quaternion rot = mirror ? MirrorQuaternion(Rotation, axis) : Rotation;
 
         Quaternion orientation = Quaternion.AngleAxis( // TODO maybe generalize this to different axes? I hardcoded it here because I think the serialized instances were set to 0, breaking this function
             NegativeFactor(mirror)*PolarPosition.x,
@@ -116,27 +121,31 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
     public static TriggerTransformation FromTransformCoordinates(TransformCoordinates coordinates, Transform origin, bool mirror) {
         Vector3 axis = Vector3.up; // TODO hardcoded
         Vector3 globalOrientedRelativePosition = coordinates.Position-origin.position;
-        Vector3 relativelyOrientedRelativePosition = Quaternion.Inverse(origin.rotation)*globalOrientedRelativePosition;
+        Vector3 relativelyOrientedRelativePosition = inv(origin.rotation)*globalOrientedRelativePosition;
 
         Vector2 PolarPosition = new Vector2(
-            NegativeFactor(mirror)*Vector3.Angle(Vector3.forward, relativelyOrientedRelativePosition),
+            Vector3.SignedAngle(Vector3.forward, relativelyOrientedRelativePosition, axis),
             relativelyOrientedRelativePosition.magnitude
         );
 
         Quaternion orientation = Quaternion.AngleAxis(
-            NegativeFactor(mirror)*PolarPosition.x,
+            PolarPosition.x,
             axis
         );
 
-        Quaternion rot = coordinates.Rotation;
         Quaternion transformationRotation =
             inv(origin.rotation)
             * inv(orientation)
-            * rot;
+            * coordinates.Rotation;
 
+        if (mirror) {
+            PolarPosition.x *= -1;
+            transformationRotation = MirrorQuaternion(transformationRotation, Vector3.up);
+        }
+        
         return new(
             PolarPosition,
-            mirror ? inv(transformationRotation): transformationRotation,
+            transformationRotation,
             coordinates.Dimension
         );
     }

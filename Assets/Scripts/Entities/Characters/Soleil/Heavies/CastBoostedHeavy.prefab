@@ -47,7 +47,7 @@ MonoBehaviour:
   effectPefabs: []
   commandMovementPrefab: {fileID: 0}
   FrameCastablesMap:
-    m_keys: 1e00000028000000
+    m_keys: 1000000018000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 6baf3fae34e635643bc265aaf8455280, type: 3}
@@ -59,6 +59,6 @@ MonoBehaviour:
   Frame: 0
   startupTime: 0
   Encumbering: 0
-  duration: 50
+  duration: 38
   Origin: {fileID: 0}
   statusEffects: []

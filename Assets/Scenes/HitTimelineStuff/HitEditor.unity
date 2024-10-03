@@ -710,7 +710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Caster: {fileID: 820023767}
   Target: {fileID: 833509156}
-  CastPrefab: {fileID: 5634063031192742342, guid: 516f5603d9c56f641bd4a89306d10c34,
+  CastPrefab: {fileID: 5634063031192742342, guid: 2bb95e036ff7bcc4b8bac902a984c829,
     type: 3}
 --- !u!33 &2088108659
 MeshFilter:

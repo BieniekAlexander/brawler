@@ -59,30 +59,30 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.6, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.3, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.76604444, z: 0, w: 0.64278764}
+  - PolarPosition: {x: -50.53938, y: 0.65927386}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9553512, z: 0, w: 0.29547268}
+  - PolarPosition: {x: -41.816845, y: 0.67491406}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.94439834, z: 0, w: 0.32880366}
+  - PolarPosition: {x: -35.97238, y: 0.766094}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9382885, z: 0, w: 0.34585375}
+  - PolarPosition: {x: -31.07904, y: 0.8523497}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9430202, z: 0, w: 0.33273545}
+  - PolarPosition: {x: -26.003342, y: 0.9123596}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.94491816, z: 0, w: 0.32730672}
+  - PolarPosition: {x: -24.443949, y: 0.96664363}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9519652, z: 0, w: 0.30620658}
+  - PolarPosition: {x: -24.443949, y: 0.96664363}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9638641, z: 0, w: 0.2663949}
+  - PolarPosition: {x: -22.249025, y: 0.95078915}
+    Dimension: {x: 0.6, y: 0.21334802, z: 0.219651}
+    Rotation: {x: 0, y: 0.9666251, z: 0, w: 0.2561951}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
@@ -93,8 +93,8 @@ MonoBehaviour:
   KnockbackCoordinateSystem: 1
   BaseKnockbackVector: {x: -2, y: 0, z: 15}
   HitTier: 3
-  hitLagDuration: 9
-  hitStunDuration: 10
+  hitLagDuration: 10
+  hitStunDuration: 15
 --- !u!136 &7506723417326245698
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -116,7 +116,7 @@ CapsuleCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 1
-  m_Direction: 1
+  m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &-3587656788900788176
 MeshRenderer:

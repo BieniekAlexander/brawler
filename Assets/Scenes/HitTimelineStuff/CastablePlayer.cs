@@ -66,7 +66,7 @@ public class CastPlayer : MonoBehaviour {
             if (prefab.FrameCastablesMap.ContainsKey(f)) {
                 for (int i = 0; i <  prefab.FrameCastablesMap[f].Length; i++) {
                     Castable newCastable = Castable.CreateCast(
-                        prefab.FrameCastablesMap[f][0],
+                        prefab.FrameCastablesMap[f][i],
                         Caster,
                         Caster.transform,
                         Target,

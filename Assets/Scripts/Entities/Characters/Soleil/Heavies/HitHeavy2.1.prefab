@@ -59,30 +59,30 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -30, y: 0.6}
+  - PolarPosition: {x: -38.480198, y: 0.6476557}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: -15, y: 0.75}
+    Rotation: {x: 0, y: 0.9366837, z: 0, w: 0.35017654}
+  - PolarPosition: {x: -36.341927, y: 0.6294267}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: -5, y: 0.85}
+    Rotation: {x: 0, y: 0.93727946, z: 0, w: 0.348579}
+  - PolarPosition: {x: -34.22174, y: 0.6276703}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 0, y: 0.9}
+    Rotation: {x: 0, y: 0.93498987, z: 0, w: 0.35467437}
+  - PolarPosition: {x: -32.44976, y: 0.6150292}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0, y: 0.7372773, z: 0, w: 0.6755902}
-  - PolarPosition: {x: 5, y: 0.95}
+    Rotation: {x: 0, y: 0.9355631, z: 0, w: 0.35315958}
+  - PolarPosition: {x: -33.319744, y: 0.60075283}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0.000000009578283, y: 0.7660444, z: -0.000000011414951, w: 0.6427877}
-  - PolarPosition: {x: 5, y: 1}
+    Rotation: {x: 0, y: 0.9432372, z: 0, w: 0.3321199}
+  - PolarPosition: {x: -33.319744, y: 0.60075283}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0.000000009578283, y: 0.7660444, z: -0.000000011414951, w: 0.6427877}
-  - PolarPosition: {x: 5, y: 1}
+    Rotation: {x: 0, y: 0.94711626, z: 0, w: 0.3208907}
+  - PolarPosition: {x: -33.319744, y: 0.60075283}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0.000000009578283, y: 0.7660444, z: -0.000000011414951, w: 0.6427877}
-  - PolarPosition: {x: 5, y: 1}
+    Rotation: {x: 0, y: 0.94711626, z: 0, w: 0.3208907}
+  - PolarPosition: {x: -33.319744, y: 0.60075283}
     Dimension: {x: 0.5, y: 0.1, z: 0.1}
-    Rotation: {x: 0.000000009578283, y: 0.7660444, z: -0.000000011414951, w: 0.6427877}
+    Rotation: {x: 0, y: 0.94711626, z: 0, w: 0.3208907}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0

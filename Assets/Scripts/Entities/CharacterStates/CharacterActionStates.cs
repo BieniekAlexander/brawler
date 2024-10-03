@@ -103,16 +103,16 @@ public class CharacterStateBlocking : CharacterState {
         if (_superState is CharacterStateRunning) {
             float dSpeed = Mathf.Max(
             Vector3.Dot(
-                Character.HorizontalVelocity.normalized,
+                MovementUtils.inXZ(Character.Velocity).normalized,
                 Character.LookDirection
             ),
             0
         ) * _maxAcceleration;
 
-            Character.HorizontalVelocity =
+            Character.Velocity =
                 MovementUtils.ClampMagnitude(
                     MovementUtils.ChangeMagnitude(
-                        Character.HorizontalVelocity,
+                        MovementUtils.inXZ(Character.Velocity),
                         -dSpeed*Time.deltaTime
                     ),
                     Character.WalkSpeedMax,
@@ -161,7 +161,7 @@ public class CharacterStateShielding : CharacterState {
         // - if you're running, shielding towards the direction of movement should rotate you (but not too much the same dir?)
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
-        Vector3 characterDirection = Character.HorizontalVelocity.normalized;
+        Vector3 characterDirection = MovementUtils.inXZ(Character.Velocity).normalized;
         Vector3 shieldDirection = Character.LookDirection;
         float acceleration = _maxAcceleration*Mathf.Max(
             Vector3.Dot(
@@ -172,15 +172,15 @@ public class CharacterStateShielding : CharacterState {
         )*Time.deltaTime;
 
         if (Character.InputRunning) {
-            Character.HorizontalVelocity = Vector3.RotateTowards(
-                Character.HorizontalVelocity,
+            Character.Velocity = Vector3.RotateTowards(
+                MovementUtils.inXZ(Character.Velocity),
                 -shieldDirection,
                 _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0
             );
         }
-        Character.HorizontalVelocity = MovementUtils.ClampMagnitude(
-            MovementUtils.ChangeMagnitude(Character.HorizontalVelocity, -acceleration),
+        Character.Velocity = MovementUtils.ClampMagnitude(
+            MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration),
             0,
             Mathf.Infinity
         );

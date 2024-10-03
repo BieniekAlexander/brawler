@@ -3,7 +3,8 @@ using UnityEngine;
 public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
 {
     /* Movement */
-    private Vector3 Velocity;
+    public Vector3 Velocity { get; set; } = new();
+    public CommandMovement CommandMovement { get; set; }
     [SerializeField] float MaxSpeed = 15f;
     [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
@@ -69,22 +70,15 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
                 targetRotation,
                 RotationalControl * Time.deltaTime);
 
-            Velocity = newRotation * Velocity.normalized * MaxSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240;
+            // force movement only in XZ
+            Velocity = MovementUtils.inXZ(newRotation * Velocity.normalized * MaxSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
             transform.rotation = Quaternion.LookRotation(Velocity.normalized, Vector3.up)*InitialRotation;
-            Velocity.y = 0; // hack to lock rotation to horizontal plane
         }
 
         transform.position += Velocity * Time.deltaTime;
     }
 
     public Transform GetTransform() { return transform; }
-
-    public Vector3 GetVelocity() { return Velocity; }
-
-    public void SetCommandMovement(CommandMovement CommandMovement) {
-        // TODO implement this
-        return;
-    }
 
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
         return 0f; // TODO I won't let this take knockback right now, but maybe!

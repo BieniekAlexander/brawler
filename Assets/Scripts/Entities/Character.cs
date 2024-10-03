@@ -40,17 +40,17 @@ public struct CastContainer {
 public enum CastId {
     Light1 = 0,
     Light2 = 1,
-    BoostedLight = 2,
+    LightS = 2,
     Medium1 = 3,
     Medium2 = 4,
-    BoostedMedium = 5,
+    MediumS = 5,
     Heavy1 = 6,
     Heavy2 = 7,
-    BoostedHeavy = 8,
+    HeavyS = 8,
     DashAttack = 9,
     Throw1 = 10,
     Throw2 = 11,
-    BoostedThrow = 12,
+    ThrowS = 12,
     Ability1 = 13,
     Ability2 = 14,
     Ability3 = 15,
@@ -72,12 +72,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* Movement */
     public CharacterController cc { get; set; }
-    public Vector3 Velocity { get { return HorizontalVelocity + Vector3.up*VerticalVelocity; } private set { throw new NotImplementedException("TODO don't set this directly"); } }
-    public Vector3 HorizontalVelocity = new();
-    public float VerticalVelocity = new();
-    public bool CastEncumbered { get; set; } = false;
+    public Vector3 Velocity { get; set; } = Vector3.zero;
+    public int CastEncumberedTimer { get; set; } = 0;
 
-    public CommandMovement CommandMovement { get; private set; } = null;
+    public CommandMovement CommandMovement { get; set; } = null;
     public bool Stunned { get; set; } = false;
     private float standingY; private float standingOffset = .1f;
 
@@ -108,7 +106,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private Vector3 _inputMoveDirection = new();
     public Vector3 InputMoveDirection {
         get {
-            return CastEncumbered ? Vector3.zero : _inputMoveDirection;
+            return (CastEncumberedTimer>0) ? Vector3.zero : _inputMoveDirection;
         }
         set {
             _inputMoveDirection = value;
@@ -122,7 +120,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* Abilities */
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
-    public static int[] boostedIds = new int[] { (int)CastId.BoostedLight, (int)CastId.BoostedMedium, (int)CastId.BoostedHeavy, (int)CastId.BoostedThrow };
+    public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     private int inputCastId = -1;
     public int CastIdBuffer { get; set; } = -1;
@@ -190,7 +188,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.BoostedLight;
+            CastIdBuffer = (int)CastId.LightS;
         }
     }
     public void OnMedium1(InputAction.CallbackContext context) {
@@ -205,7 +203,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.BoostedMedium;
+            CastIdBuffer = (int)CastId.MediumS;
         }
     }
     public void OnHeavy1(InputAction.CallbackContext context) {
@@ -220,7 +218,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.BoostedHeavy;
+            CastIdBuffer = (int)CastId.HeavyS;
         }
     }
 
@@ -244,7 +242,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
     public void OnBoostedThrow(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.BoostedThrow;
+            CastIdBuffer = (int)CastId.ThrowS;
     }
 
     // abilities
@@ -344,8 +342,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
                     castContainer.charges--;
                     castContainer.timer = castContainer.cooldown;
-                    CastEncumbered = castContainer.castPrefab.Encumbering;
                     BusyTimer = castContainer.castPrefab.startupTime;
+                    CastEncumberedTimer = (castContainer.castPrefab.Encumbering)? BusyTimer:0;
                     return true;
                 } else {
                     return false;
@@ -359,6 +357,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
+        BusyTimer--;
+        CastEncumberedTimer--;
+
         // resolve cooldowns and cast expirations
         for (int i = 0; i<castContainers.Length; i++) {
             if (castContainers[i].charges < castSlots[i].defaultChargeCount) {
@@ -470,7 +471,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         /*
          * Trail Renderer
          */
-        tr.emitting=(HorizontalVelocity.magnitude>12.6f); // TODO return to this later
+        tr.emitting=(Velocity.sqrMagnitude>12.6f*12.6f); // TODO return to this later
     }
 
     private void Update() {
@@ -493,13 +494,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // Handle Casts
         State.FixedUpdateStates();
 
-        if (CommandMovement !=  null) {
-            cc.Move(CommandMovement.GetDPosition());
-        } else if (HitStopTimer==0) {
+        if (HitStopTimer==0) {
             // TODO I think I'm gonna need more vertical velocity considerations wrt state
-            VerticalVelocity = GetVerticalVelocity(gravity);
-            cc.Move((HorizontalVelocity+Vector3.up*VerticalVelocity)*Time.deltaTime);
+            if (!IsGrounded()) {
+                Velocity += Vector3.up*gravity;
+            } else {
+                Velocity = MovementUtils.setY(Velocity, Vector3.zero);
+            }
         }
+
+        cc.Move(Velocity*Time.deltaTime);
 
         HandleCharges();
         if (CastIdBuffer >= 0) {
@@ -535,7 +539,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public void SetCommandMovement(CommandMovement _commandMovement) {
         CommandMovement = _commandMovement;
-        HorizontalVelocity = CommandMovement.Velocity.normalized * HorizontalVelocity.magnitude; // TODO maybe not the best spot to do this
     }
 
     /// <summary>
@@ -569,7 +572,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public bool IsGrounded() {
-        if (VerticalVelocity>0) {
+        if (Velocity.y>0) {
             return false;
         } else {
         // TODO ugly implementation for now - checking if grounded, updating if true, returning false if not
@@ -581,16 +584,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             } else {
                 return false;
             }
-        }
-    }
-
-    private float GetVerticalVelocity(float gravity) {
-        if (IsGrounded()) {
-            // // snap the character to the standing Height - TODO current implementation seems hacky, but it works?
-            transform.position = new Vector3(transform.position.x, standingY, transform.position.z);
-            return 0f;
-        } else {
-            return VerticalVelocity + gravity;
         }
     }
 
@@ -622,7 +615,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* IMoves Methods */
     public Transform GetTransform() { return transform; }
-    public Vector3 GetVelocity() { return HorizontalVelocity; }
 
     public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
         if (HitTier==HitTier.Soft) return 0;
@@ -662,6 +654,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             CommandMovement = null;
             KnockBack = knockBackFactor*knockBackVector;
             HitStunTimer = hitStunDuration;
+            CastEncumberedTimer = 0;
+            BusyTimer = 0;
         }
 
         if (hitStopDuration > 0) {
@@ -675,7 +669,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             } else if (hitTier == HitTier.Light) {
                 SwitchState(StateFactory.PushedBack());
             } else {
-                HorizontalVelocity += KnockBack;
+                Velocity += KnockBack;
             }
         }
 
@@ -714,7 +708,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void OnGUI() {
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20, 40, 200, 20), HorizontalVelocity.magnitude+"m/s");
+        GUI.Label(new Rect(20, 40, 200, 20), MovementUtils.inXZ(Velocity).magnitude+"m/s");
         GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);

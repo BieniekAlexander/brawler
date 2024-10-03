@@ -24,7 +24,7 @@ public class Grab : Trigger, ICollidable {
             } else {
                 CommandMovementLock cmLock = (CommandMovementLock)commandMovementPrefab;
                 CommandMovementLock commandMovementLock = Instantiate(cmLock);
-                OtherMover.SetCommandMovement(commandMovementLock);
+                OtherMover.CommandMovement = commandMovementLock;
                 commandMovementLock.Initialize(
                     OtherMover,
                     (Caster as IMoves).GetTransform()

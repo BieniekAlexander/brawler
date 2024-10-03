@@ -5,15 +5,15 @@ public interface IMoves {
     /// <returns>the <typeparamref name="Transform"/></returns>
     public Transform GetTransform();
 
-    /// <summary/>
-    /// <returns>the <typeparamref name="Vector3"/>  velocity</returns>
-    public Vector3 GetVelocity();
+    /// <summary>
+    /// Getter/Setter of Velocity
+    /// </summary>
+    public Vector3 Velocity { get; set; }
 
     /// <summary>
-    /// Take in a <typeparamref name="CommandMovement"/>, which will temporarily update the movement of the <typeparamref name="IMoves"/>
+    /// Getter/Setter of <typeparamref name="CommandMovement"/>, which will temporarily update the movement of the <typeparamref name="IMoves"/>
     /// </summary>
-    /// <param name="CommandMovement">The new, temporary movement</param>
-    public void SetCommandMovement(CommandMovement CommandMovement);
+    public CommandMovement CommandMovement { get; set; }
 
     /// <summary>
     /// Knock back the <typeparamref name="IMoves"/> as specified.

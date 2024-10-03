@@ -36,7 +36,7 @@ public class CharacterStateTumbling : CharacterState {
             return Factory.GettingUp();
         } else if (Character.InputDash) {
             return Factory.Rolling();
-        } else if (Mathf.Approximately(Character.HorizontalVelocity.magnitude, 0f)) {
+        } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.KnockedDown();
         } else {
             return null;
@@ -48,13 +48,13 @@ public class CharacterStateTumbling : CharacterState {
     public override void InitializeSubState(){}
 
     public override void FixedUpdateState() {
-        Character.HorizontalVelocity = MovementUtils.ChangeMagnitude(Character.HorizontalVelocity, -_tumbleAcceleration*Time.deltaTime);
+        Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -_tumbleAcceleration*Time.deltaTime);
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
             // TODO improve interaction of tumbling into wall
-            Character.HorizontalVelocity = new();
+            Character.Velocity = new();
         }
     }
 }
@@ -78,7 +78,7 @@ public class CharacterStateRolling : CharacterState {
 
     public override void EnterState() {
         Character.RecoveryTimer = _recoveryDuration;
-        Character.HorizontalVelocity = Character.LookDirection * _rollSpeed;
+        Character.Velocity = Character.LookDirection * _rollSpeed;
         // add invincibility
     }
 
@@ -94,7 +94,7 @@ public class CharacterStateRolling : CharacterState {
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
             // TODO improve interaction of tumbling into wall
-            Character.HorizontalVelocity = new();
+            Character.Velocity = new();
         }
     }
 }
@@ -117,7 +117,7 @@ public class CharacterStateGettingUp : CharacterState {
 
     public override void EnterState() {
         Character.RecoveryTimer = _recoveryDuration;
-        Character.HorizontalVelocity = new();
+        Character.Velocity = new();
         // TODO invulnerability
     }
 
@@ -152,7 +152,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
 
     public override void EnterState() {
         Character.RecoveryTimer = _recoveryDuration;
-        Character.HorizontalVelocity = new();
+        Character.Velocity = new();
         // TODO invulnerability
     }
 

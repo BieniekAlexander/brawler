@@ -44,7 +44,7 @@ public class CharacterAI : Agent
         sensor.AddObservation(character.isActiveAndEnabled); // +1
         sensor.AddObservation(getDistancesToEdges(character.transform, floor)); // +2 = 3
         sensor.AddObservation(enemy.transform.position-character.transform.position); // +3 = 6
-        sensor.AddObservation(character.GetVelocity()+UnityEngine.Vector3.up*character.VerticalVelocity); // +3 = 9
+        sensor.AddObservation(character.Velocity); // +3 = 9
     }
 
     public override void Heuristic(in ActionBuffers actionsOut) {

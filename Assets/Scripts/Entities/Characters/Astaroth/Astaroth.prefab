@@ -238,8 +238,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
-  HorizontalVelocity: {x: 0, y: 0, z: 0}
-  VerticalVelocity: 0
   castSlots:
   - name: Light1
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
@@ -251,7 +249,7 @@ MonoBehaviour:
       type: 3}
     cooldown: 20
     defaultChargeCount: 1
-  - name: BoostedLight
+  - name: LightS
     castPrefab: {fileID: 5634063031192742342, guid: 75f1803493995784880ec6003fc1eeec,
       type: 3}
     cooldown: 60
@@ -266,7 +264,7 @@ MonoBehaviour:
       type: 3}
     cooldown: -1
     defaultChargeCount: 1
-  - name: BoostedMedium
+  - name: MediumS
     castPrefab: {fileID: 5634063031192742342, guid: 031422b176374c1458d485649b3e84b1,
       type: 3}
     cooldown: -1
@@ -281,7 +279,7 @@ MonoBehaviour:
       type: 3}
     cooldown: 60
     defaultChargeCount: 1
-  - name: BoostedHeavy
+  - name: HeavyS
     castPrefab: {fileID: 5634063031192742342, guid: 11625355706f464468879047fabbad59,
       type: 3}
     cooldown: -1
@@ -301,7 +299,7 @@ MonoBehaviour:
       type: 3}
     cooldown: -1
     defaultChargeCount: 1
-  - name: BoostedThrow
+  - name: ThrowS
     castPrefab: {fileID: 5634063031192742342, guid: 02c3554e5b29799478fb10ac535c01d5,
       type: 3}
     cooldown: -1

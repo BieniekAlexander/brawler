@@ -73,7 +73,7 @@ public class CharacterStatePushedBack : CharacterState {
             0f
         );
 
-        KnockBackUtils.DecomposeKnockback(Character.KnockBack, ref Character.HorizontalVelocity, ref Character.VerticalVelocity);
+        Character.Velocity = Character.KnockBack;
         Character.KnockBack = new();
     }
 
@@ -81,8 +81,9 @@ public class CharacterStatePushedBack : CharacterState {
         Character.HitStunTimer--;
 
         if (Character.IsGrounded()) {
-                Character.HorizontalVelocity = MovementUtils.ChangeMagnitude(
-                Character.HorizontalVelocity, -KnockBackUtils.KnockBackDecay*Time.deltaTime
+            Character.Velocity = MovementUtils.ChangeMagnitude(
+                MovementUtils.inXZ(Character.Velocity),
+                -KnockBackUtils.KnockBackDecay*Time.deltaTime
             );
         }
     }
@@ -125,7 +126,7 @@ public class CharacterStateKnockedBack : CharacterState {
             0f
         );
 
-        KnockBackUtils.DecomposeKnockback(Character.KnockBack, ref Character.HorizontalVelocity, ref Character.VerticalVelocity);
+        Character.Velocity = Character.KnockBack;
         Character.KnockBack = new();
     }
 
@@ -133,9 +134,10 @@ public class CharacterStateKnockedBack : CharacterState {
         Character.HitStunTimer--;
 
         if (Character.IsGrounded()) {
-            Character.HorizontalVelocity = MovementUtils.ChangeMagnitude(
-            Character.HorizontalVelocity, -KnockBackUtils.KnockBackDecay * Time.deltaTime
-        );
+            Character.Velocity = MovementUtils.ChangeMagnitude(
+                MovementUtils.inXZ(Character.Velocity),
+                -KnockBackUtils.KnockBackDecay*Time.deltaTime
+            );
         }
     }
 
@@ -158,7 +160,7 @@ public class CharacterStateBlownBack : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO implement knockdown
-        if (Mathf.Approximately(Character.HorizontalVelocity.magnitude, 0f)) {
+        if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.KnockedDown();
         } else {
             return null;
@@ -177,16 +179,17 @@ public class CharacterStateBlownBack : CharacterState {
             0f
         );
 
-        KnockBackUtils.DecomposeKnockback(Character.KnockBack, ref Character.HorizontalVelocity, ref Character.VerticalVelocity);
+        Character.Velocity = Character.KnockBack;
         Character.KnockBack = new();
     }
 
     public override void FixedUpdateState() {
         Character.HitStunTimer--;
 
-        if (Character.IsGrounded()){
-            Character.HorizontalVelocity = MovementUtils.ChangeMagnitude(
-                Character.HorizontalVelocity, -KnockBackUtils.KnockBackDecay*Time.deltaTime
+        if (Character.IsGrounded()) {
+            Character.Velocity = MovementUtils.ChangeMagnitude(
+                MovementUtils.inXZ(Character.Velocity),
+                -KnockBackUtils.KnockBackDecay*Time.deltaTime
             );
         }
     }

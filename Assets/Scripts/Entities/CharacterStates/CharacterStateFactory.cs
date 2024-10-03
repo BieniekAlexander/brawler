@@ -11,6 +11,7 @@ public class CharacterStateFactory {
     public CharacterState Walking() { return new CharacterStateWalking(_character, this); }
     public CharacterState Running() { return new CharacterStateRunning(_character, this); }
     public CharacterState Dashing() { return new CharacterStateDashing(_character, this); }
+    public CharacterState CommandMovement() { return new CharacterStateCommandMovement(_character, this); }
 
     // action
     public CharacterState Ready() { return new CharacterStateReady(_character, this); }

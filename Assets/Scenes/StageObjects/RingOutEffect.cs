@@ -12,7 +12,7 @@ public class RingOutEffect : Effect
         Character = Target.GetComponent<Character>();
 
         Character.TakeDamage(Character.transform.position, RingOutDamage, HitTier.Pure);
-        Character.HorizontalVelocity = Vector3.zero;
+        Character.Velocity = Vector3.zero;
 
         if (Character == null) {
             Destroy(gameObject);

@@ -43,7 +43,7 @@ public class Hit : Trigger, ICollidable {
     public override void OnCollideWith(ICollidable Other, CollisionInfo info) {
         Physics.Raycast(
                 transform.position,
-                Other.GetCollider().transform.position,
+                Other.Collider.transform.position,
                 out RaycastHit hitInfo,
                 (1<<LayerMask.NameToLayer("Characters"))
                 | (1<<LayerMask.NameToLayer("Projectiles")) // TODO dunno if this will hit shields, but it should
@@ -74,7 +74,7 @@ public class Hit : Trigger, ICollidable {
             ) {
                 return;
             } else {
-                Vector3 knockBackVector = GetKnockBackVector(OtherMover.GetTransform().position);
+                Vector3 knockBackVector = GetKnockBackVector(OtherMover.Transform.position);
                 float targetKnockbackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
                     hitLagDuration,
@@ -86,7 +86,7 @@ public class Hit : Trigger, ICollidable {
                 if (targetKnockbackFactor < 0f && (Caster is IMoves thisMover)) {
                     // TODO this might apply knockback to things other than characters
                     thisMover.TakeKnockBack(
-                        thisMover.GetTransform().position,
+                        thisMover.Transform.position,
                         hitLagDuration,
                         knockBackVector,
                         hitStunDuration,

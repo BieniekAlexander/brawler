@@ -115,7 +115,7 @@ public class CharacterStateBlocking : CharacterState {
                         MovementUtils.inXZ(Character.Velocity),
                         -dSpeed*Time.deltaTime
                     ),
-                    Character.WalkSpeedMax,
+                    Character.BaseSpeed,
                     Mathf.Infinity
             );
         }

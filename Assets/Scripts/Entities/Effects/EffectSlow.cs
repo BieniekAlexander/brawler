@@ -11,7 +11,7 @@ public class StatusEffectSlow: Effect {
     public override void Initialize(MonoBehaviour _target) {
         if (_target.CompareTag("Character")) {
             base.Initialize(_target);
-            Character.WalkSpeedMax *= slowFactor;
+            Character.BaseSpeed *= slowFactor;
         } else {
             throw new NotImplementedException("haven't programmed slow ability to slow all movable things");
         }
@@ -19,7 +19,7 @@ public class StatusEffectSlow: Effect {
 
     public override void Expire() {
         if (Character != null) {
-            Character.WalkSpeedMax /= slowFactor;
+            Character.BaseSpeed /= slowFactor;
         }
     }
 

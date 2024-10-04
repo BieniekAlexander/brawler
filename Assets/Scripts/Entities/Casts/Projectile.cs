@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
-{
+public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     /* Movement */
     public Vector3 Velocity { get; set; } = new();
     public CommandMovement CommandMovement { get; set; }
@@ -17,6 +16,11 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
     // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
     [SerializeField] Positioning Positioning = Positioning.Directional;
     private Quaternion InitialRotation;
+
+    public void Awake() {
+        _collider = GetComponent<Collider>();
+        base.Awake();
+    }
 
     public void Start() {
         // TODO maybe make use of the Target transform instead? I took a while to debug this when trying to get the AI Agent to shoot,
@@ -55,6 +59,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
     }
 
     /* IMoves Methods */
+    public float BaseSpeed { get { return MaxSpeed; } set { MaxSpeed = value; } }
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) {
         return 0f;
     }
@@ -64,7 +69,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
             // https://www.youtube.com/watch?v=Z6qBeuN-H1M
             Vector3 targetDirection = Target.position - transform.position;
             Quaternion targetRotation = Quaternion.FromToRotation(Velocity, targetDirection);
-            
+
             Quaternion newRotation = Quaternion.RotateTowards(
                 Quaternion.Euler(Velocity.normalized),
                 targetRotation,
@@ -78,13 +83,15 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
         transform.position += Velocity * Time.deltaTime;
     }
 
-    public Transform GetTransform() { return transform; }
+    public Transform Transform { get { return transform; } }
 
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
         return 0f; // TODO I won't let this take knockback right now, but maybe!
     }
 
     /* ICollidable Methods */
+    private Collider _collider;
+
     public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
     }
@@ -109,9 +116,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts
         }
     }
 
-    public Collider GetCollider() {
-        return GetComponent<Collider>();
-    }
+    public Collider Collider { get { return _collider; } } // TODO cache collider
 
     public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
         HP -= damage;

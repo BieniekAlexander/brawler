@@ -89,7 +89,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int BusyTimer { get; set; } = 0;
 
     // Walking
-    public float WalkSpeedMax { get; set; } = 7.5f;
     private float gravity = -.5f;
 
     /* Visuals */
@@ -343,7 +342,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     castContainer.charges--;
                     castContainer.timer = castContainer.cooldown;
                     BusyTimer = castContainer.castPrefab.startupTime;
-                    CastEncumberedTimer = (castContainer.castPrefab.Encumbering)? BusyTimer:0;
+                    CastEncumberedTimer = (castContainer.castPrefab.Encumbering) ? BusyTimer : 0;
                     return true;
                 } else {
                     return false;
@@ -418,6 +417,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private void Awake() {
         // Controls
         if (me) SetMe(); // TODO lazy way to set up controls
+        _collider = GetComponent<Collider>();
         GameObject cursorGameObject = new GameObject("Player Cursor Object");
         cursorGameObject.transform.parent = transform;
         CursorTransform = cursorGameObject.transform;
@@ -575,9 +575,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (Velocity.y>0) {
             return false;
         } else {
-        // TODO ugly implementation for now - checking if grounded, updating if true, returning false if not
-        int excludeAllButTerrainLayer = 1<<LayerMask.NameToLayer("Terrain");
-        Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, excludeAllButTerrainLayer);
+            // TODO ugly implementation for now - checking if grounded, updating if true, returning false if not
+            int excludeAllButTerrainLayer = 1<<LayerMask.NameToLayer("Terrain");
+            Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, excludeAllButTerrainLayer);
             if (hitInfo.transform) {
                 standingY = hitInfo.point.y + cc.radius + standingOffset;
                 return true;
@@ -602,8 +602,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void UpdateCursorTransformWorldPosition() {
-        if (me){
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (me) {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (aimPlane.Raycast(ray, out float distance)) {
                 CursorTransform.position = ray.GetPoint(distance);
@@ -614,7 +614,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* IMoves Methods */
-    public Transform GetTransform() { return transform; }
+    public float BaseSpeed { get; set; } = 7.5f;
+    public Transform Transform { get { return transform; } }
 
     public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
         if (HitTier==HitTier.Soft) return 0;
@@ -635,7 +636,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // \left(\left(x-.5\right)\right)^{2}+\left(y\right)^{2}>\left(x^{2}+y^{2}\right)
         // x^{2}+y^{2}=1
         if (Shield.isActiveAndEnabled) {
-            return !(Shield.GetCollider().bounds.Contains(contactPoint));
+            return !(Shield.Collider.bounds.Contains(contactPoint));
         } else {
             return false;
         }
@@ -716,16 +717,15 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* ICollidable */
+    private Collider _collider;
+
     public void OnCollideWith(ICollidable other, CollisionInfo info) {
         _state.OnCollideWith(other, info);
     }
 
     public void HandleCollisions() {
-        ;
+        CollisionUtils.HandleCollisions(this);
     }
 
-    public Collider GetCollider() {
-        // TODO this might be poor performance, but it's the quickest way for me to get this for now
-        return GetComponent<Collider>();
-    }
+    public Collider Collider { get { return GetComponent<Collider>(); } }
 }

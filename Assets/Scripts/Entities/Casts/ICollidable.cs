@@ -13,6 +13,11 @@ public static class ColliderPhysicsUtils {
         return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
     }
 
+    public static void ToWorldSpaceSphere(this SphereCollider sphere, out Vector3 center, out float radius) {
+        center = sphere.transform.TransformPoint(sphere.center);
+        radius = sphere.radius * MaxVec3(AbsVec3(sphere.transform.lossyScale));
+    }
+
     public static void ToWorldSpaceBox(this BoxCollider box, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation) {
         orientation = box.transform.rotation;
         center = box.transform.TransformPoint(box.center);
@@ -54,9 +59,19 @@ public static class ColliderPhysicsUtils {
         point1 = center - dir * (height * 0.5f - radius);
     }
 
-    public static void ToWorldSpaceSphere(this SphereCollider sphere, out Vector3 center, out float radius) {
-        center = sphere.transform.TransformPoint(sphere.center);
-        radius = sphere.radius * MaxVec3(AbsVec3(sphere.transform.lossyScale));
+    public static void ToWorldSpaceCharacterCapsule(this CharacterController capsule, out Vector3 point0, out Vector3 point1, out float radius) {
+        // adapted from ToWorldSpaceCapsule - for a CharacterController, direction is always Vector3.up
+        var center = capsule.transform.TransformPoint(capsule.center);
+        radius = capsule.radius;
+        float height = capsule.height;
+        Vector3 dir = capsule.transform.TransformDirection(Vector3.up);
+
+        if (height < radius*2f) {
+            dir = Vector3.zero;
+        }
+
+        point0 = center + dir * (height * 0.5f - radius);
+        point1 = center - dir * (height * 0.5f - radius);
     }
 }
 
@@ -90,7 +105,14 @@ public static class CollisionUtils {
             return from c in Physics.OverlapCapsule(point0, point1, radius)
                    where (c!=collider)
                    select c;
-        } else if (collider is SphereCollider sphere) {
+        } else if (collider is CharacterController character) {
+            ColliderPhysicsUtils.ToWorldSpaceCharacterCapsule(character, out Vector3 point0, out Vector3 point1, out float radius);
+
+            return from c in Physics.OverlapCapsule(point0, point1, radius)
+                   where (c!=collider)
+                   select c;
+        }
+        else if (collider is SphereCollider sphere) {
             ColliderPhysicsUtils.ToWorldSpaceSphere(sphere, out Vector3 point, out float radius);
 
             return from c in Physics.OverlapSphere(point, radius)
@@ -103,6 +125,7 @@ public static class CollisionUtils {
                    where (c!=collider)
                    select c;
         } else {
+            Debug.Log($"Unhandled Collider type in {collider}");
             throw new NotImplementedException("unhandled collider type");
         }
     }
@@ -113,7 +136,7 @@ public static class CollisionUtils {
     /// <param name="ThisCollidable"></param>
     /// <param name="CollisionLog"></param>
     public static void HandleCollisions(ICollidable ThisCollidable, HashSet<ICollidable> CollisionLog) {
-        if (ThisCollidable.GetCollider() is Collider collider && collider != null) {
+        if (ThisCollidable.Collider is Collider collider && collider != null) {
             foreach (Collider otherCollider in GetOverlappingColliders(collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
                     if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {
@@ -124,12 +147,33 @@ public static class CollisionUtils {
         }
     }
 
-    public static void HandleCollisions(ICollidable ThisCollidable) {
-        HandleCollisions(ThisCollidable, null);
+    public static void HandleCollisions(ICollidable thisCollidable) {
+        HandleCollisions(thisCollidable, null);
+    }
+    
+    public static Vector3 GetDecollisionVector(ICollidable thisCollidable, ICollidable otherCollidable) {
+        if (thisCollidable is IMoves Mover) {
+            if (Physics.ComputePenetration(
+                thisCollidable.Collider,
+                thisCollidable.Transform.position,
+                thisCollidable.Transform.rotation,
+                otherCollidable.Collider,
+                otherCollidable.Transform.position,
+                otherCollidable.Transform.rotation,
+                out Vector3 direction,
+                out float distance
+            )) {
+                return direction * (Mover.BaseSpeed*Time.deltaTime*.2f+.1f);
+            } else {
+                return Vector3.zero;
+            }
+        } else {
+            return Vector3.zero;
+        }
     }
 }
 
-public class CollisionInfo {
+    public class CollisionInfo {
     public Vector3 Normal;
     
     public CollisionInfo(Vector3 _normal) {
@@ -146,5 +190,6 @@ public interface ICollidable {
 
     public void HandleCollisions();
 
-    public Collider GetCollider();
+    public Collider Collider { get; }
+    public Transform Transform { get; }
 }

@@ -27,7 +27,7 @@ public class Grab : Trigger, ICollidable {
                 OtherMover.CommandMovement = commandMovementLock;
                 commandMovementLock.Initialize(
                     OtherMover,
-                    (Caster as IMoves).GetTransform()
+                    (Caster as IMoves).Transform
                 );
             }
 
@@ -39,7 +39,7 @@ public class Grab : Trigger, ICollidable {
                     Caster.GetTargetTransform(),
                     true
                 );
-            } else if (other.GetCollider().transform.GetComponent<Shield>() is Shield Shield) {
+            } else if (other.Collider.transform.GetComponent<Shield>() is Shield Shield) {
                 Character Owner = Shield.GetComponentInParent<Character>();
                 if (GetClosestGameObject(gameObject, Owner.gameObject, Owner.gameObject)==Shield.gameObject
                     && (int)HitTier <= (int)Shield.ShieldTier)

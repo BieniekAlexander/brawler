@@ -80,9 +80,16 @@ public class CharacterStateIdle : CharacterState {
         }
     }
 
+    /// <summary>
+    /// If I'm stationary and inside another character, push myself out
+    /// </summary>
+    /// <param name="collidable"></param>
+    /// <param name="info"></param>
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+        if (collidable is Character otherCharacter) {
+            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
+            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
+        } else if (collidable is StageTerrain terrain) {
             Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
             Character.Velocity = MovementUtils.setXZ(Character.Velocity, bounceDirection*Character.Velocity.magnitude);
@@ -106,7 +113,7 @@ public class CharacterStateWalking : CharacterState {
             return Factory.Dashing();
         } else if (Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
             return Factory.Idle();
-        } else if (MovementUtils.inXZ(Character.Velocity).magnitude>Character.WalkSpeedMax+.1f) {
+        } else if (MovementUtils.inXZ(Character.Velocity).magnitude>Character.BaseSpeed+.1f) {
             return Factory.Running();
         } else {
             return null;
@@ -124,7 +131,7 @@ public class CharacterStateWalking : CharacterState {
         // TODO what if I'm in the air? Air control?
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
         float dSpeed = Mathf.Clamp(
-            Character.WalkSpeedMax - Vector3.Dot(horizontalVelocity, Character.InputMoveDirection),
+            Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.InputMoveDirection),
             0, _acceleration*Time.deltaTime
         );
 
@@ -134,7 +141,7 @@ public class CharacterStateWalking : CharacterState {
                 ? (Character.InputRunning ? Vector3.zero : (-horizontalVelocity.normalized))
                 : Character.InputMoveDirection
             ),
-            Mathf.Max(Character.WalkSpeedMax, horizontalVelocity.magnitude)
+            Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude)
         );
         Character.Velocity = MovementUtils.setXZ(
             Character.Velocity,
@@ -263,7 +270,7 @@ public class CharacterStateDashing : CharacterState {
         _boostTimer = _boostMaxDuration;
         Character.Charges--;
 
-        _boostSpeedEnd = Mathf.Max(MovementUtils.inXZ(Character.Velocity).magnitude, Character.WalkSpeedMax)+_boostSpeedBump;
+        _boostSpeedEnd = Mathf.Max(MovementUtils.inXZ(Character.Velocity).magnitude, Character.BaseSpeed)+_boostSpeedBump;
         float boostSpeedStart = _boostSpeedEnd + 2*_boostSpeedBump;
         boostDecay = (_boostSpeedEnd-boostSpeedStart)/_boostMaxDuration;
 
@@ -305,8 +312,8 @@ public class CharacterStateDashing : CharacterState {
                 Character.Velocity-=dvNormal;
                 otherCharacter.Velocity=MovementUtils.inXZ(Character.Velocity)+dvNormal;
             }
-        } else if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+        } else if (collidable is StageTerrain terrain && info!=null) {
+            // TODO sometimes this collision is breaking because info is null?
             Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
             Character.Velocity = MovementUtils.inY(Character.Velocity) + MovementUtils.inXZ(bounceDirection*Character.Velocity.magnitude);

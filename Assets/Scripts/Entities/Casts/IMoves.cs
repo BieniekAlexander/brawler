@@ -3,7 +3,9 @@ using UnityEngine;
 public interface IMoves {
     /// <summary/>
     /// <returns>the <typeparamref name="Transform"/></returns>
-    public Transform GetTransform();
+    public Transform Transform { get; }
+
+    public float BaseSpeed { get; set; }
 
     /// <summary>
     /// Getter/Setter of Velocity

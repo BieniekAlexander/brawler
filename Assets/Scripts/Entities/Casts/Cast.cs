@@ -66,7 +66,7 @@ public class Cast : MonoBehaviour, ICastMessage {
 
             if (commandMovementPrefab != null) {
                 if ((Caster as MonoBehaviour) is IMoves Mover) {
-                    CommandMovement commandMovement = Instantiate(commandMovementPrefab, Mover.GetTransform());
+                    CommandMovement commandMovement = Instantiate(commandMovementPrefab, transform);
                     commandMovement.Initialize(Mover, Caster.GetTargetTransform());
                     Mover.CommandMovement = commandMovement;
                 }

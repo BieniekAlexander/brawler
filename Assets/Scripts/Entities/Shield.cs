@@ -8,13 +8,13 @@ public enum ShieldTier {
 
 public class Shield : MonoBehaviour, ICollidable {
     [HideInInspector] public ShieldTier ShieldTier = ShieldTier.Exposed;
-    [HideInInspector] Collider Collider;
     public Material Material { get; set; }
+    public Transform Transform { get { return transform; } }
     
     // public float - TODO should I tie the shield to a resource?
 
     private void Awake() {
-        Collider = GetComponent<Collider>();
+        _collider = GetComponent<Collider>();
         Material = GetComponent<Renderer>().material;
     }
 
@@ -36,6 +36,8 @@ public class Shield : MonoBehaviour, ICollidable {
     }
 
     /* ICollidable Methods */
+    private Collider _collider;
+
     public void OnCollideWith(ICollidable other, CollisionInfo info) {
         ;
         // TODO currently no-op
@@ -46,7 +48,5 @@ public class Shield : MonoBehaviour, ICollidable {
         CollisionUtils.HandleCollisions(this, null);
     }
 
-    public Collider GetCollider() {
-        return Collider;
-    }
+    public Collider Collider { get { return _collider; } }
 }

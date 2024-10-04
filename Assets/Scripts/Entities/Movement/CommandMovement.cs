@@ -9,11 +9,15 @@ public abstract class CommandMovement : MonoBehaviour {
     public Vector3 Velocity { get; set; }
     public int Frame { get; private set; } = 0;
     public List<Effect> Effects { get; private set; } = new();
+    public IMoves Mover { get; private set; }
+    public Transform Target { get; private set; }
 
     public virtual void Initialize(IMoves mover, Transform target) {
-        Path = (target.position-mover.GetTransform().position).normalized
+        Mover = mover;
+        Target = target;
+        Path = (target.position-mover.Transform.position).normalized
             * Mathf.Min(
-                (target.position-mover.GetTransform().position).magnitude,
+                (target.position-mover.Transform.position).magnitude,
                 Range
             );
     }

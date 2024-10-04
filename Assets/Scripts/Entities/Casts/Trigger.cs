@@ -193,12 +193,12 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     /* Transform */
     [SerializeField] public List<TriggerTransformation> TriggerTransformations;
 
-    /* Collision */
-    [HideInInspector] public Collider Collider;
+    /* ICollidabl & Collision */
     [SerializeField] public List<Effect> effects = new();
     [SerializeField] public bool RedundantCollisions = false;
     [SerializeField] public bool DissapearOnTrigger = false;
     private HashSet<ICollidable> CollisionLog = new();
+    public Transform Transform { get { return transform; } }
 
     /* Utility Functions */
     public static GameObject GetClosestGameObject(GameObject reference, params GameObject[] others) {
@@ -212,12 +212,14 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
 
     /* State Handling */
     public void Awake() {
-        Collider=GetComponent<Collider>();
+        _collider = GetComponent<Collider>();
 
-        if (Collider is CapsuleCollider cc) {
+        if (_collider is CapsuleCollider cc) {
             // https://discussions.unity.com/t/capsule-collider-how-direction-change-to-z-axis-c/225672/2
             Assert.IsTrue(cc.direction==0);
         }
+
+        base.Awake();
     }
 
     public void Initiate(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
@@ -273,7 +275,8 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f; }
 
     /* ICollidable Methods */
-    public Collider GetCollider() { return Collider; }
+    private Collider _collider;
+    public Collider Collider { get { return _collider; } } // TODO cache collider
 
     public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this, RedundantCollisions ? null : CollisionLog);

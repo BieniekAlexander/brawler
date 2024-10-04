@@ -52,6 +52,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -59,30 +60,30 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -70.16931, y: 0.61018443}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.3546068, y: 0.61176306, z: -0.61176306, w: -0.3546068}
   - PolarPosition: {x: -62.561596, y: 0.7335155}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
     Rotation: {x: -0.35005143, y: 0.6143811, z: -0.6143811, w: -0.35005143}
-  - PolarPosition: {x: -53.858658, y: 0.7392598}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.34899926, y: 0.61497927, z: -0.61497927, w: -0.34899926}
-  - PolarPosition: {x: -43.479237, y: 0.7993122}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.30989563, y: 0.6355822, z: -0.6355822, w: -0.30989563}
-  - PolarPosition: {x: -35.83765, y: 0.88814414}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.32277128, y: 0.6291413, z: -0.6291413, w: -0.32277128}
-  - PolarPosition: {x: -31.938446, y: 0.90735877}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.34993812, y: 0.6144456, z: -0.6144456, w: -0.34993812}
-  - PolarPosition: {x: -29.054607, y: 0.9266068}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.39594808, y: 0.5858542, z: -0.5858542, w: -0.39594808}
-  - PolarPosition: {x: -28.515553, y: 0.9218294}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
+  - PolarPosition: {x: -52.29343, y: 0.8354892}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.36424744, y: 0.6060725, z: -0.6060725, w: -0.3642474}
+  - PolarPosition: {x: -45.860504, y: 0.8945911}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.432771, y: 0.55920416, z: -0.55920416, w: -0.432771}
+  - PolarPosition: {x: -35.33566, y: 0.9561427}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.4559098, y: 0.5405056, z: -0.54050565, w: -0.45590973}
+  - PolarPosition: {x: -20.659756, y: 1.0345285}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.44287902, y: 0.5512333, z: -0.55123335, w: -0.44287902}
+  - PolarPosition: {x: -8.261108, y: 1.1135547}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.42946985, y: 0.5617434, z: -0.56174344, w: -0.42946985}
+  - PolarPosition: {x: -1.8279915, y: 1.1285744}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.45534143, y: 0.54098445, z: -0.5409845, w: -0.45534146}
+  - PolarPosition: {x: 4.3028855, y: 1.1462308}
+    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
+    Rotation: {x: -0.44726226, y: 0.5476829, z: -0.54768294, w: -0.4472623}
   - PolarPosition: {x: -28.515553, y: 0.9218294}
     Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
     Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
@@ -97,7 +98,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 1
-  BaseKnockbackVector: {x: 0, y: 15, z: 10}
+  BaseKnockbackVector: {x: 10, y: 0, z: 2}
   HitTier: 3
   hitLagDuration: 15
   hitStunDuration: 20

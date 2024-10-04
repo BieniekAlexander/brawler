@@ -52,6 +52,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -59,24 +60,24 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: 25.887028, y: 0.75584394}
+  - PolarPosition: {x: -25.887028, y: 0.75584394}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.53667575, z: 0, w: -0.84378856}
-  - PolarPosition: {x: 22.56701, y: 0.8338465}
+    Rotation: {x: 0, y: 0.53667575, z: 0, w: -0.8437886}
+  - PolarPosition: {x: -22.56701, y: 0.8338465}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.4557219, z: 0, w: -0.89012223}
-  - PolarPosition: {x: 14.620888, y: 0.9507892}
+    Rotation: {x: 0, y: 0.45572194, z: 0, w: -0.89012223}
+  - PolarPosition: {x: -14.620888, y: 0.9507892}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.41075397, z: 0, w: -0.9117462}
-  - PolarPosition: {x: 10.619655, y: 0.9767292}
+    Rotation: {x: 0, y: 0.41075397, z: 0, w: -0.9117462}
+  - PolarPosition: {x: -10.619655, y: 0.9767292}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.40745935, z: 0, w: -0.9132233}
-  - PolarPosition: {x: 10.619655, y: 0.9767292}
+    Rotation: {x: 0, y: 0.40745935, z: 0, w: -0.9132233}
+  - PolarPosition: {x: -10.619655, y: 0.9767292}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.40745935, z: 0, w: -0.9132233}
-  - PolarPosition: {x: 10.619655, y: 0.9767292}
+    Rotation: {x: 0, y: 0.40745935, z: 0, w: -0.9132233}
+  - PolarPosition: {x: -10.619655, y: 0.9767292}
     Dimension: {x: 0.5116026, y: 0.126248, z: 0.114452004}
-    Rotation: {x: 0, y: -0.40745935, z: 0, w: -0.9132233}
+    Rotation: {x: 0, y: 0.40745935, z: 0, w: -0.9132233}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
@@ -85,7 +86,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 10}
+  BaseKnockbackVector: {x: 0, y: 0, z: 6}
   HitTier: 1
   hitLagDuration: 3
   hitStunDuration: 5

@@ -119,7 +119,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* Abilities */
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
-    public CastContainer[] castContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
+    public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     private int inputCastId = -1;
@@ -305,7 +305,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <param name="castId"></param>
     /// <returns>Whether the cast was initiated or not</returns>
     private bool StartCast(int castId) {
-        ref CastContainer castContainer = ref castContainers[castId];
+        ref CastContainer castContainer = ref CastContainers[castId];
 
         if (castContainer.cast is not null) {
             // we're updating another cast - allowed
@@ -361,24 +361,24 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         CastEncumberedTimer--;
 
         // resolve cooldowns and cast expirations
-        for (int i = 0; i<castContainers.Length; i++) {
-            if (castContainers[i].charges < castSlots[i].defaultChargeCount) {
-                if (--castContainers[i].timer<=0) {
-                    castContainers[i].charges++;
-                    castContainers[i].timer = castSlots[i].cooldown;
+        for (int i = 0; i<CastContainers.Length; i++) {
+            if (CastContainers[i].charges < castSlots[i].defaultChargeCount) {
+                if (--CastContainers[i].timer<=0) {
+                    CastContainers[i].charges++;
+                    CastContainers[i].timer = castSlots[i].cooldown;
                 }
             }
 
-            if (castContainers[i].cast == null) {
-                castContainers[i].cast = null;
+            if (CastContainers[i].cast == null) {
+                CastContainers[i].cast = null;
             }
         }
         // resolve cast startup
         int j = (int)inputCastId;
         if (j >= 0) { // if an active cast is designated
-            if (castContainers[j].cast == null) {
+            if (CastContainers[j].cast == null) {
                 inputCastId = -1;
-            } else if (castContainers[j].cast.Frame >= castContainers[j].cast.startupTime) { // if startup time has elapsed
+            } else if (CastContainers[j].cast.Frame >= CastContainers[j].cast.startupTime) { // if startup time has elapsed
                 inputCastId = -1;
             }
         }
@@ -401,7 +401,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public IEnumerable<Castable> ActiveCastables {
         get {
             return (
-                from castContainer in castContainers
+                from castContainer in CastContainers
                 where castContainer.cast != null
                 select castContainer.cast.ActiveCastables
             ).SelectMany(castable => castable);
@@ -440,7 +440,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         tr = GetComponent<TrailRenderer>();
 
         for (int i = 0; i<castSlots.Length; i++) {
-            castContainers[i] = new CastContainer(castSlots[i]);
+            CastContainers[i] = new CastContainer(castSlots[i]);
         }
     }
 

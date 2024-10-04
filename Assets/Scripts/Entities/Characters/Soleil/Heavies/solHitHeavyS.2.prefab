@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 468869571193420691}
   - component: {fileID: 8505069744054384372}
   - component: {fileID: 4389762314818548743}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: solHitHeavyS.2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,33 +133,33 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: 30, y: 0.6}
+  - PolarPosition: {x: 29.999994, y: 0.6}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.7071067}
+  - PolarPosition: {x: 29.962996, y: 0.71680194}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.67369974, z: 0, w: 0.73900527}
+  - PolarPosition: {x: 27.305511, y: 0.830545}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.60006976, z: 0, w: 0.7999477}
+  - PolarPosition: {x: 25.142397, y: 0.8826245}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.49778336, z: 0, w: 0.86730146}
+  - PolarPosition: {x: 23.40556, y: 0.9087777}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.37777075, z: 0, w: 0.92589915}
+  - PolarPosition: {x: 20.248962, y: 0.9390346}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.27678415, z: 0, w: 0.96093214}
+  - PolarPosition: {x: 17.54066, y: 0.9522778}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.15479003, z: 0, w: 0.98794746}
+  - PolarPosition: {x: 11.732636, y: 0.9835492}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
-  - PolarPosition: {x: 30, y: 0.6}
+    Rotation: {x: 0, y: 0.17814007, z: 0, w: 0.9840052}
+  - PolarPosition: {x: 7.195111, y: 1.0139848}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0.70710677, z: 0, w: 0.70710677}
+    Rotation: {x: 0, y: 0.20075588, z: 0, w: 0.9796413}
   Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
@@ -168,7 +168,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: -2, y: 0, z: 8}
+  BaseKnockbackVector: {x: -2, y: 0, z: 15}
   HitTier: 3
   hitLagDuration: 7
   hitStunDuration: 20

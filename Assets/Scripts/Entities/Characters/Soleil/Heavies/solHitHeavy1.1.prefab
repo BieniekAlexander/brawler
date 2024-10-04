@@ -52,6 +52,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -97,9 +98,9 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 1
-  BaseKnockbackVector: {x: 0, y: 15, z: 10}
+  BaseKnockbackVector: {x: 0, y: 7, z: 10}
   HitTier: 3
-  hitLagDuration: 15
+  hitLagDuration: 10
   hitStunDuration: 20
 --- !u!23 &2262089815033693738
 MeshRenderer:

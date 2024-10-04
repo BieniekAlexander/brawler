@@ -28,6 +28,7 @@ public abstract class Castable : MonoBehaviour, ICasts {
     [HideInInspector] public Transform Target; // TODO do I need this?
     [HideInInspector] public bool Mirror = false;
     [HideInInspector] public int Frame = 0;
+    [HideInInspector] public bool indefinite = false;
     [HideInInspector] public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
     [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
     [SerializeField]
@@ -37,6 +38,11 @@ public abstract class Castable : MonoBehaviour, ICasts {
             .ToDictionary(t => t, t => new Castable[0])
         as ConditionCastablesDictionary
     );
+
+    public void Awake() {
+        if (Duration<0)
+            indefinite = true;
+    }
 
     /// <summary>
     /// To be run right when the Castable is casted by a caster.
@@ -116,7 +122,7 @@ public abstract class Castable : MonoBehaviour, ICasts {
             }
         }
 
-        if (Frame++ == Duration) {
+        if (++Frame == Duration && !indefinite) {
             Destroy(gameObject);
         }
     }

@@ -232,15 +232,11 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
         UpdateTransform(0);
     }
 
-    public void FixedUpdate() {
-        // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they will
-        if (Frame>=Duration) {
-            Destroy(gameObject);
-        }
-
+    public override void FixedUpdate() {
+        // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they 
         UpdateTransform(Frame);
         HandleCollisions();
-        Frame++;
+        base.FixedUpdate();
     }
 
     /* IMoves Methods */
@@ -298,12 +294,6 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     }
 
     public void OnBeforeSerialize() {
-        /*
-        if (TriggerTransformations!=null && TriggerTransformations.Count > 0) {
-            transform.position = TriggerTransformations[0].Position;
-            transform.rotation = TriggerTransformations[0].Rotation;
-            transform.localScale = TriggerTransformations[0].Dimension;
-        }*/
     }
 
     public void OnAfterDeserialize() {

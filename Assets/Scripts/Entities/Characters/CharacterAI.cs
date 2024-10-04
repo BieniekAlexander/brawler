@@ -45,6 +45,7 @@ public class CharacterAI : Agent
         sensor.AddObservation(getDistancesToEdges(character.transform, floor)); // +2 = 3
         sensor.AddObservation(enemy.transform.position-character.transform.position); // +3 = 6
         sensor.AddObservation(character.Velocity); // +3 = 9
+        sensor.AddObservation(character.IsGrounded()); // +1 = 10
     }
 
     public override void Heuristic(in ActionBuffers actionsOut) {
@@ -78,12 +79,10 @@ public class CharacterAI : Agent
             aim = UnityEngine.Vector3.right;
         }
         character.LookDirection = aim.normalized;
-
-        
     }
 
     private void FixedUpdate() {
-        float frameRewardTotal = character.DamageDealt;
+        float frameRewardTotal = 2*character.DamageDealt;
 
         if (lastFrameHP != character.HP) {
             frameRewardTotal += character.HP-lastFrameHP;
@@ -93,13 +92,11 @@ public class CharacterAI : Agent
         AddReward(frameRewardTotal);
 
         if (episodeTimer--==0 || character == null || character.HP<=0 || enemy.HP==0) {
-            Debug.Log($"cumulative reward: {GetCumulativeReward()}");
             EndEpisode();
         }
     }
 
     public override void OnEpisodeBegin() {
-        Debug.Log("restarting");
         episodeTimer = maxEpisodeTimer;
         character.HP = Character.HPMax;
         lastFrameHP = Character.HPMax;

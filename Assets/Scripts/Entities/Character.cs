@@ -61,7 +61,6 @@ public enum CastId {
 }
 
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
-
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
 
@@ -70,26 +69,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public CharacterState State { get { return _state; } set { _state = value; } }
     CharacterStateFactory StateFactory;
 
-    /* Movement */
-    public CharacterController cc { get; set; }
-    public Vector3 Velocity { get; set; } = Vector3.zero;
-    public int CastEncumberedTimer { get; set; } = 0;
 
-    public CommandMovement CommandMovement { get; set; } = null;
-    public bool Stunned { get; set; } = false;
-    private float standingY; private float standingOffset = .1f;
-
-    // knockback
-    public HitTier KnockBackHitTier { get; set; }
-    public float KnockBackDecay { get; private set; } = 1f;
-    public Vector3 KnockBack { get; set; } = new();
-    public int HitStunTimer { get; set; } = 0;
-    public int HitStopTimer { get; set; } = 0;
-    public int RecoveryTimer { get; set; } = 0;
+    
     public int BusyTimer { get; set; } = 0;
-
-    // Walking
-    private float gravity = -.5f;
 
     /* Visuals */
     // Bolt Visualization
@@ -125,10 +107,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int CastIdBuffer { get; set; } = -1;
 
     /* Resources */
-    public int HP { get; set; } = HPMax;
-    public static int HPMax = 1000;
-    public bool Reflects { get; set; } = false;
-    private int healMax; private int healMaxOffset = 100;
     private int maxCharges = 5;
     public int Charges { get; set; } = 3;
     private int chargeCooldownMax = 60;
@@ -385,6 +363,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* ICasts Methods */
     // TODO bake these into getters
+    public int SilenceStack { get; set; } = 0;
+    public int MaimStack { get; set; } = 0;
+
     public bool IsRotatingClockwise() {
         return RotatingClockwise;
     }
@@ -616,6 +597,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* IMoves Methods */
     public float BaseSpeed { get; set; } = 7.5f;
     public Transform Transform { get { return transform; } }
+    public CharacterController cc { get; set; }
+    public Vector3 Velocity { get; set; } = Vector3.zero;
+    public int CastEncumberedTimer { get; set; } = 0;
+    public int StunStack { get; set; } // stuns
+    public Transform ForceMoveDestination { get; set; } = null; // taunts, fears, etc.
+    public CommandMovement CommandMovement { get; set; } = null;
+    private float gravity = -.5f;
+    private float standingY; private float standingOffset = .1f;
+    public HitTier KnockBackHitTier { get; set; }
+    public float KnockBackDecay { get; private set; } = 1f;
+    public Vector3 KnockBack { get; set; } = new();
+    public int HitStunTimer { get; set; } = 0;
+    public int HitStopTimer { get; set; } = 0;
+    public int RecoveryTimer { get; set; } = 0;
 
     public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
         if (HitTier==HitTier.Soft) return 0;
@@ -678,13 +673,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* IDamageable Methods */
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="_contactPoint"></param>
-    /// <param name="damage"></param>
+    public int HP { get; set; } = HPMax;
+    public static int HPMax = 1000;
+    private int healMax; private int healMaxOffset = 100;
+    public List<Armor> Armors { get; } = new List<Armor>();
+    public int ParryWindow { get; set; } = 0;
+    public int InvulnerableStack { get; set; } = 0;
+
     public int TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
         // TODO add some sort of implementation to ignore shield
+        // TODO add taking damage from armor before HP
         if ((hitTier!=HitTier.Pure) && (invincible || HitsShield(_contactPoint))) return 0;
 
         HP -= damage;
@@ -700,6 +698,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int TakeHeal(int damage) {
         HP = Math.Max(HP+damage, healMax);
         return Math.Min(damage, healMax-damage); // TODO I think this calculation is correct, but I'm not positive :)
+    }
+
+    public void TakeArmor(Armor armor) {
+        Armors.Add(armor);
     }
 
     public void OnDeath() {
@@ -718,9 +720,17 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* ICollidable */
     private Collider _collider;
+    public int ImmaterialStack { get; set; } = 0;
 
     public void OnCollideWith(ICollidable other, CollisionInfo info) {
-        _state.OnCollideWith(other, info);
+        if (other is Character otherCharacter
+            && (
+                ImmaterialStack > 0
+                || otherCharacter.ImmaterialStack > 0
+            )
+        ) return; else {
+            _state.OnCollideWith(other, info);
+        }
     }
 
     public void HandleCollisions() {

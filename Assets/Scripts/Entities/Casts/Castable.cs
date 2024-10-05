@@ -25,11 +25,14 @@ public abstract class Castable : MonoBehaviour, ICasts {
     [SerializeField] public int Duration;
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform Origin;
-    [HideInInspector] public Transform Target; // TODO do I need this?
+    [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirror = false;
     [HideInInspector] public int Frame = 0;
     [HideInInspector] public bool indefinite = false;
     [HideInInspector] public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
+    public int MaimStack { get {return 0; } set {; } }
+    public int SilenceStack { get { return 0; } set {; } }
+
     [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
     [SerializeField]
     public ConditionCastablesDictionary ConditionCastablesMap = (
@@ -52,9 +55,9 @@ public abstract class Castable : MonoBehaviour, ICasts {
     /// <param name="_target">The Transform towards which the castable was initially sent.</param>
     /// <param name="_rotatingClockwise">Whether, according the castable's movement, the trajcetory needs to be mirrored.</param>
     public virtual void Initialize(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
+        Target = _target;
         Caster = _caster;
         Origin = _origin;
-        Target = _target;
         Mirror = _mirrored;
     }
 

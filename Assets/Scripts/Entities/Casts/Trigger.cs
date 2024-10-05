@@ -199,6 +199,7 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     [SerializeField] public bool DissapearOnTrigger = false;
     private HashSet<ICollidable> CollisionLog = new();
     public Transform Transform { get { return transform; } }
+    public int ImmaterialStack { get { return 0; } set {; } }
 
     /* Utility Functions */
     public static GameObject GetClosestGameObject(GameObject reference, params GameObject[] others) {

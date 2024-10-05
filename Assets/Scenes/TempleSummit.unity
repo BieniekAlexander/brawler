@@ -192,7 +192,6 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 100, y: 0, z: 100}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  Collider: {fileID: 0}
   effects:
   - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
   RedundantCollisions: 1

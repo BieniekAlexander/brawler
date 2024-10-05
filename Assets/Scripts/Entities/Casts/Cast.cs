@@ -4,6 +4,7 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
+using static UnityEngine.GraphicsBuffer;
 
 public interface ICastMessage : IEventSystemHandler {
     // functions that can be called via the messaging system
@@ -30,9 +31,10 @@ public class Cast : MonoBehaviour, ICastMessage {
     [HideInInspector] public int Frame = 0;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public bool Encumbering = false;
+    [SerializeField] public bool DynamicTargeting = true;
     [SerializeField] public int duration;
     private bool rotatingClockwise = true;
-    public Transform CastAimPositionTransform { get; private set; }
+    public Transform Target { get; private set; }
 
     [HideInInspector] private ICasts Caster;
     [HideInInspector] public Transform Origin;
@@ -48,28 +50,21 @@ public class Cast : MonoBehaviour, ICastMessage {
     private void Initialize(ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
         Caster = _caster;
         Origin = _origin;
-        CastAimPositionTransform = _castAimPositionTransform;
         rotatingClockwise = _rotatingClockwise;
+
+        if (DynamicTargeting) {
+            Target = _castAimPositionTransform;
+        } else {
+            GameObject go = new("Cast Target");
+            go.transform.parent = transform;
+            go.transform.position = _castAimPositionTransform.position;
+            Target = go.transform;
+        }
+        
 
         foreach (KeyValuePair<CastableCondition, Castable[]> CastableEvents in ConditionCastablesMap) {
             foreach (Castable Castable in CastableEvents.Value) {
                 Assert.IsNotNull(Castable);
-            }
-        }
-
-        if (Caster != null) {
-            foreach (Effect sePrefab in effectPefabs) {
-                Effect se = Instantiate(sePrefab);
-                se.Initialize(Caster as MonoBehaviour);
-                statusEffects.Add(se);
-            }
-
-            if (commandMovementPrefab != null) {
-                if ((Caster as MonoBehaviour) is IMoves Mover) {
-                    CommandMovement commandMovement = Instantiate(commandMovementPrefab, transform);
-                    commandMovement.Initialize(Mover, Caster.GetTargetTransform());
-                    Mover.CommandMovement = commandMovement;
-                }
             }
         }
     }
@@ -82,7 +77,7 @@ public class Cast : MonoBehaviour, ICastMessage {
                         Castable,
                         Caster,
                         Origin,
-                        Caster.GetTargetTransform(),
+                        Target,
                         !Caster.IsRotatingClockwise()
                     )
                 );
@@ -90,17 +85,30 @@ public class Cast : MonoBehaviour, ICastMessage {
         }
 
         if (Frame==startupTime) {
-            if (ConditionCastablesMap.ContainsKey(CastableCondition.OnFinishStartup)) {
-                // I don't know that this is tecnically the right way to implement it, but it's okay for now
-                // the idea is, if I start a cast (say it takes 120 frames to run), and I run the cast to completion,
-                // create the casts
+            if (Caster != null) {
+                foreach (Effect sePrefab in effectPefabs) { // activate effects
+                    Effect se = Instantiate(sePrefab);
+                    se.Initialize(Caster as MonoBehaviour);
+                    statusEffects.Add(se);
+                }
+
+                if (commandMovementPrefab != null) { // set command movement
+                    if ((Caster as MonoBehaviour) is IMoves Mover) {
+                        CommandMovement commandMovement = Instantiate(commandMovementPrefab, transform);
+                        commandMovement.Initialize(Mover, Target);
+                        Mover.CommandMovement = commandMovement;
+                    }
+                }
+            }
+
+            if (ConditionCastablesMap.ContainsKey(CastableCondition.OnFinishStartup)) { // create any casts that required startup
                 foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnFinishStartup]) {
                     ActiveCastables.Add(
                         Castable.CreateCast(
                             Castable,
                             Caster,
                             Caster.GetOriginTransform(),
-                            Caster.GetTargetTransform(),
+                            Target,
                             !Caster.IsRotatingClockwise()
                         )
                     );

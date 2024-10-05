@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: -328604978404938118}
+  - component: {fileID: -4766296664684992488}
   m_Layer: 9
-  m_Name: CastAbility4
+  m_Name: gatCastAbility2
   m_TagString: Untagged
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-328604978404938118
+--- !u!114 &-4766296664684992488
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,8 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectPefabs: []
-  commandMovementPrefab: {fileID: -6070660620648995026, guid: b8e43f27a6c6c1844bc4ee1bb95c148b,
-    type: 3}
+  commandMovementPrefab: {fileID: 0}
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -56,6 +55,6 @@ MonoBehaviour:
   Frame: 0
   startupTime: 0
   Encumbering: 0
-  duration: 40
+  duration: 0
   Origin: {fileID: 0}
   statusEffects: []

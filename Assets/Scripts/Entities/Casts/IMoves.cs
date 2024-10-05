@@ -29,5 +29,9 @@ public interface IMoves {
     /// The degree of knockback taken by the target - if less than 0, the caller shall receive some knockback
     /// </returns>
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier);
-    // TODO I hope I don't accidentally have tow knockback events classinfinitely recurse :) I should make the implementation more explicit about that
+    // TODO I hope I don't accidentally have two knockback events infinitely recurse :) I should make the implementation more explicit about that
+
+    // Status effects
+    public int StunStack { get; set; } // stuns
+    public Transform ForceMoveDestination { get; set; } // taunts, fears, etc.
 }

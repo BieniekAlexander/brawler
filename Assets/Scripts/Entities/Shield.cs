@@ -49,4 +49,5 @@ public class Shield : MonoBehaviour, ICollidable {
     }
 
     public Collider Collider { get { return _collider; } }
+    public int ImmaterialStack { get { return 0; } set {; } }
 }

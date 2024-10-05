@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
@@ -7,9 +8,6 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     [SerializeField] float MaxSpeed = 15f;
     [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
-
-    /* Damage */
-    [SerializeField] int HP = 100;
 
     // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
     // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
@@ -23,8 +21,12 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     public void Start() {
-        // TODO maybe make use of the Target transform instead? I took a while to debug this when trying to get the AI Agent to shoot,
-        // because I was updating the Aim Cursor position, but not the transform's rotation, and so there's some redundancy in this implementation
+        // TODO clean this up later - currently copying target's position to a new transform
+        // because I'm having an issue where the Castable's parent cast expires, and the Target is destroyed
+        GameObject go = new GameObject("Projectile Target");
+        go.transform.position = Target.transform.position;
+        Target = go.transform;
+
         InitialRotation = transform.rotation;
         Vector3 Direction = Origin.rotation * Vector3.forward;
         Velocity = MaxSpeed * Direction;
@@ -58,7 +60,13 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         }
     }
 
+    public override void Recast(Transform _target) {
+        Target.position = _target.position;
+    }
+
     /* IMoves Methods */
+    public Transform ForceMoveDestination { get; set; } = null;
+    public int StunStack { get { return 0; } set {; } } // do I want these to be stunnable? doubt it
     public float BaseSpeed { get { return MaxSpeed; } set { MaxSpeed = value; } }
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) {
         return 0f;
@@ -91,6 +99,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
     /* ICollidable Methods */
     private Collider _collider;
+    public int ImmaterialStack { get { return 0; } set {; } }
 
     public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
@@ -116,12 +125,19 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         }
     }
 
-    public Collider Collider { get { return _collider; } } // TODO cache collider
+    public Collider Collider { get { return _collider; } }
+
+    /* IDamageable */
+    [SerializeField] private int _hp;
+    public int HP { get { return _hp; } }
+    public List<Armor> Armors { get { return null; } set {; } }
+    public int ParryWindow { get { return 0; } set {; } }
+    public int InvulnerableStack { get { return 0; } set {; } }
 
     public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
-        HP -= damage;
+        _hp -= damage;
 
-        if (HP <= 0)
+        if (_hp <= 0)
             OnDeath();
 
         return damage;
@@ -145,4 +161,6 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         }
         Destroy(gameObject);
     }
+
+    public void TakeArmor(Armor armor) { ; }
 }

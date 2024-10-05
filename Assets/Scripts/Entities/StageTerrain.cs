@@ -13,4 +13,5 @@ public class StageTerrain : MonoBehaviour, ICollidable {
     public void OnCollideWith(ICollidable other, CollisionInfo info) {}
     public void HandleCollisions() {}
     public Collider Collider { get { return _collider; } }
+    public int ImmaterialStack {  get { return 0; } set {; } } // TODO this might be nice for shroud? LOS blockers?
 }

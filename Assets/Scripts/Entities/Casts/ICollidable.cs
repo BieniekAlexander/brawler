@@ -192,4 +192,7 @@ public interface ICollidable {
 
     public Collider Collider { get; }
     public Transform Transform { get; }
+
+    // status effects
+    public int ImmaterialStack { get; set; }
 }

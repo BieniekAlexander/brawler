@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6173491151393082049}
   - component: {fileID: 1146318602555230060}
   m_Layer: 0
-  m_Name: Ability1Movement
+  m_Name: gatAbility1Movement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

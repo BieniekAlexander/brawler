@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: -4766296664684992488}
+  - component: {fileID: 1893018920000934706}
   m_Layer: 9
-  m_Name: CastAbility2
+  m_Name: gatCastUltimate
   m_TagString: Untagged
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-4766296664684992488
+--- !u!114 &1893018920000934706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,6 +55,6 @@ MonoBehaviour:
   Frame: 0
   startupTime: 0
   Encumbering: 0
-  duration: 0
+  duration: 30
   Origin: {fileID: 0}
   statusEffects: []

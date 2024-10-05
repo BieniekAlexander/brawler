@@ -1,5 +1,3 @@
-using Codice.Client.BaseCommands;
-using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,7 +7,9 @@ public class CommandMovementDash: CommandMovement {
 
     public override void Initialize(IMoves mover, Transform target) {
         base.Initialize(mover, target);
-        initialSpeed = Mathf.Min(mover.Velocity.magnitude, mover.BaseSpeed);
+
+        // set movement trajectory
+        initialSpeed = Mathf.Max(mover.Velocity.magnitude, mover.BaseSpeed);
         mover.Velocity = Path.normalized*Mathf.Max(initialSpeed, speed);
         Duration = Mathf.FloorToInt((Path.magnitude/speed)/Time.fixedDeltaTime);
     }

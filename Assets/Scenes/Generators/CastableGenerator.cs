@@ -19,6 +19,8 @@ public class CastableGenerator : MonoBehaviour, ICasts {
 
     /* Castables */
     public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
+    public int MaimStack { get { return 0; } set {; } }
+    public int SilenceStack { get { return 0; } set {; } }
 
     void Start() {
         Timer = 0;

@@ -22,4 +22,8 @@ public interface ICasts {
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Castable> ActiveCastables { get; }
+
+    // status effects
+    public int MaimStack { get; set; } // can't use attacks
+    public int SilenceStack { get; set; } // can't cast spells
 }

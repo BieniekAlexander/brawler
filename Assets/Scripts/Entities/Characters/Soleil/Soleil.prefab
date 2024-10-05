@@ -302,8 +302,9 @@ MonoBehaviour:
     cooldown: -1
     defaultChargeCount: 1
   - name: Ability1
-    castPrefab: {fileID: 0}
-    cooldown: -1
+    castPrefab: {fileID: -4766296664684992488, guid: e543eea69e68de04d922b8bd51adc275,
+      type: 3}
+    cooldown: 300
     defaultChargeCount: 1
   - name: Ability2
     castPrefab: {fileID: 0}

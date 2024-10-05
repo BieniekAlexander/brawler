@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public enum HitTier {
@@ -10,9 +11,22 @@ public enum HitTier {
     Pure = 4
 }
 
+[Serializable]
+public class Armor: Effect {
+    [SerializeField] public int amount;
+
+    public override bool CanEffect(MonoBehaviour _target) {
+        return (_target is Character);
+    }
+
+    public int TakeDamage(int damage) {
+        amount -= damage;
+        return Mathf.Min(amount, 0);
+    }
+}
+
 public interface IDamageable
 {
-
     /// <summary>
     /// Take <paramref name="damage"/> damage and do some related behaviors, if applicable.
     /// </summary>
@@ -32,7 +46,25 @@ public interface IDamageable
     int TakeHeal(int damage);
 
     /// <summary>
+    /// Take in an armor object and persist it
+    /// </summary>
+    /// <remarks>
+    /// take damage from the armor before from the character's health,
+    /// and have the armor expire after some time
+    /// </remarks>
+    /// <param name="damage"></param>
+    /// <returns></returns>
+    void TakeArmor(Armor armor);
+
+    /// <summary>
     /// What to do when the <typeparamref name="IDamageable"/> takes excess damage.
     /// </summary>
     void OnDeath();
+
+    public List<Armor> Armors { get; }
+    int HP { get; }
+    int ParryWindow { get; set; } // if hit during the window, reflect projectiles, ignore damage, and maybe hitstun?
+
+    // Status effects
+    int InvulnerableStack { get; set; } // can't be damaged
 }

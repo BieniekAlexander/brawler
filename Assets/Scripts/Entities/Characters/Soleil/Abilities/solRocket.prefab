@@ -121,8 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 300
-  DynamicTargeting: 0
+  Duration: 480
   Origin: {fileID: 0}
   Target: {fileID: 0}
   Mirror: 0

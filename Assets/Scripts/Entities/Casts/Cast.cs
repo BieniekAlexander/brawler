@@ -4,7 +4,6 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
-using static UnityEngine.GraphicsBuffer;
 
 public interface ICastMessage : IEventSystemHandler {
     // functions that can be called via the messaging system

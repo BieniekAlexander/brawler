@@ -58,6 +58,6 @@ MonoBehaviour:
   startupTime: 30
   Encumbering: 1
   DynamicTargeting: 0
-  duration: 60
+  duration: 480
   Origin: {fileID: 0}
   statusEffects: []

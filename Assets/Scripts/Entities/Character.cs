@@ -262,9 +262,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void HandleControls() {
         if (me) {
             // aiming TODO move to input manager
-            UpdateCursorTransformWorldPosition();
             var playerPosition = cc.transform.position;
             aimPlane.SetNormalAndPosition(Vector3.up, playerPosition);
+            UpdateCursorTransformWorldPosition();
             var direction = new Vector3(CursorTransform.position.x-playerPosition.x, 0, CursorTransform.position.z-playerPosition.z).normalized;
             Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
 
@@ -587,6 +587,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (aimPlane.Raycast(ray, out float distance)) {
+                Debug.Log(CursorTransform.position);
                 CursorTransform.position = ray.GetPoint(distance);
             } else {
                 CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self

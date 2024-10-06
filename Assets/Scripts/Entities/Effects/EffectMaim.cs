@@ -1,16 +1,18 @@
 using UnityEngine;
 
-public class StatusEffectStun: Effect {
+public class EffectMaim: Effect {
     public override void Initialize(MonoBehaviour _target) {
         base.Initialize(_target);
-         // TODO do I need this class? Might I just use the Hit hitstun thing?
+        (Target as ICasts).MaimStack++;
     }
 
     public override void Expire() {
-        ;
+        if (Target != null) {
+            (Target as ICasts).MaimStack--;
+        }
     }
 
     public override bool CanEffect(MonoBehaviour _target) {
-        throw new System.NotImplementedException();
+        return (_target is ICasts);
     }
 }

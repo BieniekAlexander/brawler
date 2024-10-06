@@ -15,7 +15,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     [SerializeField] Positioning Positioning = Positioning.Directional;
     private Quaternion InitialRotation;
 
-    public void Awake() {
+    new public void Awake() {
         _collider = GetComponent<Collider>();
         base.Awake();
     }

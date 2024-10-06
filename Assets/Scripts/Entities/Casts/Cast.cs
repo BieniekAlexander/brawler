@@ -5,6 +5,13 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
 
+public enum TargetingMethod {
+    ContinuousTargeting,
+    DiscreteTargeting,
+    SnapTarget,
+    SelfTarget
+}
+
 public interface ICastMessage : IEventSystemHandler {
     // functions that can be called via the messaging system
     void FinishCast();
@@ -30,7 +37,7 @@ public class Cast : MonoBehaviour, ICastMessage {
     [HideInInspector] public int Frame = 0;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public bool Encumbering = false;
-    [SerializeField] public bool DynamicTargeting = true;
+    [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;
     [SerializeField] public int duration;
     private bool rotatingClockwise = true;
     public Transform Target { get; private set; }
@@ -51,9 +58,9 @@ public class Cast : MonoBehaviour, ICastMessage {
         Origin = _origin;
         rotatingClockwise = _rotatingClockwise;
 
-        if (DynamicTargeting) {
+        if (TargetingMethod == TargetingMethod.ContinuousTargeting) {
             Target = _castAimPositionTransform;
-        } else {
+        } else if (TargetingMethod == TargetingMethod.DiscreteTargeting) {
             GameObject go = new("Cast Target");
             go.transform.parent = transform;
             go.transform.position = _castAimPositionTransform.position;

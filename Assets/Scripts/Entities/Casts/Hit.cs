@@ -41,6 +41,8 @@ public class Hit : Trigger, ICollidable {
 
     /* ICollidable Methods */
     public override void OnCollideWith(ICollidable Other, CollisionInfo info) {
+        base.OnCollideWith(Other, info);
+
         Physics.Raycast(
                 transform.position,
                 Other.Collider.transform.position,

@@ -41,13 +41,13 @@ public class Grab : Trigger, ICollidable {
                 );
             } else if (other.Collider.transform.GetComponent<Shield>() is Shield Shield) {
                 Character Owner = Shield.GetComponentInParent<Character>();
-                if (GetClosestGameObject(gameObject, Owner.gameObject, Owner.gameObject)==Shield.gameObject
-                    && (int)HitTier <= (int)Shield.ShieldTier)
-                    ; // TODO no-op - need to implement things like grab techs and such
-                      //OnCollideWith(Shield);
+                if (
+                    GetClosestGameObject(gameObject, Owner.gameObject, Owner.gameObject)==Shield.gameObject
+                    && (int)HitTier <= (int)Shield.ShieldTier
+                ) {
+                    Debug.Log("TODO implement this interaction");
+                }
             }
         }
-        // identify the character that was hit
-        
     }
 }

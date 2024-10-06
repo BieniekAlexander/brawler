@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+#pragma warning disable CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.Equals(object o)
+
 public class VectorLabelsAttribute : PropertyAttribute {
     public readonly string[] Labels;
 
@@ -212,7 +215,7 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     }
 
     /* State Handling */
-    public void Awake() {
+    new public void Awake() {
         _collider = GetComponent<Collider>();
 
         if (_collider is CapsuleCollider cc) {

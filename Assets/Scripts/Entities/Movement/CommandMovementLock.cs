@@ -5,7 +5,7 @@ public class CommandMovementLock : CommandMovement {
     [SerializeField] float Offset;
     private Transform Lock;
 
-    public void Initialize(IMoves mover, Transform _destination) {
+    new public void Initialize(IMoves mover, Transform _destination) {
         base.Initialize(mover, _destination);
         Lock = _destination;
     }

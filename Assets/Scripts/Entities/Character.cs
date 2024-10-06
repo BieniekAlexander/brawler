@@ -587,7 +587,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (aimPlane.Raycast(ray, out float distance)) {
-                Debug.Log(CursorTransform.position);
                 CursorTransform.position = ray.GetPoint(distance);
             } else {
                 CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self

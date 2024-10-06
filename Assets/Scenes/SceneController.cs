@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -46,6 +47,10 @@ public class SceneController : MonoBehaviour
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             }
         }
+
+        // set up UI
+        Canvas canvas = FindAnyObjectByType(typeof(Canvas)).GetComponent<Canvas>();
+        canvas.InitializeStatBars(Characters);
 
         if (HazardHandlerPrefab != null) {
             HazardHandler = Instantiate(HazardHandlerPrefab);

@@ -57,7 +57,7 @@ MonoBehaviour:
   Frame: 0
   startupTime: 30
   Encumbering: 1
-  DynamicTargeting: 0
+  TargetingMethod: 1
   duration: 480
   Origin: {fileID: 0}
   statusEffects: []

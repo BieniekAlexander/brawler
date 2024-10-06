@@ -160,8 +160,7 @@ public class CharacterStateWalking : CharacterState {
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
+        if (collidable is StageTerrain terrain && info!=null) {
             Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
             Character.Velocity = MovementUtils.setXZ(

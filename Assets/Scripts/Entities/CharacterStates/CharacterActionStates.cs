@@ -70,6 +70,7 @@ public class CharacterStateBusy : CharacterState {
     }
     
     public override void FixedUpdateState() {
+        Debug.Log("busy");
         Character.BusyTimer--;
     }
 

@@ -380,7 +380,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             // we're updating another cast - allowed
             return castContainer.cast.Recast(CursorTransform);
         } else {
-            if (castContainer.charges==0) {
+            if (castContainer.charges==0 || BusyTimer>0) {
                 return false;
             } else {
                 if (_activeCast is not null) {
@@ -431,7 +431,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
-        BusyTimer--;
         CastEncumberedTimer--;
 
         // resolve cooldowns and cast expirations

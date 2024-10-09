@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5943401942403558227}
-  - component: {fileID: 610583978582319596}
   - component: {fileID: 2347922906722580081}
   - component: {fileID: 3196091043477512915}
   - component: {fileID: 7138127940618277914}
-  m_Layer: 0
+  - component: {fileID: 1568748315190447676}
+  m_Layer: 8
   m_Name: astAbility1Hit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35,46 +35,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &610583978582319596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2075623021827197374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Duration: 5
-  Origin: {fileID: 0}
-  Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
-  indefinite: 0
-  FrameCastablesMap:
-    m_keys: 
-    m_values: []
-  ConditionCastablesMap:
-    m_keys: 
-    m_values: []
-  TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 5, y: 5, z: 5}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-  effects:
-  - {fileID: 7134396115805570166, guid: 95059c8501938204286e2a822d6dc958, type: 3}
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
-  damage: 0
-  HitsEnemies: 1
-  HitsFriendlies: 1
-  KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 0}
-  HitTier: 0
-  hitLagDuration: 0
-  hitStunDuration: 10
 --- !u!135 &2347922906722580081
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -146,3 +106,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1568748315190447676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075623021827197374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afab953a169b7264aa242dba2fcbaecc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Duration: 5
+  Origin: {fileID: 0}
+  Target: {fileID: 0}
+  Mirror: 0
+  Frame: 0
+  indefinite: 0
+  FrameCastablesMap:
+    m_keys: 
+    m_values: []
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
+  TriggerTransformations:
+  - PolarPosition: {x: 0, y: 0}
+    Dimension: {x: 5, y: 5, z: 5}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+  effects:
+  - {fileID: 7134396115805570166, guid: 95059c8501938204286e2a822d6dc958, type: 3}
+  RedundantCollisions: 0
+  DissapearOnTrigger: 0
+  HitsEnemies: 1
+  HitsFriendlies: 0

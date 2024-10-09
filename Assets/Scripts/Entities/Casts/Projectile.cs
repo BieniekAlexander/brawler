@@ -60,8 +60,14 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         }
     }
 
-    public override void Recast(Transform _target) {
-        Target.position = _target.position;
+    public override bool Recast(Transform _target) {
+        if (!Mathf.Approximately(RotationalControl, 0)) {
+            Target.position = _target.position;
+            return true;
+        } else {
+            // nothing to recast
+            return false;
+        }
     }
 
     /* IMoves Methods */

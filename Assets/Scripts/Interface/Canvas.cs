@@ -34,7 +34,6 @@ public class Canvas : MonoBehaviour {
         HealthBars.RemoveAll(bar => bar==null);
 
         for (int i = 0; i < HealthBars.Count; i++) {
-            Debug.Log(i);
             Vector2 ViewportPosition = Cam.WorldToViewportPoint(HealthBars[i].Character.transform.position+offset);
             Vector2 WorldObject_ScreenPosition = new Vector2(
                 (ViewportPosition.x*CanvasRect.sizeDelta.x)-(CanvasRect.sizeDelta.x*0.5f),

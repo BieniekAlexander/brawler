@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 5084085653392112361}
-  - component: {fileID: 2262089815033693738}
-  - component: {fileID: -307428251642088603}
-  - component: {fileID: 3317143023062883117}
+  - component: {fileID: 4918249452027163949}
+  - component: {fileID: 7506723417326245698}
+  - component: {fileID: -3587656788900788176}
+  - component: {fileID: 7159542288348881807}
   m_Layer: 8
   m_Name: astHitHeavy1.1
   m_TagString: Untagged
@@ -27,15 +27,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
-  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalRotation: {x: 0.24184479, y: 0.66446304, z: -0.66446304, w: 0.24184479}
+  m_LocalPosition: {x: -35, y: 0, z: 1.3}
+  m_LocalScale: {x: 0.6, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5084085653392112361
+--- !u!114 &4918249452027163949
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 8
+  Duration: 20
   Origin: {fileID: 0}
   Target: {fileID: 0}
   Mirror: 0
@@ -60,49 +60,99 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -62.561596, y: 0.7335155}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.35005143, y: 0.6143811, z: -0.6143811, w: -0.35005143}
-  - PolarPosition: {x: -52.29343, y: 0.8354892}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.36424744, y: 0.6060725, z: -0.6060725, w: -0.3642474}
-  - PolarPosition: {x: -45.860504, y: 0.8945911}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.432771, y: 0.55920416, z: -0.55920416, w: -0.432771}
-  - PolarPosition: {x: -35.33566, y: 0.9561427}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.4559098, y: 0.5405056, z: -0.54050565, w: -0.45590973}
-  - PolarPosition: {x: -20.659756, y: 1.0345285}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.44287902, y: 0.5512333, z: -0.55123335, w: -0.44287902}
-  - PolarPosition: {x: -8.261108, y: 1.1135547}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.42946985, y: 0.5617434, z: -0.56174344, w: -0.42946985}
-  - PolarPosition: {x: -1.8279915, y: 1.1285744}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.45534143, y: 0.54098445, z: -0.5409845, w: -0.45534146}
-  - PolarPosition: {x: 4.3028855, y: 1.1462308}
-    Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
-    Rotation: {x: -0.44726226, y: 0.5476829, z: -0.54768294, w: -0.4472623}
-  - PolarPosition: {x: -28.515553, y: 0.9218294}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
-  - PolarPosition: {x: -28.515553, y: 0.9218294}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
-  Collider: {fileID: 0}
+  - PolarPosition: {x: -50, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.24184477, y: 0.664463, z: -0.664463, w: 0.24184477}
+  - PolarPosition: {x: -30, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.35355335, y: 0.61237246, z: -0.61237246, w: 0.35355335}
+  - PolarPosition: {x: -10, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.43045932, y: 0.5609855, z: -0.5609855, w: 0.43045932}
+  - PolarPosition: {x: 10, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.47757155, y: 0.5214897, z: -0.5211779, w: 0.47785726}
+  - PolarPosition: {x: 30, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 50, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 70, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 90, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 110, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 130, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 150, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 170, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 190, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 210, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 230, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 250, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 270, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 290, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 310, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
+  - PolarPosition: {x: 330, y: 0.7}
+    Dimension: {x: 0.6, y: 0.3, z: 0.3}
+    Rotation: {x: 0.49985045, y: 0.5001495, z: -0.49985045, w: 0.5001495}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 5
+  damage: 1
   HitsEnemies: 1
   HitsFriendlies: 0
-  KnockbackCoordinateSystem: 1
-  BaseKnockbackVector: {x: 10, y: 0, z: 2}
+  KnockbackCoordinateSystem: 0
+  BaseKnockbackVector: {x: 15, y: 0, z: 12}
   HitTier: 3
-  hitLagDuration: 15
-  hitStunDuration: 20
---- !u!23 &2262089815033693738
+--- !u!136 &7506723417326245698
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3059344016903470191}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +194,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &-307428251642088603
+--- !u!33 &7159542288348881807
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,26 +202,3 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!136 &3317143023062883117
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3059344016903470191}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 0
-  m_Center: {x: 0, y: 0, z: 0}

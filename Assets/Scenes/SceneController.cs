@@ -14,6 +14,7 @@ public class SceneController : MonoBehaviour
     private List<Character> Characters = new();
     private HazardHandler HazardHandler;
     public static SceneController Instance;
+    private int _meId = 0;
 
     string scene0 = "TempleSummit";
     string scene1 = "Forsaken";
@@ -41,7 +42,7 @@ public class SceneController : MonoBehaviour
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
             Characters.Add(Char);
-            if (i == 0) {
+            if (i == _meId) {
                 Char.gameObject.name = "Player";
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
@@ -59,6 +60,7 @@ public class SceneController : MonoBehaviour
     }
 
     void Update() {
+        // switch/reload scene
         if (Input.GetKey(KeyCode.RightControl) && Input.GetKey(KeyCode.RightAlt)) {
             if (Input.GetKey(KeyCode.R)) {
                 activeScene = scene0;
@@ -73,6 +75,23 @@ public class SceneController : MonoBehaviour
                 SceneManager.LoadScene(scene1);
                 InitializeScene();
                 Debug.Log($"[{this.name}] Loading {scene1}");
+            }
+        } else if (Input.GetKeyDown(KeyCode.KeypadMultiply)) {
+            Characters[_meId].UnsetMe();
+            _meId = Utils.mod(_meId+1, Characters.Count);
+            Characters[_meId].SetMe();
+            GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Characters[_meId].transform;
+        } else if (Input.GetKey(KeyCode.KeypadPlus)) {
+            int charIdx = -1;
+
+            if (Input.GetKeyDown(KeyCode.Keypad0)) {
+                charIdx = 0;
+            } else if (Input.GetKeyDown(KeyCode.Keypad1)) {
+                charIdx = 1;
+            }
+
+            if (charIdx>=0) {
+                Characters[charIdx].ToggleCollectingControls("characterInput", Input.GetKey(KeyCode.RightShift));
             }
         }
     }

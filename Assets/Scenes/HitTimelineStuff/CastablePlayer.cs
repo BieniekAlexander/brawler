@@ -209,17 +209,12 @@ public class CastPlayer : MonoBehaviour {
             SaveCurrentCast();
             InitializeCast(castId);
         } else if (CheckControl(CastEditorControls.NextCast, Input.GetKeyDown)) {
-            castId = mod(castId+1, castIds.Length);
+            castId = Utils.mod(castId+1, castIds.Length);
             InitializeCast(castId);
         } else if (CheckControl(CastEditorControls.PreviousCast, Input.GetKeyDown)) {
-            castId = mod(castId-1, castIds.Length);
+            castId = Utils.mod(castId-1, castIds.Length);
             InitializeCast(castId);
         }
-    }
-
-    private int mod(int x, int m) {
-        int r = x%m;
-        return r<0 ? r+m : r;
     }
 
     private void MirrorFrame() {

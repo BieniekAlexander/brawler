@@ -95,7 +95,9 @@ public abstract class Castable : MonoBehaviour, ICasts {
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="_target"></param>
-    public virtual void Recast(Transform _target) {; }
+    public virtual bool Recast(Transform _target) {
+        return false;
+    }
 
     /* ICasts Methods */
     public bool IsRotatingClockwise() {

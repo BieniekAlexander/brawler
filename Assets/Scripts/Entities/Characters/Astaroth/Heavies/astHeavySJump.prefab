@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8c0ae9696b2ef34d977caa26145877d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 10
+  Duration: 40
   Range: 0
-  JumpSquatDuration: 10
   JumpVelocity: 10

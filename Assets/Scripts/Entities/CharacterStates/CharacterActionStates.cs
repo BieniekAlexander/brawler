@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public static class DefenseUtils {
@@ -8,7 +9,6 @@ public class CharacterStateReady : CharacterState {
     public CharacterStateReady(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -23,6 +23,7 @@ public class CharacterStateReady : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.Shield.gameObject.SetActive(false);
 
     }
@@ -34,17 +35,22 @@ public class CharacterStateReady : CharacterState {
 }
 
 public class CharacterStateBusy : CharacterState {
-    private int _exposedDuration = 10;
+    private int _exposedDuration = 15;
+    private CharacterState[] _validExitParentStates;
 
     public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
-        InitializeSubState();
+        _validExitParentStates = new CharacterState[] {
+            Factory.Idle(),
+            Factory.Walking(),
+            Factory.Running()
+        };
     }
 
     public override CharacterState CheckGetNewState() {
         // TODO make sure that you can't shield if you're dashing, in disadvantage, etc.
-        if (Character.BusyTimer==0) {
+        if (Character.BusyTimer<=0 && _validExitParentStates.Contains(_superState)) {
             return Factory.Ready();
         } else {
             return null;
@@ -52,6 +58,7 @@ public class CharacterStateBusy : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.BusyTimer = _exposedDuration;
     }
     
@@ -69,12 +76,11 @@ public class CharacterStateBusy : CharacterState {
 
 public class CharacterStateBlocking : CharacterState {
     private float _maxAcceleration = 10f;
-    private int _exposedDuration = 10;
+    private int _exposedDuration = 15;
 
     public CharacterStateBlocking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -89,6 +95,7 @@ public class CharacterStateBlocking : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.Shield.gameObject.SetActive(true);
         Character.Shield.ShieldTier = ShieldTier.Blocking;
     }
@@ -104,7 +111,7 @@ public class CharacterStateBlocking : CharacterState {
             float dSpeed = Mathf.Max(
             Vector3.Dot(
                 MovementUtils.inXZ(Character.Velocity).normalized,
-                Character.LookDirection
+                Character.InputAimDirection
             ),
             0
         ) * _maxAcceleration;
@@ -129,12 +136,11 @@ public class CharacterStateBlocking : CharacterState {
 public class CharacterStateShielding : CharacterState {
     private float _maxAcceleration = 29f;
     private float _rotationalSpeed = 300f*Mathf.Deg2Rad;
-    private int _exposedDuration = 10;
+    private int _exposedDuration = 15;
 
     public CharacterStateShielding(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -149,10 +155,14 @@ public class CharacterStateShielding : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.Shield.gameObject.SetActive(true);
         Character.Shield.ShieldTier = ShieldTier.Shielding;
     }
 
+    public override void ExitState() {
+        Character.Shield.gameObject.SetActive(false);
+    }
 
     public override void FixedUpdateState() {
         // TODO return to this implementation because I don't know how to make it more elegant,
@@ -162,7 +172,7 @@ public class CharacterStateShielding : CharacterState {
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
         Vector3 characterDirection = MovementUtils.inXZ(Character.Velocity).normalized;
-        Vector3 shieldDirection = Character.LookDirection;
+        Vector3 shieldDirection = Character.InputAimDirection;
         float acceleration = _maxAcceleration*Mathf.Max(
             Vector3.Dot(
                 characterDirection,
@@ -184,10 +194,6 @@ public class CharacterStateShielding : CharacterState {
             0,
             Mathf.Infinity
         );
-    }
-
-    public override void ExitState(){
-        Character.Shield.gameObject.SetActive(false);
     }
 
     public override void InitializeSubState(){}

@@ -52,6 +52,7 @@ MonoBehaviour:
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -80,7 +81,6 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: 1.5}
     Dimension: {x: 0.5, y: 0.2, z: 0.2}
     Rotation: {x: 0.49999997, y: 0.49999997, z: -0.49999997, w: 0.49999997}
-  Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
@@ -88,10 +88,8 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   KnockbackCoordinateSystem: 1
-  BaseKnockbackVector: {x: 0, y: 0, z: 8}
+  BaseKnockbackVector: {x: 0, y: 0, z: 9}
   HitTier: 1
-  hitLagDuration: 3
-  hitStunDuration: 5
 --- !u!136 &7506723417326245698
 CapsuleCollider:
   m_ObjectHideFlags: 0

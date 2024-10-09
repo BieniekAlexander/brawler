@@ -7,7 +7,7 @@ public class CharacterStateKnockedDown : CharacterState {
     }
 
     public override CharacterState CheckGetNewState() {
-        if (Character.InputMoveDirection != Vector3.zero) {
+        if (Character.MoveDirection != Vector3.zero) {
             return Factory.GettingUp();
         } else if (Character.InputDash) {
             return Factory.Rolling();
@@ -16,15 +16,22 @@ public class CharacterStateKnockedDown : CharacterState {
         }
     }
 
-    public override void EnterState(){}
-    public override void ExitState(){} 
+    public override void EnterState(){
+        base.EnterState();
+    }
+
+    public override void ExitState(){}
+
     public override void FixedUpdateState(){}
-    public override void InitializeSubState(){}
+    public override void InitializeSubState(){
+        SetSubState(Factory.Busy());
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
 public class CharacterStateTumbling : CharacterState {
-    private float _tumbleAcceleration = 50f;
+    private float _tumbleAcceleration = 10f;
     
     public CharacterStateTumbling(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -32,7 +39,7 @@ public class CharacterStateTumbling : CharacterState {
     }
 
     public override CharacterState CheckGetNewState() {
-        if (Character.InputMoveDirection!=Vector3.zero) {
+        if (Character.MoveDirection!=Vector3.zero) {
             return Factory.GettingUp();
         } else if (Character.InputDash) {
             return Factory.Rolling();
@@ -43,12 +50,20 @@ public class CharacterStateTumbling : CharacterState {
         }
     }
 
-    public override void EnterState(){}
+    public override void EnterState(){
+        base.EnterState();
+    }
+
     public override void ExitState(){}
-    public override void InitializeSubState(){}
+    public override void InitializeSubState(){
+        SetSubState(Factory.Busy());
+    }
 
     public override void FixedUpdateState() {
-        Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -_tumbleAcceleration*Time.deltaTime);
+        Character.Velocity = MovementUtils.ChangeMagnitude(
+            MovementUtils.inXZ(Character.Velocity),
+            -_tumbleAcceleration*Time.deltaTime
+        ) + MovementUtils.inY(Character.Velocity);
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
@@ -77,8 +92,9 @@ public class CharacterStateRolling : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
-        Character.Velocity = Character.LookDirection * _rollSpeed;
+        Character.Velocity = Character.InputAimDirection * _rollSpeed;
         // add invincibility
     }
 
@@ -90,7 +106,10 @@ public class CharacterStateRolling : CharacterState {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState() {}
+    public override void InitializeSubState() {
+        SetSubState(Factory.Busy());
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
             // TODO improve interaction of tumbling into wall
@@ -116,6 +135,7 @@ public class CharacterStateGettingUp : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
         // TODO invulnerability
@@ -129,7 +149,10 @@ public class CharacterStateGettingUp : CharacterState {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState(){}
+    public override void InitializeSubState(){
+        SetSubState(Factory.Busy());
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
 }
 
@@ -151,6 +174,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
         // TODO invulnerability
@@ -164,6 +188,9 @@ public class CharacterStateGetUpAttacking : CharacterState {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState() { }
+    public override void InitializeSubState() {
+        SetSubState(Factory.Busy());
+    }
+
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
 }

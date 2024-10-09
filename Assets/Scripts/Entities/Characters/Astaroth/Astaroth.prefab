@@ -242,7 +242,7 @@ MonoBehaviour:
   - name: Light1
     castPrefab: {fileID: 5634063031192742342, guid: 67246e4d3dfac644c8f891ab6bb14252,
       type: 3}
-    cooldown: 30
+    cooldown: 20
     defaultChargeCount: 1
   - name: Light2
     castPrefab: {fileID: 5634063031192742342, guid: 5a4bc79fc75605d45b3af66d9a33b265,

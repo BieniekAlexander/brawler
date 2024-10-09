@@ -43,7 +43,6 @@ public class CharacterStateIdle : CharacterState {
     public CharacterStateIdle(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -59,7 +58,7 @@ public class CharacterStateIdle : CharacterState {
     }
 
     public override void EnterState() {
-        // write stuff that happens when the state starts
+        base.EnterState();
     }
 
     public override void ExitState() {
@@ -67,14 +66,16 @@ public class CharacterStateIdle : CharacterState {
 
     public override void FixedUpdateState() {
         // TODO I guess it can be assumed that velocity.magnitude is zero here?
-        Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.InputMoveDirection*(_acceleration*Time.deltaTime));
+        Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration*Time.deltaTime));
     }
 
     public override void InitializeSubState() {
-        if (Character.InputShielding) {
-            SetSubState(Factory.Shielding());
+        if (Character.BusyTimer>0) {
+            SetSubState(Factory.Busy());
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
+        } else if (Character.InputShielding) {
+            SetSubState(Factory.Shielding());
         } else {
             SetSubState(Factory.Ready());
         }
@@ -103,7 +104,6 @@ public class CharacterStateWalking : CharacterState {
     public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -121,7 +121,7 @@ public class CharacterStateWalking : CharacterState {
     }
 
     public override void EnterState() {
-        // write stuff that happens when the state starts
+        base.EnterState();
     }
 
     public override void ExitState() {
@@ -131,15 +131,15 @@ public class CharacterStateWalking : CharacterState {
         // TODO what if I'm in the air? Air control?
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
         float dSpeed = Mathf.Clamp(
-            Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.InputMoveDirection),
+            Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
             0, _acceleration*Time.deltaTime
         );
 
         Vector3 newVelocity = Vector3.ClampMagnitude(
             horizontalVelocity + dSpeed*(
-                (Character.InputMoveDirection == Vector3.zero)
+                (Character.MoveDirection == Vector3.zero)
                 ? (Character.InputRunning ? Vector3.zero : (-horizontalVelocity.normalized))
-                : Character.InputMoveDirection
+                : Character.MoveDirection
             ),
             Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude)
         );
@@ -150,7 +150,9 @@ public class CharacterStateWalking : CharacterState {
     }
 
     public override void InitializeSubState() {
-        if (Character.InputShielding) {
+        if (Character.BusyTimer>0) {
+            SetSubState(Factory.Busy());
+        } else if (Character.InputShielding) {
             SetSubState(Factory.Shielding());
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
@@ -179,7 +181,6 @@ public class CharacterStateRunning : CharacterState {
     public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -194,7 +195,9 @@ public class CharacterStateRunning : CharacterState {
         }
     }
 
-    public override void EnterState() { }
+    public override void EnterState() {
+        base.EnterState();
+    }
 
     public override void ExitState() {
     }
@@ -207,10 +210,10 @@ public class CharacterStateRunning : CharacterState {
 
         Character.Velocity = MovementUtils.setXZ(
             Character.Velocity,
-            (Character.InputMoveDirection!=Vector3.zero)
+            (Character.MoveDirection!=Vector3.zero)
             ? Vector3.RotateTowards(
                 horizontalVelocity.normalized,
-                Character.InputMoveDirection,
+                Character.MoveDirection,
                 _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0) * speed
             : horizontalVelocity.normalized * speed
@@ -218,7 +221,15 @@ public class CharacterStateRunning : CharacterState {
     }
 
     public override void InitializeSubState() {
-        SetSubState(Factory.Ready());
+        if (Character.BusyTimer>0) {
+            SetSubState(Factory.Busy());
+        } else if (Character.InputBlocking) {
+            SetSubState(Factory.Blocking());
+        } else if (Character.InputShielding) {
+            SetSubState(Factory.Shielding());
+        } else {
+            SetSubState(Factory.Ready());
+        }
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
@@ -266,6 +277,7 @@ public class CharacterStateDashing : CharacterState {
     public override void EnterState() {
         // TODO should I have a boost cooldown? I'm not sure
         // chargeCooldown = chargeCooldownMax;
+        base.EnterState();
         _boostTimer = _boostMaxDuration;
         Character.Charges--;
 
@@ -273,7 +285,7 @@ public class CharacterStateDashing : CharacterState {
         float boostSpeedStart = _boostSpeedEnd + 2*_boostSpeedBump;
         boostDecay = (_boostSpeedEnd-boostSpeedStart)/_boostMaxDuration;
 
-        Vector3 v = Character.LookDirection;
+        Vector3 v = Character.InputAimDirection;
         Character.Velocity = new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
         // TODO I think I'm losing the vertical velocity implementation here
 
@@ -291,13 +303,7 @@ public class CharacterStateDashing : CharacterState {
     }
 
     public override void InitializeSubState() {
-        if (Character.InputShielding) {
-            SetSubState(Factory.Shielding());
-        } else if (Character.InputBlocking) {
-            SetSubState(Factory.Blocking());
-        } else {
-            SetSubState(Factory.Ready());
-        }
+        SetSubState(Factory.Ready());
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
@@ -334,9 +340,12 @@ public class CharacterStateCommandMovement : CharacterState {
         }
     }
 
-    public override void EnterState() {}
-    public override void ExitState() {}
-    public override void FixedUpdateState() {}
+    public override void EnterState() {
+        base.EnterState();
+    }
+
+    public override void ExitState() { }
+    public override void FixedUpdateState() { }
 
     public override void InitializeSubState() {
         // override any sort of inputs - I want this state to generally be locked in

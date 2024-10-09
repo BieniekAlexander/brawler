@@ -12,15 +12,11 @@ using UnityEngine;
 public class Hit : Trigger, ICollidable {
     /* Effects */
     [SerializeField] private int damage;
-    [SerializeField] public bool HitsEnemies = true;
-    [SerializeField] public bool HitsFriendlies = false;
 
     /* Knockback */
     [SerializeField] private CoordinateSystem KnockbackCoordinateSystem;
     [SerializeField] private Vector3 BaseKnockbackVector;
     [SerializeField] public HitTier HitTier;
-    [SerializeField] private int hitLagDuration = 0;
-    [SerializeField] private int hitStunDuration = 10;
 
     /* Visualization */
     private float animationDuration;
@@ -77,6 +73,9 @@ public class Hit : Trigger, ICollidable {
                 return;
             } else {
                 Vector3 knockBackVector = GetKnockBackVector(OtherMover.Transform.position);
+                int hitStunDuration = KnockBackUtils.getHitStun(knockBackVector);
+                int hitLagDuration = KnockBackUtils.getHitLag(HitTier);
+
                 float targetKnockbackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
                     hitLagDuration,

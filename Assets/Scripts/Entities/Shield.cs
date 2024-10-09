@@ -32,7 +32,7 @@ public class Shield : MonoBehaviour, ICollidable {
         else if (ShieldTier == ShieldTier.Blocking)
             Material.color=Color.cyan;
         else
-            Material.color=Color.white;
+            Material.color=Color.red;
     }
 
     /* ICollidable Methods */

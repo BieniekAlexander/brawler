@@ -8,8 +8,6 @@ public class Grab : Trigger, ICollidable {
 
     /* Cast, to be triggered on grab */
     [SerializeField] public Cast OnGrabCast;
-    [SerializeField] public bool HitsEnemies = true;
-    [SerializeField] public bool HitsFriendlies = false;
     [SerializeField] HitTier HitTier;
 
     public override void OnCollideWith(ICollidable other, CollisionInfo info) {

@@ -30,7 +30,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""aim"",
                     ""type"": ""Value"",
-                    ""id"": ""b00bba34-9aa5-417a-80eb-c0a83e3d4bd6"",
+                    ""id"": ""7071446c-b52b-4cab-b22b-0abd99c27ef6"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -916,7 +916,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a34993f6-0f2f-4a36-9409-cd5f4654da24"",
+                    ""id"": ""3d7c51ac-eadd-4fc1-bae5-011688ce73ea"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",

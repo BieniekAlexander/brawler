@@ -126,7 +126,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
             new TransformCoordinates(transform.position, transform.rotation, transform.localScale),
             origin,
             mirror
-        );    
+        );
     }
 
     public static TriggerTransformation FromTransformCoordinates(TransformCoordinates coordinates, Transform origin, bool mirror) {
@@ -153,7 +153,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
             PolarPosition.x *= -1;
             transformationRotation = MirrorQuaternion(transformationRotation, Vector3.up);
         }
-        
+
         return new(
             PolarPosition,
             transformationRotation,
@@ -184,7 +184,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
             return false;
         else if (ReferenceEquals(obj2, null))
             return false;
-        else 
+        else
             return obj1.Equals(obj2);
     }
 }
@@ -192,7 +192,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 /// <summary>
 /// Class that generically handles the changing of object states when the object collides with it
 /// </summary>
-public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackReceiver {
+public class Trigger : Castable, ICollidable, ICasts {
     /* Transform */
     [SerializeField] public List<TriggerTransformation> TriggerTransformations;
 
@@ -200,6 +200,8 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     [SerializeField] public List<Effect> effects = new();
     [SerializeField] public bool RedundantCollisions = false;
     [SerializeField] public bool DissapearOnTrigger = false;
+    [SerializeField] public bool HitsEnemies = true;
+    [SerializeField] public bool HitsFriendlies = false;
     private HashSet<ICollidable> CollisionLog = new();
     public Transform Transform { get { return transform; } }
     public int ImmaterialStack { get { return 0; } set {; } }
@@ -287,23 +289,24 @@ public class Trigger : Castable, ICollidable, ICasts, ISerializationCallbackRece
     }
 
     public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
-        if (other is MonoBehaviour mono && mono.enabled) {
-            for (int i = 0; i < effects.Count; i++) {
-                if (effects[i].CanEffect(mono)) {
-                    // TODO what if I don't want the status effect to stack?
-                    // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                    // e.g. if two slows are applied, refresh slow
-                    Effect effect = Instantiate(effects[i]);
-                    effect.Initialize(mono);
+        if (
+            (Caster==other && !HitsFriendlies)
+            || (Caster!=other && !HitsEnemies)
+        ) {
+            return;
+        } else {
+            if (other is MonoBehaviour mono && mono.enabled) {
+                for (int i = 0; i < effects.Count; i++) {
+                    if (effects[i].CanEffect(mono)) {
+                        // TODO what if I don't want the status effect to stack?
+                        // maybe check if an effect of the same type is active, and if so, do some sort of resolution
+                        // e.g. if two slows are applied, refresh slow
+                        Effect effect = Instantiate(effects[i]);
+                        effect.Initialize(mono);
+                    }
                 }
             }
         }
-    }
-
-    public void OnBeforeSerialize() {
-    }
-
-    public void OnAfterDeserialize() {
     }
 
     public void UpdatePrefabTransformations(Trigger prefab) {

@@ -71,14 +71,14 @@ public class CharacterAI : Agent
         ).normalized;
 
         // cast
-        character.CastIdBuffer = (actions.DiscreteActions[2]==0) ? -1 : (int)CastId.Medium1;
+        character.InputCastId = (actions.DiscreteActions[2]==0) ? -1 : (int)CastId.Medium1;
 
         // aim
         UnityEngine.Vector3 aim = new UnityEngine.Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);
         if (aim == UnityEngine.Vector3.zero) {
             aim = UnityEngine.Vector3.right;
         }
-        character.LookDirection = aim.normalized;
+        character.InputAimDirection = aim.normalized;
     }
 
     private void FixedUpdate() {

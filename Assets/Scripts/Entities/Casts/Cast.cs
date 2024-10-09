@@ -4,6 +4,7 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System.Text;
 
 public enum TargetingMethod {
     ContinuousTargeting,
@@ -130,10 +131,14 @@ public class Cast : MonoBehaviour, ICastMessage {
 
     /// <summary/>
     /// <param name="worldPosition"></param>
-    public virtual void Recast(Transform worldPosition) {
+    public bool Recast(Transform worldPosition) {
+        bool recasted = false;
+        
         foreach (Castable Castable in ActiveCastables) {
-            Castable.Recast(worldPosition);
+            recasted |= Castable.Recast(worldPosition);
         }
+
+        return recasted;
     }
 
     public void FinishCast() {

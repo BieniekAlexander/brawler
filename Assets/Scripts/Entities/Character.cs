@@ -5,6 +5,8 @@ using System;
 using UnityEditor;
 using UnityEngine.InputSystem;
 using UnityEngine;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 [Serializable]
 public class CastSlot {
@@ -60,6 +62,38 @@ public enum CastId {
     Ultimate = 19
 }
 
+[Serializable]
+public class CharacterFrameInput {
+    public CharacterFrameInput(
+        Vector2 moveDirection,
+        Vector3 aimDirection,
+        bool blocking,
+        bool shielding,
+        bool running,
+        bool dash,
+        int castId) {
+        MoveDirectionX = moveDirection.x;
+        MoveDirectionZ = moveDirection.y;
+        AimDirectionX = aimDirection.x;
+        AimDirectionZ = aimDirection.z;
+        Blocking = blocking;
+        Shielding = shielding;
+        Running = running;
+        Dash = dash;
+        CastId = castId;
+    }
+
+    public float MoveDirectionX = 0f;
+    public float MoveDirectionZ = 0f;
+    public float AimDirectionX = 0f;
+    public float AimDirectionZ = 0f;
+    public bool Blocking = false;
+    public bool Shielding = false;
+    public bool Running = false;
+    public bool Dash = false;
+    public int CastId = -1;
+}
+
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
@@ -69,8 +103,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public CharacterState State { get { return _state; } set { _state = value; } }
     CharacterStateFactory StateFactory;
 
-
-    
     public int BusyTimer { get; set; } = 0;
 
     /* Visuals */
@@ -84,15 +116,40 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public float MinimumRotationThreshold { get; private set; } = 1f; // TODO put this in some kind of control config
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
-    private Vector3 _inputMoveDirection = new();
-    public Vector3 InputMoveDirection {
+
+    public Vector2 InputMoveDirection = new();
+    public Vector3 MoveDirection {
         get {
-            return (CastEncumberedTimer>0) ? Vector3.zero : _inputMoveDirection;
-        }
-        set {
-            _inputMoveDirection = value;
+            // TODO is this the best way to do this
+            return (CastEncumberedTimer>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
         }
     }
+
+    public Vector3 InputAimDirection { // TODO make sure that the Y position is locked to the character's Y
+        get {
+            return CursorTransform.position-cc.transform.position;
+        }
+        set {
+            if (value == Vector3.zero) {
+                value = Vector3.forward;
+            }
+
+            // setting direction
+            CursorTransform.position = cc.transform.position+value;
+
+            // setting rotation
+            var direction = value.normalized;
+            Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
+
+            float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
+            if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
+                RotatingClockwise = (yRotationDiff<0);
+            }
+
+            transform.rotation = newRotation;
+        }
+    }
+
     public bool InputDash { get; set; } = false;
     public bool InputRunning { get; set; } = false;
     public bool InputBlocking { get; set; } = false;
@@ -103,8 +160,18 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
-    private int inputCastId = -1;
-    public int CastIdBuffer { get; set; } = -1;
+    public int CastBufferTimer { get; private set; } = 0;
+    private Cast _activeCast = null;
+    private int _nextCastId;
+    public int InputCastId {
+        get { return _nextCastId; }
+        set {
+            _nextCastId = value;
+            if (value>0) {
+                CastBufferTimer = 60;
+            }
+        }
+    }
 
     /* Resources */
     private int maxCharges = 5;
@@ -140,14 +207,28 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
      * CONTROLS
      */
     //movement
-    public void OnMovement(InputAction.CallbackContext context) {
-        var direction = context.ReadValue<Vector2>();
-        InputMoveDirection = (direction.x==0 && direction.y==0) ? Vector3.zero : new Vector3(direction.x, 0, direction.y).normalized;
+    public void OnAim(InputAction.CallbackContext context) {
+        Vector2 InputAimPosition = context.action.ReadValue<Vector2>();
+
+        if (Camera.main != null) { // yells at me when the game is closed
+            Ray ray = Camera.main.ScreenPointToRay(InputAimPosition);
+
+            if (aimPlane.Raycast(ray, out float distance)) {
+                Vector3 aimPoint = ray.GetPoint(distance);
+                // cursor position getting locked to Z by inputrelaimpos set
+                InputAimDirection = MovementUtils.inXZ(aimPoint-cc.transform.position);
+            }
+        }
     }
+
+    public void OnMovement(InputAction.CallbackContext context) {
+        InputMoveDirection = context.ReadValue<Vector2>();
+    }
+
     public void OnRunning(InputAction.CallbackContext context) {
-        // TODO fix tihs - shielding sets running to false
         InputRunning=context.ReadValueAsButton();
     }
+
     public void OnDash(InputAction.CallbackContext context) {
         InputDash=context.ReadValueAsButton();
     }
@@ -155,47 +236,47 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     // attacks
     public void OnLight1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Light1;
+            InputCastId = (int)CastId.Light1;
         }
     }
     public void OnLight2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Light2;
+            InputCastId = (int)CastId.Light2;
         }
     }
     public void OnBoostedLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.LightS;
+            InputCastId = (int)CastId.LightS;
         }
     }
     public void OnMedium1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Medium1;
+            InputCastId = (int)CastId.Medium1;
         }
     }
     public void OnMedium2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Medium2;
+            InputCastId = (int)CastId.Medium2;
         }
     }
     public void OnBoostedMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.MediumS;
+            InputCastId = (int)CastId.MediumS;
         }
     }
     public void OnHeavy1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Heavy1;
+            InputCastId = (int)CastId.Heavy1;
         }
     }
     public void OnHeavy2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Heavy2;
+            InputCastId = (int)CastId.Heavy2;
         }
     }
     public void OnBoostedHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.HeavyS;
+            InputCastId = (int)CastId.HeavyS;
         }
     }
 
@@ -210,46 +291,67 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            CastIdBuffer = (int)CastId.Throw1;
+            InputCastId = (int)CastId.Throw1;
         }
     }
     public void OnThrow2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Throw2;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Throw2;
+        }
     }
     public void OnBoostedThrow(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.ThrowS;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.ThrowS;
+        }
     }
 
     // abilities
     public void OnAbility1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Ability1;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Ability1;
+        }
     }
     public void OnAbility2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Ability2;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Ability2;
+        }
     }
     public void OnAbility3(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Ability3;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Ability3;
+        }
     }
     public void OnAbility4(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Ability4;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Ability4;
+        }
     }
     public void OnSpecial1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Special1;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Special1;
+        }
     }
     public void OnSpecial2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Special2;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Special2;
+        }
     }
     public void OnUltimate(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton())
-            CastIdBuffer = (int)CastId.Ultimate;
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Ultimate;
+        }
+    }
+
+    public CharacterFrameInput GetCharacterFrameInput() {
+        return new CharacterFrameInput(
+            MoveDirection,
+            InputAimDirection,
+            InputBlocking,
+            InputShielding,
+            InputRunning,
+            InputDash,
+            InputCastId
+        );
     }
 
     public void SetMe() {
@@ -259,22 +361,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         characterControls.character.SetCallbacks(this);
     }
 
-    void HandleControls() {
-        if (me) {
-            // aiming TODO move to input manager
-            var playerPosition = cc.transform.position;
-            aimPlane.SetNormalAndPosition(Vector3.up, playerPosition);
-            UpdateCursorTransformWorldPosition();
-            var direction = new Vector3(CursorTransform.position.x-playerPosition.x, 0, CursorTransform.position.z-playerPosition.z).normalized;
-            Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
-
-            float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
-            if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
-                RotatingClockwise = (yRotationDiff<0);
-            }
-
-            transform.rotation = newRotation;
-        }
+    public void UnsetMe() {
+        me = false;
+        characterControls.Disable();
     }
 
     /* Casts */
@@ -284,15 +373,23 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private bool StartCast(int castId) {
         ref CastContainer castContainer = ref CastContainers[castId];
 
-        if (castContainer.cast is not null) {
+        if (
+            castContainer.cast is not null // cast has not expired
+            && castContainer.charges == 0 // cast is still on cooldown
+        ) {
             // we're updating another cast - allowed
-            castContainer.cast.Recast(CursorTransform);
-            return true;
+            return castContainer.cast.Recast(CursorTransform);
         } else {
             if (castContainer.charges==0) {
                 return false;
             } else {
-                // nothing is being casted, so start this new one
+                if (_activeCast is not null) {
+                    // Destroy any active casts on recast
+                    // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
+                    Destroy(_activeCast);
+                    _activeCast = null;
+                }
+
                 if (castContainer.castPrefab == null) {
                     Debug.Log("No cast supplied for cast"+(int)castId);
                     return true;
@@ -310,7 +407,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                         energy -= 100;
                     }
 
-                    castContainer.cast = Cast.Initiate(
+                    castContainer.cast = _activeCast = Cast.Initiate(
                         castContainer.castPrefab,
                         this,
                         transform,
@@ -348,15 +445,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             if (CastContainers[i].cast == null) {
                 CastContainers[i].cast = null;
-            }
-        }
-        // resolve cast startup
-        int j = (int)inputCastId;
-        if (j >= 0) { // if an active cast is designated
-            if (CastContainers[j].cast == null) {
-                inputCastId = -1;
-            } else if (CastContainers[j].cast.Frame >= CastContainers[j].cast.startupTime) { // if startup time has elapsed
-                inputCastId = -1;
             }
         }
     }
@@ -442,7 +530,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         else if (_state is CharacterStateRolling // recovering
             || _state is CharacterStateGettingUp)
             Material.color=new Color(255, 255, 0);
-        else if (inputCastId >= 0)
+        else if (InputCastId >= 0)
             Material.color=Color.magenta;
         else if (chargeCooldown<0&&Charges>0)
             Material.color=Color.green;
@@ -457,8 +545,41 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     private void Update() {
         // handle inputs
-        HandleControls();
+        if (me) {
+            if (Input.GetKeyDown(KeyCode.KeypadMinus)) {
+                ToggleRecordingControls("characterInput");
+            }
+        }
+
         HandleVisuals();
+    }
+
+    private void ToggleRecordingControls(string recordFileName) {
+        if (!_recordingControls) {
+            Debug.Log("Starting to record controls");
+            _recordingControls = true;
+            _recordControlStream = new FileStream(recordFileName, FileMode.Create);
+        } else {
+            Debug.Log("Finished recording controls");
+            _recordingControls = false;
+            _recordControlStream.Close();
+        }
+    }
+
+    public void ToggleCollectingControls(string recordFileName, bool restartAfterDone) {
+        if (!_collectingControls) {
+            Debug.Log("Starting to collect controls");
+            _collectingControls = true;
+            _collectingControlsRestart = restartAfterDone;
+            _recordControlStream = new FileStream(recordFileName, FileMode.Open);
+            if (characterControls!=null) { characterControls.Disable(); }
+        } else {
+            Debug.Log("Terminating control collection");
+            _collectingControls = false;
+            _collectingControlsRestart = false;
+            _recordControlStream.Close();
+            if (me) { characterControls.Enable(); }
+        }
     }
 
     private void HandleCharges() {
@@ -472,6 +593,15 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     void FixedUpdate() {
+        // handle control recordings
+
+
+        if (_recordingControls) {
+            WriteCharacterFrameInput(_recordControlStream);
+        } else if (_collectingControls) {
+            LoadCharacterFrameInput(ReadCharacterFrameInput(_recordControlStream));
+        }
+
         // Handle Casts
         State.FixedUpdateStates();
 
@@ -485,15 +615,17 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
 
         cc.Move(Velocity*Time.deltaTime);
-
         HandleCharges();
-        if (CastIdBuffer >= 0) {
-            if (StartCast(CastIdBuffer)) {
-                CastIdBuffer = -1;
+
+        if (--CastBufferTimer == 0) {
+            InputCastId = -1;
+        } else if (InputCastId >= 0) {
+            if (StartCast(InputCastId)) {
+                InputCastId = -1;
             }
         }
+
         TickCasts();
-        //Move();
         HandleCollisions();
 
         // apply statusEffects
@@ -504,52 +636,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         statusEffects.RemoveAll((Effect effect) => { return (effect == null); });
     }
 
-    // Movement evaluations
-    public Vector3 LookDirection {
-        get {
-            Vector3 LookDirection = CursorTransform.position-cc.transform.position;
-            LookDirection.y = 0;
-            return LookDirection.normalized;
-        }
-        set {
-            // used for AI
-            CursorTransform.position = cc.transform.position+value;
-            transform.rotation = Quaternion.LookRotation(value, Vector3.up);
-        }
-    }
-
     public void SetCommandMovement(CommandMovement _commandMovement) {
         CommandMovement = _commandMovement;
-    }
-
-    /// <summary>
-    /// Determines the acceleration of the Character's movemnt while the shield is up
-    /// Generally, the Character shall slow down when the direction of their shield is in the direction of their movement
-    /// </summary>
-    /// <param name="level"></param>
-    /// <param name="velocity"></param>
-    /// <param name="lookVector"></param>
-    /// <returns></returns>
-    private float GetShieldAccelerationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
-        if (Shield.ShieldTier == ShieldTier.Exposed) return 0;
-        else {
-            float x = (int)Shield.ShieldTier * Vector3.Dot(velocity.normalized, lookVector.normalized);
-            return Mathf.Pow(x, (int)Shield.ShieldTier);
-        }
-    }
-
-    /// <summary>
-    /// Determines how much the player's velocity rotates when using a boosted shield
-    /// </summary>
-    /// <param name="level"></param>
-    /// <param name="velocity"></param>
-    /// <param name="lookVector"></param>
-    /// <returns></returns>
-    private float GetShieldRotationFactor(ShieldTier level, Vector3 velocity, Vector3 lookVector) {
-        if (Shield.ShieldTier == ShieldTier.Shielding) {
-
-            return 2.5f * (1-Vector3.Dot(velocity.normalized, lookVector.normalized));
-        } else return 0;
     }
 
     public bool IsGrounded() {
@@ -579,18 +667,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             OnCollideWith(collidable, new CollisionInfo(hit.normal));
         } else {
             throw new Exception("Unhandled collision type");
-        }
-    }
-
-    public void UpdateCursorTransformWorldPosition() {
-        if (me) {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (aimPlane.Raycast(ray, out float distance)) {
-                CursorTransform.position = ray.GetPoint(distance);
-            } else {
-                CursorTransform.position = transform.position; // TODO is this good? currently, the cursor will just point to self
-            }
         }
     }
 
@@ -728,7 +804,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 ImmaterialStack > 0
                 || otherCharacter.ImmaterialStack > 0
             )
-        ) return; else {
+        ) return;
+        else {
             _state.OnCollideWith(other, info);
         }
     }
@@ -738,4 +815,56 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public Collider Collider { get { return GetComponent<Collider>(); } }
+
+    /* Control Recording */
+    private bool _recordingControls;
+    private bool _collectingControls;
+    private bool _collectingControlsRestart;
+    private FileStream _recordControlStream = null;
+    private void WriteCharacterFrameInput(FileStream outputStream) {
+        CharacterFrameInput input = new CharacterFrameInput(
+            InputMoveDirection,
+            InputAimDirection,
+            InputBlocking,
+            InputShielding,
+            InputRunning,
+            InputDash,
+            InputCastId
+        );
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        formatter.Serialize(outputStream, input);
+    }
+
+    public void LoadCharacterFrameInput(CharacterFrameInput input) {
+        InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
+        InputAimDirection = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
+        InputDash = input.Dash;
+        InputRunning = input.Running;
+        InputCastId = input.CastId;
+        InputBlocking = input.Blocking;
+        InputShielding = input.Shielding;
+    }
+
+    public CharacterFrameInput ReadCharacterFrameInput(FileStream inputStream) {
+        BinaryFormatter formatter = new BinaryFormatter();
+        CharacterFrameInput ret = (CharacterFrameInput)formatter.Deserialize(inputStream);
+
+        if (inputStream.Position==inputStream.Length) {
+            Debug.Log("Finishing reading recording");
+
+            if (_collectingControlsRestart) {
+                Debug.Log("restarting recording");
+                inputStream.Seek(0, SeekOrigin.Begin);
+            } else {
+                Debug.Log("Closing recording recording");
+                inputStream.Close();
+                _collectingControlsRestart = false;
+                _collectingControls = false;
+                if (me) { characterControls.Enable(); }
+            }
+        }
+
+        return ret;
+    }// TODO collect inputs of user to replay them
 }

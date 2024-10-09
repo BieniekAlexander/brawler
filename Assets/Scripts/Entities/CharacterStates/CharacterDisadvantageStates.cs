@@ -1,10 +1,24 @@
+using System;
 using UnityEngine;
 
 public static class KnockBackUtils {
-    // TODO maybe this isn't the best spot, but I think it's okay for now :)
-    public static void DecomposeKnockback(Vector3 knockBackVector, ref Vector3 horizontalVector, ref float verticalMagnitude) {
-        horizontalVector = Vector3.Scale(new Vector3(1f, 0f, 1f), knockBackVector);
-        verticalMagnitude = knockBackVector.y;
+    public static int getHitLag(HitTier HitTier) {
+        return (HitTier) switch {
+            HitTier.Soft => 0,
+            HitTier.Light => 3,
+            HitTier.Medium => 5,
+            HitTier.Heavy => 7,
+            HitTier.Pure => 10, // TODO play around with these values
+            _ => throw new NotImplementedException($"Unknown HitTier value: {HitTier}")
+        };
+    }
+
+    public static int getHitStun(Vector3 knockbackVector) {
+        int hitstun = Mathf.FloorToInt(
+            MovementUtils.inXZ(knockbackVector).magnitude * .8f
+        );
+        
+        return hitstun;
     }
 
     public static float KnockBackDecay = 10f;
@@ -14,7 +28,6 @@ public class CharacterStateHitStopped : CharacterState {
     public CharacterStateHitStopped(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -30,10 +43,14 @@ public class CharacterStateHitStopped : CharacterState {
         }
     }
 
-    public override void EnterState() { }
+    public override void EnterState() {
+        base.EnterState();
+        Character.Shield.gameObject.SetActive(false);
+    }
+
     public override void ExitState() { }
     public override void InitializeSubState() {
-        _subState = null;
+        _subState = Factory.Busy();
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
@@ -50,7 +67,6 @@ public class CharacterStatePushedBack : CharacterState {
     public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -62,12 +78,14 @@ public class CharacterStatePushedBack : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
+
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
             (
-                Character.InputMoveDirection==Vector3.zero
+                Character.MoveDirection==Vector3.zero
                 ? Character.KnockBack
-                : Character.InputMoveDirection
+                : Character.MoveDirection
             ),
             _maxAngleChange,
             0f
@@ -78,9 +96,8 @@ public class CharacterStatePushedBack : CharacterState {
     }
 
     public override void FixedUpdateState() {
-        Character.HitStunTimer--;
-
         if (Character.IsGrounded()) {
+            Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
                 -KnockBackUtils.KnockBackDecay*Time.deltaTime
@@ -89,8 +106,9 @@ public class CharacterStatePushedBack : CharacterState {
     }
 
     public override void ExitState() { }
+
     public override void InitializeSubState() {
-        _subState = null;
+        _subState = Factory.Busy();
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
@@ -102,7 +120,6 @@ public class CharacterStateKnockedBack : CharacterState {
     public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -115,12 +132,14 @@ public class CharacterStateKnockedBack : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
+
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
             (
-                Character.InputMoveDirection==Vector3.zero
+                Character.MoveDirection==Vector3.zero
                 ? Character.KnockBack
-                : Character.InputMoveDirection
+                : Character.MoveDirection
             ),
             _maxAngleChange,
             0f
@@ -131,9 +150,9 @@ public class CharacterStateKnockedBack : CharacterState {
     }
 
     public override void FixedUpdateState() {
-        Character.HitStunTimer--;
 
         if (Character.IsGrounded()) {
+            Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
                 -KnockBackUtils.KnockBackDecay*Time.deltaTime
@@ -142,7 +161,7 @@ public class CharacterStateKnockedBack : CharacterState {
     }
 
     public override void InitializeSubState() {
-        _subState = null;
+        _subState = Factory.Busy();
     }
 
     public override void ExitState() { }
@@ -155,7 +174,6 @@ public class CharacterStateBlownBack : CharacterState {
     public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
-        InitializeSubState();
     }
 
     public override CharacterState CheckGetNewState() {
@@ -168,12 +186,14 @@ public class CharacterStateBlownBack : CharacterState {
     }
 
     public override void EnterState() {
+        base.EnterState();
+
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
             (
-                Character.InputMoveDirection==Vector3.zero
+                Character.MoveDirection==Vector3.zero
                 ? Character.KnockBack
-                : Character.InputMoveDirection
+                : Character.MoveDirection
             ),
             _maxAngleChange,
             0f
@@ -184,9 +204,8 @@ public class CharacterStateBlownBack : CharacterState {
     }
 
     public override void FixedUpdateState() {
-        Character.HitStunTimer--;
-
         if (Character.IsGrounded()) {
+            Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
                 -KnockBackUtils.KnockBackDecay*Time.deltaTime
@@ -195,7 +214,7 @@ public class CharacterStateBlownBack : CharacterState {
     }
 
     public override void InitializeSubState() {
-        _subState = null;
+        _subState = Factory.Busy();
     }
 
     public override void ExitState() { }

@@ -50,13 +50,14 @@ MonoBehaviour:
     m_keys: 0a000000
     m_values:
     - data:
-      - {fileID: 610786074341264652, guid: 7107a9149509a124ca8338b60092f698, type: 3}
+      - {fileID: 5084085653392112361, guid: 067767b4065268e43a73323816bce9e1, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []
   Frame: 0
   startupTime: 0
   Encumbering: 0
+  TargetingMethod: 0
   duration: 20
   Origin: {fileID: 0}
   statusEffects: []

@@ -16,7 +16,10 @@ public abstract class CharacterState {
         Factory = _factory;
     }
 
-    public abstract void EnterState();
+    public virtual void EnterState() {
+        InitializeSubState();
+    }
+
     public abstract void FixedUpdateState();
     public abstract void ExitState();
 
@@ -41,6 +44,7 @@ public abstract class CharacterState {
 
         if (_isRootState) {
             Character.State = newState;
+
         } else if (_superState != null) {
             _superState.SetSubState(newState);
         }

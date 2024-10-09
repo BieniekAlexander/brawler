@@ -57,6 +57,7 @@ MonoBehaviour:
   Frame: 0
   startupTime: 0
   Encumbering: 0
-  duration: 15
+  TargetingMethod: 0
+  duration: 20
   Origin: {fileID: 0}
   statusEffects: []

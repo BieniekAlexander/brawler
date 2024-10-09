@@ -56,8 +56,9 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   Frame: 0
-  startupTime: 50
+  startupTime: 10
   Encumbering: 1
+  TargetingMethod: 0
   duration: 60
   Origin: {fileID: 0}
   statusEffects: []

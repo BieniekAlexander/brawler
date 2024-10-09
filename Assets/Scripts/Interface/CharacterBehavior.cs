@@ -21,10 +21,10 @@ public class CharacterBehavior : MonoBehaviour
     void Update()
     {
         if (++WhackCounter == WhackTimer) {
-            Character.CastIdBuffer = (int) CastId;
+            Character.InputCastId = (int) CastId;
             WhackCounter = 0;
         } else {
-            Character.CastIdBuffer = - 1;
+            Character.InputCastId = - 1;
         }
     }
 }

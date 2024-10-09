@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StatusEffectImmaterial: Effect {
+public class EffectImmaterial: Effect {
     private int originalLayer;
 
     public override void Initialize(MonoBehaviour _target) {

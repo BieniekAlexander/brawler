@@ -6,20 +6,25 @@ public enum ShieldTier {
     Shielding = 2
 }
 
-public class Shield : MonoBehaviour, ICollidable {
+public class Shield : MonoBehaviour {
     [HideInInspector] public ShieldTier ShieldTier = ShieldTier.Exposed;
     public Material Material { get; set; }
     public Transform Transform { get { return transform; } }
+    public int ParryWindow { get; private set; }
+    private int _parryWindowMax = 30;
     
     // public float - TODO should I tie the shield to a resource?
 
     private void Awake() {
-        _collider = GetComponent<Collider>();
         Material = GetComponent<Renderer>().material;
     }
 
     private void Update() {
         HandleVisuals();
+    }
+
+    private void FixedUpdate() {
+        ParryWindow--;
     }
 
     private void HandleVisuals() {
@@ -35,19 +40,7 @@ public class Shield : MonoBehaviour, ICollidable {
             Material.color=Color.red;
     }
 
-    /* ICollidable Methods */
-    private Collider _collider;
-
-    public void OnCollideWith(ICollidable other, CollisionInfo info) {
-        ;
-        // TODO currently no-op
-        // have this reflect projectiles on Parry, and maybe hitstun attackers on parry
+    private void OnEnable() {
+        ParryWindow = _parryWindowMax;
     }
-
-    public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this, null);
-    }
-
-    public Collider Collider { get { return _collider; } }
-    public int ImmaterialStack { get { return 0; } set {; } }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,7 +8,7 @@ public interface IStatusEffectMessage : IEventSystemHandler {
 
 public abstract class Effect : MonoBehaviour, IStatusEffectMessage {
     [SerializeField] int tickRate;
-    [SerializeField] public int duration;
+    [SerializeField] public int _duration;
     [HideInInspector] public MonoBehaviour Target;
     private int frame;
 
@@ -31,7 +32,7 @@ public abstract class Effect : MonoBehaviour, IStatusEffectMessage {
     public virtual void Tick() {; }
 
     public void FixedUpdate() {
-        if (++frame >= duration) {
+        if (++frame >= _duration) {
             if (Target != null) {
                 // TODO I'm worried about target suddenly being null because of destruction
                 // https://community.gamedev.tv/t/question-about-destroy-gameobject/176998/4

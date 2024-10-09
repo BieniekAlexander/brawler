@@ -104,6 +104,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     CharacterStateFactory StateFactory;
 
     public int BusyTimer { get; set; } = 0;
+    public bool Parried = false;
 
     /* Visuals */
     // Bolt Visualization
@@ -181,7 +182,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private int rechargeRate = 300;
     private int rechargeTimer = 0;
     private int shieldDuration = -1;
-    private int parryWindow = 30;
     private int energy = 100;
     private int maxEnergy = 100;
 
@@ -197,10 +197,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* Status Effects */
     private List<Effect> statusEffects = new();
-    private bool invincible = false;
 
     /* Children */
     [SerializeField] public Shield ShieldPrefab;
+    [SerializeField] public EffectInvulnerable ParryInvulnerabilityPrefab;
     public Shield Shield { get; private set; }
 
     /*
@@ -491,6 +491,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         cursorGameObject.transform.parent = transform;
         CursorTransform = cursorGameObject.transform;
         aimPlane = new Plane(Vector3.up, transform.position);
+        InputCastId = -1;
 
         // State WIP
         StateFactory = new(this);
@@ -518,18 +519,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
          * Bolt Indicator
          */
         // duration
-        if (HitStopTimer>0)
-            Material.color=new Color(0, 0, 0);
+        if (InvulnerableStack>0)
+            Material.color = new Color(255, 255, 255);
+        else if (HitStopTimer>0)
+            Material.color = new Color(0, 0, 0);
         else if (_state is CharacterStateBlownBack // disadvantage
             || _state is CharacterStateKnockedBack
             || _state is CharacterStatePushedBack)
-            Material.color=new Color(255, 0, 0);
+            Material.color = new Color(255, 0, 0);
         else if (_state is CharacterStateTumbling // vulnerable
             || _state is CharacterStateKnockedDown)
-            Material.color=new Color(125, 125, 0);
+            Material.color = new Color(125, 125, 0);
         else if (_state is CharacterStateRolling // recovering
             || _state is CharacterStateGettingUp)
-            Material.color=new Color(255, 255, 0);
+            Material.color = new Color(255, 255, 0);
         else if (InputCastId >= 0)
             Material.color=Color.magenta;
         else if (chargeCooldown<0&&Charges>0)
@@ -593,9 +596,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     void FixedUpdate() {
-        // handle control recordings
-
-
         if (_recordingControls) {
             WriteCharacterFrameInput(_recordControlStream);
         } else if (_collectingControls) {
@@ -725,38 +725,57 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public float TakeKnockBack(Vector3 contactPoint, int hitStopDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
-        float knockBackFactor = HitsShield(contactPoint)
-            ? GetKnockBackFactor(hitTier, (Shield.isActiveAndEnabled ? Shield.ShieldTier : 0))
-            : 1f;
+        float knockBackFactor;
 
-        // TODO account for pushback of HitTier.Soft
-        KnockBackHitTier = hitTier;
+        if (HitsShield(contactPoint)) {
+            if (Shield.ParryWindow > 0) {
+                EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
+                Invulnerability.Initialize(this);
+                Parried = true;
+                // TODO:
+                // - reflect projectiles
+                // - set 
+            }
 
-        if (knockBackFactor > 0) {
-            Destroy(CommandMovement);
-            CommandMovement = null;
-            KnockBack = knockBackFactor*knockBackVector;
-            HitStunTimer = hitStunDuration;
-            CastEncumberedTimer = 0;
-            BusyTimer = 0;
+            knockBackFactor = GetKnockBackFactor(hitTier, (Shield.isActiveAndEnabled ? Shield.ShieldTier : 0));
+            return knockBackFactor;
+        } else {
+            if (InvulnerableStack>0) {
+                return 0;
+            }
 
-            if (hitStopDuration > 0) {
-                HitStopTimer = hitStopDuration;
-                SwitchState(StateFactory.HitStopped());
-            } else if (KnockBack != Vector3.zero) {
-                if (hitTier >= HitTier.Heavy) {
-                    SwitchState(StateFactory.BlownBack());
-                } else if (hitTier == HitTier.Medium) {
-                    SwitchState(StateFactory.KnockedBack());
-                } else if (hitTier == HitTier.Light) {
-                    SwitchState(StateFactory.PushedBack());
-                } else {
-                    Velocity += KnockBack;
+            // TODO account for pushback of HitTier.Soft
+            KnockBackHitTier = hitTier;
+            knockBackFactor = 1;
+
+            if (knockBackFactor > 0) {
+                Destroy(CommandMovement);
+                CommandMovement = null;
+                KnockBack = knockBackFactor*knockBackVector;
+                HitStunTimer = hitStunDuration;
+                CastEncumberedTimer = 0;
+                BusyTimer = 0;
+
+                if (hitStopDuration > 0) {
+                    HitStopTimer = hitStopDuration;
+                    SwitchState(StateFactory.HitStopped());
+                } else if (KnockBack != Vector3.zero) {
+                    if (hitTier >= HitTier.Heavy) {
+                        SwitchState(StateFactory.BlownBack());
+                    } else if (hitTier == HitTier.Medium) {
+                        SwitchState(StateFactory.KnockedBack());
+                    } else if (hitTier == HitTier.Light) {
+                        SwitchState(StateFactory.PushedBack());
+                    } else {
+                        Velocity += KnockBack;
+                    }
                 }
             }
+
+            return knockBackFactor;
         }
 
-        return knockBackFactor;
+        
     }
 
     /* IDamageable Methods */
@@ -770,7 +789,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
         // TODO add some sort of implementation to ignore shield
         // TODO add taking damage from armor before HP
-        if ((hitTier!=HitTier.Pure) && (invincible || HitsShield(_contactPoint))) return 0;
+        if ((hitTier!=HitTier.Pure) && (InvulnerableStack>0 || HitsShield(_contactPoint))) return 0;
 
         HP -= damage;
         healMax = Mathf.Min(healMax, HP+healMaxOffset);

@@ -238,6 +238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
+  InputMoveDirection: {x: 0, y: 0}
   castSlots:
   - name: Light1
     castPrefab: {fileID: 5634063031192742342, guid: dde3ed861901527448a1de30d9005c81,
@@ -330,4 +331,6 @@ MonoBehaviour:
     cooldown: -1
     defaultChargeCount: 1
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
+    type: 3}
+  ParryInvulnerabilityPrefab: {fileID: -868168471956183718, guid: ac1b3db686c9bf647af1e23771ca1023,
     type: 3}

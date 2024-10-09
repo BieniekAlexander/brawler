@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StatusEffectBurning: Effect {
+public class EffectBurning: Effect {
     [SerializeField] int damage;
     private IDamageable Damageable;
 

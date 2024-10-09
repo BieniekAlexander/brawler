@@ -695,19 +695,30 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /// <summary>
-    /// Returns true if the contact poins is not intersecting with the <paramref name="Character"/>'s <paramref name="Shield"/>
+    /// Returns true if the contact point is between the <paramref name="Character"/>'s center and their <paramref name="Shield"/>
     /// </summary>
     /// <remarks>I'll leave it up to the caller as to where the <paramref name="contactPoint"/> is</remarks>
     /// <param name="contactPoint"></param>
     /// <returns></returns>
     private bool HitsShield(Vector3 contactPoint) {
-        // I want the attack to hit shield if the contact point is not inside the shield
-        // 
-        /// https://www.desmos.com/3d
-        // \left(\left(x-.5\right)\right)^{2}+\left(y\right)^{2}>\left(x^{2}+y^{2}\right)
-        // x^{2}+y^{2}=1
         if (Shield.isActiveAndEnabled) {
-            return !(Shield.Collider.bounds.Contains(contactPoint));
+            Vector2 s = new Vector2(contactPoint.x, contactPoint.z);
+            Vector2 a = new Vector2(transform.position.x, transform.position.z);
+
+            if ((s-a).magnitude>=.5) {
+                return true;
+            } else {
+                Vector2 mid = new Vector2(Shield.transform.position.x, Shield.transform.position.z);
+                Vector2 perp = Vector2.Perpendicular(mid-a).normalized;
+                Vector2 b = mid + perp*Shield.transform.localScale.x/2;
+                Vector2 c = mid - perp*Shield.transform.localScale.x/2;
+
+                if (MathUtils.pointInTriangle(s, a, b, c)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         } else {
             return false;
         }
@@ -728,20 +739,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             HitStunTimer = hitStunDuration;
             CastEncumberedTimer = 0;
             BusyTimer = 0;
-        }
 
-        if (hitStopDuration > 0) {
-            HitStopTimer = hitStopDuration;
-            SwitchState(StateFactory.HitStopped());
-        } else if (KnockBack != Vector3.zero) {
-            if (hitTier >= HitTier.Heavy) {
-                SwitchState(StateFactory.BlownBack());
-            } else if (hitTier == HitTier.Medium) {
-                SwitchState(StateFactory.KnockedBack());
-            } else if (hitTier == HitTier.Light) {
-                SwitchState(StateFactory.PushedBack());
-            } else {
-                Velocity += KnockBack;
+            if (hitStopDuration > 0) {
+                HitStopTimer = hitStopDuration;
+                SwitchState(StateFactory.HitStopped());
+            } else if (KnockBack != Vector3.zero) {
+                if (hitTier >= HitTier.Heavy) {
+                    SwitchState(StateFactory.BlownBack());
+                } else if (hitTier == HitTier.Medium) {
+                    SwitchState(StateFactory.KnockedBack());
+                } else if (hitTier == HitTier.Light) {
+                    SwitchState(StateFactory.PushedBack());
+                } else {
+                    Velocity += KnockBack;
+                }
             }
         }
 

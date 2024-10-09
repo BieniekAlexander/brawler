@@ -78,7 +78,7 @@ public class SceneController : MonoBehaviour
             }
         } else if (Input.GetKeyDown(KeyCode.KeypadMultiply)) {
             Characters[_meId].UnsetMe();
-            _meId = Utils.mod(_meId+1, Characters.Count);
+            _meId = MathUtils.mod(_meId+1, Characters.Count);
             Characters[_meId].SetMe();
             GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Characters[_meId].transform;
         } else if (Input.GetKey(KeyCode.KeypadPlus)) {

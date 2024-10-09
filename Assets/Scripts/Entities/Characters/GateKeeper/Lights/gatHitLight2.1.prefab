@@ -84,18 +84,15 @@ MonoBehaviour:
   - PolarPosition: {x: 19.264254, y: 1.0487211}
     Dimension: {x: 0.8, y: 0.25, z: 0.25}
     Rotation: {x: 0, y: 0.68745345, z: 0, w: 0.7262285}
-  Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 1
   HitsEnemies: 1
   HitsFriendlies: 0
+  damage: 50
   KnockbackCoordinateSystem: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 7}
   HitTier: 1
-  hitLagDuration: 3
-  hitStunDuration: 5
 --- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -76,7 +76,7 @@ public class Hit : Trigger, ICollidable {
                 int hitStunDuration = KnockBackUtils.getHitStun(knockBackVector);
                 int hitLagDuration = KnockBackUtils.getHitLag(HitTier);
 
-                float targetKnockbackFactor = OtherMover.TakeKnockBack(
+                float shieldKnockBackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
                     hitLagDuration,
                     knockBackVector,
@@ -84,12 +84,12 @@ public class Hit : Trigger, ICollidable {
                     HitTier
                 );
 
-                if (targetKnockbackFactor < 0f && (Caster is IMoves thisMover)) {
+                if (shieldKnockBackFactor < 0f && (Caster is IMoves thisMover)) {
                     // TODO this might apply knockback to things other than characters
                     thisMover.TakeKnockBack(
                         thisMover.Transform.position,
                         hitLagDuration,
-                        knockBackVector,
+                        shieldKnockBackFactor*knockBackVector,
                         hitStunDuration,
                         HitTier
                     );

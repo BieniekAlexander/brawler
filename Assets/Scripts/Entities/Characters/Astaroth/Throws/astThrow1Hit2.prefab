@@ -47,11 +47,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 20
+  Duration: 1
   Origin: {fileID: 0}
   Target: {fileID: 0}
   Mirror: 0
   Frame: 0
+  indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -59,78 +60,24 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0}
+  - PolarPosition: {x: 0, y: -0.1}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
+  - PolarPosition: {x: 0, y: -0.1}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
+  - PolarPosition: {x: 0, y: -0.1}
     Dimension: {x: 0.2, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.2, y: 0.2, z: 0.2}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  Collider: {fileID: 0}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 10
   HitsEnemies: 1
   HitsFriendlies: 0
+  damage: 10
   KnockbackCoordinateSystem: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 10}
   HitTier: 2
-  hitLagDuration: 10
-  hitStunDuration: 30
 --- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0

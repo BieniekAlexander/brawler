@@ -659,16 +659,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return vector.normalized*Mathf.Max(vector.magnitude-decayRate*Time.deltaTime, 0);
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit) {
-        GameObject collisionObject = hit.collider.gameObject;
-
-        if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
-            OnCollideWith(collidable, new CollisionInfo(hit.normal));
-        } else {
-            throw new Exception("Unhandled collision type");
-        }
-    }
-
     /* IMoves Methods */
     public float BaseSpeed { get; set; } = 7.5f;
     public Transform Transform { get { return transform; } }
@@ -827,6 +817,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private Collider _collider;
     public int ImmaterialStack { get; set; } = 0;
 
+    void OnControllerColliderHit(ControllerColliderHit hit) {
+        GameObject collisionObject = hit.collider.gameObject;
+
+        if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
+            State.HandleCollisionWithStates(collidable, new CollisionInfo(hit.normal));
+        } else {
+            throw new Exception("Unhandled collision type");
+        }
+    }
+
     public void OnCollideWith(ICollidable other, CollisionInfo info) {
         if (other is Character otherCharacter
             && (
@@ -835,7 +835,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             )
         ) return;
         else {
-            _state.OnCollideWith(other, info);
+            _state.HandleCollisionWithStates(other, info);
         }
     }
 

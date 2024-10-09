@@ -45,5 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tickRate: 0
-  duration: 30
+  _duration: 15
   Target: {fileID: 0}

@@ -15,7 +15,7 @@ public class EffectImmaterial: Effect {
     public override void Expire() {
         if (Target != null){
             Target.gameObject.layer = originalLayer;
-            (Target as ICollidable).ImmaterialStack += 1;
+            (Target as ICollidable).ImmaterialStack -= 1;
         }
     }
 

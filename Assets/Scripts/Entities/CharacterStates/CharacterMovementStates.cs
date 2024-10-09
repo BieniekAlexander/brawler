@@ -65,7 +65,6 @@ public class CharacterStateIdle : CharacterState {
     }
 
     public override void FixedUpdateState() {
-        // TODO I guess it can be assumed that velocity.magnitude is zero here?
         Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration*Time.deltaTime));
     }
 
@@ -307,8 +306,8 @@ public class CharacterStateDashing : CharacterState {
     }
 
     public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is Character otherCharacter) {
-            if (info != null && MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
+        if (collidable is Character otherCharacter) { // TODO 
+            if (MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
                 // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
                 // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
                 // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
@@ -317,7 +316,7 @@ public class CharacterStateDashing : CharacterState {
                 Character.Velocity-=dvNormal;
                 otherCharacter.Velocity=MovementUtils.inXZ(Character.Velocity)+dvNormal;
             }
-        } else if (info != null && collidable is StageTerrain terrain) {
+        } else if (collidable is StageTerrain terrain) {
             // TODO sometimes this collision is breaking because info is null?
             Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;

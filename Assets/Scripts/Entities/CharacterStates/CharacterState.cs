@@ -60,4 +60,12 @@ public abstract class CharacterState {
     }
 
     public abstract void OnCollideWith(ICollidable collidable, CollisionInfo info);
+
+    public virtual void HandleCollisionWithStates(ICollidable collidable, CollisionInfo info) {
+        OnCollideWith(collidable, info);
+
+        if (_subState != null) {
+            _subState.HandleCollisionWithStates(collidable, info);
+        }
+    }
 }

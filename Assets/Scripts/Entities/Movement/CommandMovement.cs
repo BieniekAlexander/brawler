@@ -6,7 +6,6 @@ public abstract class CommandMovement : MonoBehaviour {
     [SerializeField] public float Range;
 
     public Vector3 Path { get; set; }
-    public Vector3 Velocity { get; set; }
     public int Frame { get; private set; } = 0;
     public List<Effect> Effects { get; private set; } = new();
     public IMoves Mover { get; private set; }

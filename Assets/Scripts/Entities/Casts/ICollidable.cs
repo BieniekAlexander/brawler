@@ -136,8 +136,8 @@ public static class CollisionUtils {
     /// <param name="ThisCollidable"></param>
     /// <param name="CollisionLog"></param>
     public static void HandleCollisions(ICollidable ThisCollidable, HashSet<ICollidable> CollisionLog) {
-        if (ThisCollidable.Collider is Collider collider && collider != null) {
-            foreach (Collider otherCollider in GetOverlappingColliders(collider)) {
+        if (ThisCollidable.Collider != null) {
+            foreach (Collider otherCollider in GetOverlappingColliders(ThisCollidable.Collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
                     if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {
                         ThisCollidable.OnCollideWith(OtherCollidable, null);

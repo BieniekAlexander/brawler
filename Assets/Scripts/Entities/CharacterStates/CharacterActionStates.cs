@@ -192,20 +192,15 @@ public class CharacterStateShielding : CharacterState {
         // - if you're running, shielding towards the direction of movement should rotate you (but not too much the same dir?)
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
-        Vector3 characterDirection = MovementUtils.inXZ(Character.Velocity).normalized;
         Vector3 shieldDirection = Character.InputAimDirection;
-        float acceleration = _maxAcceleration*Mathf.Max(
-            Vector3.Dot(
-                characterDirection,
-                shieldDirection
-            ),
-            0
-        )*Time.deltaTime;
+        float directionDot = Mathf.Max(Vector3.Dot(MovementUtils.inXZ(Character.Velocity).normalized, shieldDirection), 0);
+        float acceleration = _maxAcceleration*directionDot*Time.deltaTime;
+        Vector3 direction = Vector3.RotateTowards(Character.Velocity, -shieldDirection, 90f*Mathf.Deg2Rad*directionDot, 0);
 
         if (Character.InputRunning) {
             Character.Velocity = Vector3.RotateTowards(
                 MovementUtils.inXZ(Character.Velocity),
-                -shieldDirection,
+                direction,
                 _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0
             );

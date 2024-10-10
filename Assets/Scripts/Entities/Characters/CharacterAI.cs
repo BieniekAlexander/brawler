@@ -53,7 +53,7 @@ public class CharacterAI : Agent
         var discreteActionsOut = actionsOut.DiscreteActions;
         discreteActionsOut[0] = 1; // don't move
         discreteActionsOut[1] = 1; // don't move
-        discreteActionsOut[2] = 0; // don't shoot
+        discreteActionsOut[2] = 0; // don't attack
 
         var continuousActionsOut = actionsOut.ContinuousActions;
         continuousActionsOut[0] = 1;
@@ -64,14 +64,15 @@ public class CharacterAI : Agent
     public override void OnActionReceived(ActionBuffers actions) {
         /* Set inputs of Character behavior */
         // movement
-        character.InputMoveDirection = new UnityEngine.Vector3(
+        character.InputMoveDirection = new UnityEngine.Vector2(
             actions.DiscreteActions[0]-1,   // [0,2] -> [-1,1]
-            0,
             actions.DiscreteActions[1]-1    // [0,2] -> [-1,1]
         ).normalized;
 
         // cast
-        character.InputCastId = (actions.DiscreteActions[2]==0) ? -1 : (int)CastId.Medium1;
+        character.InputCastId = actions.DiscreteActions[2]-1;
+        character.InputBlocking = actions.DiscreteActions[3]==1;
+        character.InputShielding = actions.DiscreteActions[4]==1;
 
         // aim
         UnityEngine.Vector3 aim = new UnityEngine.Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);

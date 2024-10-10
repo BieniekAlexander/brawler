@@ -21,22 +21,26 @@ public class CastSlot {
     public Cast castPrefab;
     public int cooldown;
     public int defaultChargeCount;
+    public bool overwriteOnNewCast = true;
 }
 
-public struct CastContainer {
+public class CastContainer {
     public CastContainer(CastSlot _castSlot) {
         castPrefab = _castSlot.castPrefab;
         cast = null;
         cooldown = _castSlot.cooldown;
         timer = 0;
         charges = _castSlot.defaultChargeCount;
-    }
+        overwriteOnNewCast = _castSlot.overwriteOnNewCast;
+}
 
     public Cast castPrefab;
     public Cast cast;
+    public List<Castable> castables; // TODO if we have castables still active from a previous cast, and we create a new cast, use this to inherit the castables from the old one
     public int cooldown;
     public int timer;
     public int charges;
+    public bool overwriteOnNewCast;
 }
 
 public enum CastId {
@@ -162,7 +166,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     public int CastBufferTimer { get; private set; } = 0;
-    private Cast _activeCast = null;
+    private CastContainer _activeCastContainer = null;
     private int _nextCastId;
     public int InputCastId {
         get { return _nextCastId; }
@@ -383,13 +387,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             if (castContainer.charges==0 || BusyTimer>0) {
                 return false;
             } else {
-                if (_activeCast is not null) {
-                    // Destroy any active casts on recast
-                    // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
-                    Destroy(_activeCast);
-                    _activeCast = null;
-                }
-
                 if (castContainer.castPrefab == null) {
                     Debug.Log("No cast supplied for cast"+(int)castId);
                     return true;
@@ -407,7 +404,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                         energy -= 100;
                     }
 
-                    castContainer.cast = _activeCast = Cast.Initiate(
+                    if (_activeCastContainer!=null && _activeCastContainer.cast != null && _activeCastContainer.overwriteOnNewCast) {
+                        // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
+                        Destroy(_activeCastContainer.cast.gameObject);
+                    }
+
+                    _activeCastContainer = castContainer;
+                    castContainer.cast = Cast.Initiate(
                         castContainer.castPrefab,
                         this,
                         transform,

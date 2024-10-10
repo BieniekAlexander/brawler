@@ -49,13 +49,15 @@ public class SceneController : MonoBehaviour
             }
         }
 
-        // set up UI
-        Canvas canvas = FindAnyObjectByType(typeof(Canvas)).GetComponent<Canvas>();
-        canvas.InitializeStatBars(Characters);
+        // set up UI, if a canvas is provided
+        if (FindAnyObjectByType(typeof(Canvas)) is GameObject canvasGO) {
+            Canvas canvas = canvasGO.GetComponent<Canvas>();
+            canvas.InitializeStatBars(Characters);
 
-        if (HazardHandlerPrefab != null) {
-            HazardHandler = Instantiate(HazardHandlerPrefab);
-            HazardHandler.Initialize(Characters[0].transform);
+            if (HazardHandlerPrefab != null) {
+                HazardHandler = Instantiate(HazardHandlerPrefab);
+                HazardHandler.Initialize(Characters[0].transform);
+            }
         }
     }
 

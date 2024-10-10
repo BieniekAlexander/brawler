@@ -4,7 +4,6 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
-using System.Text;
 
 public enum TargetingMethod {
     ContinuousTargeting,
@@ -35,7 +34,7 @@ public class Cast : MonoBehaviour, ICastMessage {
         as ConditionCastablesDictionary
     );
 
-    [HideInInspector] public int Frame = 0;
+    public int Frame = 0;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public bool Encumbering = false;
     [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;

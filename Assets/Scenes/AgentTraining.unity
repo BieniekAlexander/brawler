@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -134,7 +134,7 @@ PrefabInstance:
     - target: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
         type: 3}
       propertyPath: m_Name
-      value: Char0
+      value: Soleil
       objectReference: {fileID: 0}
     - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
         type: 3}
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 301333194}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94df876addd913044b22e00264726e7e, type: 3}
   m_Name: 
@@ -261,12 +261,12 @@ MonoBehaviour:
     NumStackedVectorObservations: 2
     m_ActionSpec:
       m_NumContinuousActions: 2
-      BranchSizes: 030000000300000002000000
+      BranchSizes: 03000000030000000a0000000200000002000000
     VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: edc03cda332e5eb48a06b1adc79a9ead, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: soleilAI
@@ -296,62 +296,67 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_Name
-      value: Char1
+      value: Astaroth
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 1.2
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
@@ -360,22 +365,22 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 340440068}
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 340440067}
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 340440066}
-  m_SourcePrefab: {fileID: 100100000, guid: 2457e88a3fcb33445b7bb852bfa93bbd, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
 --- !u!1 &340440065 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+  m_CorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
     type: 3}
   m_PrefabInstance: {fileID: 340440064}
   m_PrefabAsset: {fileID: 0}
@@ -428,22 +433,22 @@ MonoBehaviour:
     NumStackedVectorObservations: 2
     m_ActionSpec:
       m_NumContinuousActions: 2
-      BranchSizes: 030000000300000002000000
+      BranchSizes: 03000000030000000a0000000200000002000000
     VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: edc03cda332e5eb48a06b1adc79a9ead, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: soleilAI
+  m_BehaviorName: astarothAI
   TeamId: 1
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
 --- !u!114 &340440069 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3614030272537791910, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+  m_CorrespondingSourceObject: {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
     type: 3}
   m_PrefabInstance: {fileID: 340440064}
   m_PrefabAsset: {fileID: 0}

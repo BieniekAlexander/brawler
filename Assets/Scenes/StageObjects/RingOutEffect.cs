@@ -3,7 +3,6 @@ using UnityEngine;
 public class RingOutEffect : Effect
 {
     [SerializeField] public int RingOutDamage = 250;
-    [SerializeField] public int RingOutDuration = 60*5;
 
     private Character Character;
 

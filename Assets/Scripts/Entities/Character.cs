@@ -122,7 +122,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
 
-    public Vector2 InputMoveDirection = new();
+    public Vector2 InputMoveDirection { get; set; } = new();
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this

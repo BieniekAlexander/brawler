@@ -78,11 +78,11 @@ public class CharacterStateBusy : CharacterState {
     }
 
     public override void InitializeSubState() { }
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
 }
 
 public class CharacterStateBlocking : CharacterState {
-    private float _maxAcceleration = 10f;
+    private float _maxAcceleration = 1f;
     private int _exposedDuration = 15;
 
     public CharacterStateBlocking(Character _machine, CharacterStateFactory _factory)
@@ -148,7 +148,7 @@ public class CharacterStateBlocking : CharacterState {
 
 
 public class CharacterStateShielding : CharacterState {
-    private float _maxAcceleration = 29f;
+    private float _maxAcceleration = 3f;
     private float _rotationalSpeed = 300f*Mathf.Deg2Rad;
     private int _exposedDuration = 15;
 
@@ -212,7 +212,7 @@ public class CharacterStateShielding : CharacterState {
         }
         Character.Velocity = MovementUtils.ClampMagnitude(
             MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration),
-            0,
+            Character.BaseSpeed,
             Mathf.Infinity
         );
     }

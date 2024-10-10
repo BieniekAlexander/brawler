@@ -84,9 +84,9 @@ MonoBehaviour:
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 5
   HitsEnemies: 1
   HitsFriendlies: 0
+  damage: 25
   KnockbackCoordinateSystem: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 9}
   HitTier: 1

@@ -73,6 +73,8 @@ public class CharacterAI : Agent
         character.InputCastId = actions.DiscreteActions[2]-1;
         character.InputBlocking = actions.DiscreteActions[3]==1;
         character.InputShielding = actions.DiscreteActions[4]==1;
+        character.InputDash = actions.DiscreteActions[5]==1;
+        character.InputRunning = actions.DiscreteActions[6]==1;
 
         // aim
         UnityEngine.Vector3 aim = new UnityEngine.Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);

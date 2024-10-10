@@ -34,7 +34,7 @@ public class Cast : MonoBehaviour, ICastMessage {
         as ConditionCastablesDictionary
     );
 
-    public int Frame = 0;
+    [HideInInspector] public int Frame = 0;
     [SerializeField] public int startupTime = 0;
     [SerializeField] public bool Encumbering = false;
     [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;

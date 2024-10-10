@@ -78,24 +78,18 @@ MonoBehaviour:
   - PolarPosition: {x: -8.261108, y: 1.1135547}
     Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
     Rotation: {x: -0.42946985, y: 0.5617434, z: -0.56174344, w: -0.42946985}
-  - PolarPosition: {x: -1.8279915, y: 1.1285744}
+  - PolarPosition: {x: -1.827991, y: 1.1285744}
     Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
     Rotation: {x: -0.45534143, y: 0.54098445, z: -0.5409845, w: -0.45534146}
   - PolarPosition: {x: 4.3028855, y: 1.1462308}
     Dimension: {x: 0.42283016, y: 0.36468074, z: 0.38468453}
     Rotation: {x: -0.44726226, y: 0.5476829, z: -0.54768294, w: -0.4472623}
-  - PolarPosition: {x: -28.515553, y: 0.9218294}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
-  - PolarPosition: {x: -28.515553, y: 0.9218294}
-    Dimension: {x: 0.216204, y: 0.22822501, z: 0.24887401}
-    Rotation: {x: -0.41285452, y: 0.57406557, z: -0.57406557, w: -0.41285452}
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0
-  damage: 50
+  damage: 70
   KnockbackCoordinateSystem: 1
   BaseKnockbackVector: {x: 10, y: 0, z: 2}
   HitTier: 2

@@ -84,14 +84,12 @@ MonoBehaviour:
   effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 20
   HitsEnemies: 1
   HitsFriendlies: 0
+  damage: 30
   KnockbackCoordinateSystem: 1
   BaseKnockbackVector: {x: 0, y: 0, z: -8}
   HitTier: 2
-  hitLagDuration: 7
-  hitStunDuration: 12
 --- !u!136 &3815909016718323041
 CapsuleCollider:
   m_ObjectHideFlags: 0

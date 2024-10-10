@@ -131,62 +131,62 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_Name
-      value: Soleil
+      value: Astaroth1
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.x
       value: -10
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 1.2
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3714925749414027555, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - target: {fileID: 3714925749414027555, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
@@ -195,28 +195,28 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 301333197}
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 301333196}
-    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+    - targetCorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 301333198}
-  m_SourcePrefab: {fileID: 100100000, guid: 2457e88a3fcb33445b7bb852bfa93bbd, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
 --- !u!1 &301333194 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 967517793056741292, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+  m_CorrespondingSourceObject: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
     type: 3}
   m_PrefabInstance: {fileID: 301333193}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &301333195 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3614030272537791910, guid: 2457e88a3fcb33445b7bb852bfa93bbd,
+  m_CorrespondingSourceObject: {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
     type: 3}
   m_PrefabInstance: {fileID: 301333193}
   m_PrefabAsset: {fileID: 0}
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 301333194}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94df876addd913044b22e00264726e7e, type: 3}
   m_Name: 
@@ -261,7 +261,7 @@ MonoBehaviour:
     NumStackedVectorObservations: 2
     m_ActionSpec:
       m_NumContinuousActions: 2
-      BranchSizes: 03000000030000000a0000000200000002000000
+      BranchSizes: 03000000030000000a00000002000000020000000200000002000000
     VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: soleilAI
+  m_BehaviorName: astarothAI
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -299,7 +299,7 @@ PrefabInstance:
     - target: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
       propertyPath: m_Name
-      value: Astaroth
+      value: Astaroth2
       objectReference: {fileID: 0}
     - target: {fileID: 967517793056741292, guid: f72ec7dc90e91a74e8eff3cc0dde0185,
         type: 3}
@@ -433,7 +433,7 @@ MonoBehaviour:
     NumStackedVectorObservations: 2
     m_ActionSpec:
       m_NumContinuousActions: 2
-      BranchSizes: 03000000030000000a0000000200000002000000
+      BranchSizes: 03000000030000000a00000002000000020000000200000002000000
     VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0

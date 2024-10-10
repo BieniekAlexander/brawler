@@ -48,7 +48,7 @@ public class CharacterStateIdle : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash) {
+        } else if (Character.InputDash && Character.Charges>=1) {
             return Factory.Dashing();
         } else if (!Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
             return Factory.Walking();
@@ -108,7 +108,7 @@ public class CharacterStateWalking : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash) {
+        } else if (Character.InputDash && Character.Charges>=1) {
             return Factory.Dashing();
         } else if (Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
             return Factory.Idle();
@@ -185,7 +185,7 @@ public class CharacterStateRunning : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash) {
+        } else if (Character.InputDash && Character.Charges>=1) {
             return Factory.Dashing();
         } else if (MovementUtils.inXZ(Character.Velocity).magnitude<=7.51f) {
             return Factory.Walking();

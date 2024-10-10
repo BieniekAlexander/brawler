@@ -140,7 +140,9 @@ public static class CollisionUtils {
             foreach (Collider otherCollider in GetOverlappingColliders(ThisCollidable.Collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
                     if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {
-                        ThisCollidable.OnCollideWith(OtherCollidable, null);
+                        Vector3 normal = GetDecollisionVector(ThisCollidable, OtherCollidable).normalized;
+                        CollisionInfo info = new CollisionInfo(normal); // TOOD is this an effective way to find the normal?
+                        ThisCollidable.OnCollideWith(OtherCollidable, info);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -196,8 +197,7 @@ public class Trigger : Castable, ICollidable, ICasts {
     /* Transform */
     [SerializeField] public List<TriggerTransformation> TriggerTransformations;
 
-    /* ICollidabl & Collision */
-    [SerializeField] public List<Effect> effects = new();
+    /* ICollidable */
     [SerializeField] public bool RedundantCollisions = false;
     [SerializeField] public bool DissapearOnTrigger = false;
     [SerializeField] public bool HitsEnemies = true;
@@ -228,23 +228,20 @@ public class Trigger : Castable, ICollidable, ICasts {
         base.Awake();
     }
 
-    public void Initiate(ICasts _caster, Transform _origin, Transform _target, bool _mirrored) {
-        Caster = _caster;
-        Origin = _origin;
-        Target = _target;
-        Mirror = _mirrored;
-    }
-
     public void Start() {
         // Evaluate the position of the Trigger before it's accounted for in game logic
         UpdateTransform(0);
     }
 
-    public override void FixedUpdate() {
+    protected override void Tick() {
         // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they 
         UpdateTransform(Frame);
         HandleCollisions();
-        base.FixedUpdate();
+    }
+
+    public override bool AppliesTo(MonoBehaviour mono) {
+        // TODO check
+        return true;
     }
 
     /* IMoves Methods */
@@ -266,12 +263,12 @@ public class Trigger : Castable, ICollidable, ICasts {
          */
         // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
         // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
-        if (Origin==null) {
+        if (About==null) {
             return; // If the origin disappears, stop moving
         }
 
         int index = Math.Min(_frame, TriggerTransformations.Count-1);
-        TransformCoordinates tc = TriggerTransformations[index].ToTransformCoordinates(Origin, Mirror);
+        TransformCoordinates tc = TriggerTransformations[index].ToTransformCoordinates(About, Mirrored);
         tc.Apply(transform);
     }
 
@@ -296,14 +293,14 @@ public class Trigger : Castable, ICollidable, ICasts {
             return;
         } else {
             if (other is MonoBehaviour mono && mono.enabled) {
-                for (int i = 0; i < effects.Count; i++) {
-                    if (effects[i].CanEffect(mono)) {
-                        // TODO what if I don't want the status effect to stack?
-                        // maybe check if an effect of the same type is active, and if so, do some sort of resolution
-                        // e.g. if two slows are applied, refresh slow
-                        Effect effect = Instantiate(effects[i]);
-                        effect.Initialize(mono);
-                    }
+                if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollide)) {
+                    ActiveCastables.InsertRange(
+                        0,
+                        from Castable c
+                        in ConditionCastablesMap[CastableCondition.OnCollide]
+                        where c.AppliesTo(mono)
+                        select CreateCast(c, Caster, mono.transform, Target, Mirrored)
+                    );
                 }
             }
         }
@@ -312,7 +309,7 @@ public class Trigger : Castable, ICollidable, ICasts {
     public void UpdatePrefabTransformations(Trigger prefab) {
         for (int i = 0; i < Duration; i++) {
             UpdateTransform(i);
-            prefab.TriggerTransformations[i] = TriggerTransformation.FromTransformCoordinates(transform, Origin, Mirror);
+            prefab.TriggerTransformations[i] = TriggerTransformation.FromTransformCoordinates(transform, About, Mirrored);
             // TODO hardcoding mirrored=false - I'm worried that the Caster is getting rotated in the CastablePlayer edit process
         }
     }

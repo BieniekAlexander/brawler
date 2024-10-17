@@ -21,7 +21,7 @@ public interface ICasts {
     /// Get a list of all of the things that the ICasts has casted
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Castable> ActiveCastables { get; }
+    public List<Castable> ActiveCastables { get; }
 
     // status effects
     public int MaimStack { get; set; } // can't use attacks

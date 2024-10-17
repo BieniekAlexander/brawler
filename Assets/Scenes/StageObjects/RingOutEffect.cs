@@ -1,35 +1,33 @@
 using UnityEngine;
 
-public class RingOutEffect : Effect
+public class RingOutEffect : Castable
 {
     [SerializeField] public int RingOutDamage = 250;
+    private Character Effected;
 
-    private Character Character;
+    protected override void OnInitialize() {
+        Effected = About.GetComponent<Character>();
+        Effected.TakeDamage(Effected.transform.position, RingOutDamage, HitTier.Pure);
+        Effected.Velocity = Vector3.zero;
 
-    public override void Initialize(MonoBehaviour _target) {
-        base.Initialize(_target);
-        Character = Target.GetComponent<Character>();
-
-        Character.TakeDamage(Character.transform.position, RingOutDamage, HitTier.Pure);
-        Character.Velocity = Vector3.zero;
-
-        if (Character == null) {
+        if (Effected == null) {
             Destroy(gameObject);
         } else {
-            Character.enabled = false;
+            Effected.enabled = false;
         }
     }
 
-    public override void Expire() {
-        if (Character != null) {
+    protected override void OnExpire() {
+        if (Effected != null) {
+            Character c = Effected.GetComponent<Character>();
             GameObject[] spawns = SceneController.GetSceneSpawns();
             GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
-            Character.transform.position = randomSpawn.transform.position;
-            Character.enabled = true;
+            c.transform.position = randomSpawn.transform.position;
+            c.enabled = true;
         }
     }
 
-    public override bool CanEffect(MonoBehaviour _target) {
-        return _target.CompareTag("Character");
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return mono.CompareTag("Character");
     }
 }

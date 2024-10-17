@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 4816246695473929763}
   m_Layer: 9
   m_Name: astCastSpecial1
   m_TagString: Untagged
@@ -32,25 +31,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4816246695473929763
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3059344016903470191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c790ce187734424448243be20128a1a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hitEvents: []
-  projectileEvents: []
-  statusEffectPefabs: []
-  commandMovementPrefab: {fileID: 0}
-  startupTime: 0
-  duration: 610
-  caster: {fileID: 0}
-  hits: []
-  projectiles: []
-  statusEffects: []

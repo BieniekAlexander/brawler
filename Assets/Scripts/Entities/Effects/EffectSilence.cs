@@ -1,18 +1,20 @@
 using UnityEngine;
 
-public class EffectSilence: Effect {
-    public override void Initialize(MonoBehaviour _target) {
-        base.Initialize(_target);
-        (Target as ICasts).SilenceStack++;
+public class EffectSilence: Castable {
+    private ICasts Effected;
+
+    protected override void OnInitialize() {
+        Effected = About.GetComponent<ICasts>();
+        Effected.SilenceStack++;
     }
 
-    public override void Expire() {
-        if (Target != null) {
-            (Target as ICasts).SilenceStack--;
+    protected override void OnExpire() {
+        if (Effected != null) {
+            Effected.SilenceStack--;
         }
     }
 
-    public override bool CanEffect(MonoBehaviour _target) {
-        return (_target is ICasts);
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return mono is ICasts;
     }
 }

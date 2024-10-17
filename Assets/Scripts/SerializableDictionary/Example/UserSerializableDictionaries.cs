@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-[Serializable] // TODO mine
+/* START MINE */
+[Serializable]
 public class FrameCastablesDictionary : SerializableDictionary<int, Castable[], CastableArrayStorage> { }
 
-[Serializable] // TODO mine
+[Serializable]
 public class ConditionCastablesDictionary : SerializableDictionary<CastableCondition, Castable[], CastableArrayStorage> { }
 
-[Serializable] // TODO also mine
+[Serializable]
 public class CastableArrayStorage : SerializableDictionary.Storage<Castable[]> { }
+/* END MINE */
 
 [Serializable]
 public class StringStringDictionary : SerializableDictionary<string, string> {}

@@ -18,7 +18,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
     [SerializeField] public float TargetJiggle = 30f;
 
     /* Castables */
-    public IEnumerable<Castable> ActiveCastables { get; set; } = new List<Castable>();
+    public List<Castable> ActiveCastables { get; set; } = new List<Castable>();
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
 

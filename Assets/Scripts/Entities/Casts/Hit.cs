@@ -25,14 +25,18 @@ public class Hit : Trigger, ICollidable {
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
         if (KnockbackCoordinateSystem==CoordinateSystem.Cartesian) {
             // TODO knockback is behaving very oddly with this setting, particularly with the throw hitbox I was working on - why?
-            Vector3 knockBackDirection = Origin.transform.rotation * BaseKnockbackVector;
-            if (Mirror) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
+            Vector3 knockBackDirection = About.transform.rotation * BaseKnockbackVector;
+            if (Mirrored) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
             return knockBackDirection;
         } else { // polar
             Vector3 hitboxToTargetNormalized = Vector3.Scale(targetPosition - transform.position, new Vector3(1, 0, 1)).normalized;
             Vector3 knockBackDirection = Quaternion.Euler(0, BaseKnockbackVector.x, 0) * hitboxToTargetNormalized * BaseKnockbackVector.z;
             return knockBackDirection;
         }
+    }
+
+    override protected void OnExpire() {
+        Destroy(gameObject);
     }
 
     /* ICollidable Methods */

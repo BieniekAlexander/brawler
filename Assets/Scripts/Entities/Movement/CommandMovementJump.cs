@@ -4,9 +4,10 @@ public class CommandMovementJump : CommandMovement
 {
     [SerializeField] private float JumpVelocity;
 
-    // TODO I have no idea if this implementation will work
-    public override void Initialize(IMoves mover, Transform target) {
-        base.Initialize(mover, target);
-        Mover.Velocity += Vector3.up * JumpVelocity;
+    protected override void OnInitialize() {
+        IMoves mover = About.gameObject.GetComponent<IMoves>();
+        mover.Velocity += Vector3.up * JumpVelocity;
     }
+
+    // TODO what do I do about air control?
 }

@@ -23,44 +23,43 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     public void Start() {
         // TODO clean this up later - currently copying target's position to a new transform
         // because I'm having an issue where the Castable's parent cast expires, and the Target is destroyed
-        GameObject go = new GameObject("Projectile Target");
+        GameObject go = new("Projectile Target");
         go.transform.position = Target.transform.position;
         Target = go.transform;
 
         InitialRotation = transform.rotation;
-        Vector3 Direction = Origin.rotation * Vector3.forward;
+        Vector3 Direction = About.rotation * Vector3.forward;
         Velocity = MaxSpeed * Direction;
 
         if (Positioning == Positioning.Directional) {
-            transform.position = Origin.position + InitialOffset*Direction;
-        } else { // Positioning == Positioning.Absolute
-            float CastDistance = (Target.position - Origin.position).magnitude;
-            transform.position = Origin.position + Mathf.Min(InitialOffset, CastDistance)*Direction;
-            transform.rotation = Origin.rotation * transform.rotation;
+            transform.position = About.position + InitialOffset*Direction;
+        } else if (Positioning == Positioning.Absolute) { // Positioning == Positioning.Absolute
+            float CastDistance = (Target.position - About.position).magnitude;
+            transform.position = About.position + Mathf.Min(InitialOffset, CastDistance)*Direction;
+            transform.rotation = About.rotation * transform.rotation;
         }
     }
 
-    public override void FixedUpdate() {
+    protected override void Tick() {
         Move();
         HandleCollisions();
+    }
 
-        if (Frame++ == Duration) {
-            if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
-                foreach (Castable Castable in value) {
-                    CreateCast(
-                        Castable,
-                        Caster,
-                        transform,
-                        null,
-                        false
-                    );
-                }
+    protected override void OnExpire() {
+        if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
+            foreach (Castable Castable in value) {
+                CreateCast(
+                    Castable,
+                    Caster,
+                    transform,
+                    null,
+                    false
+                );
             }
-            Destroy(gameObject);
         }
     }
 
-    public override bool Recast(Transform _target) {
+    public override bool OnRecast(Transform _target) {
         if (!Mathf.Approximately(RotationalControl, 0)) {
             Target.position = _target.position;
             return true;
@@ -139,6 +138,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     public List<Armor> Armors { get { return null; } set {; } }
     public int ParryWindow { get { return 0; } set {; } }
     public int InvulnerableStack { get { return 0; } set {; } }
+    public int EncumberedStack { get { return 0; } set {; } }
 
     public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
         _hp -= damage;
@@ -169,4 +169,8 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     public void TakeArmor(Armor armor) { ; }
+
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return true;
+    }
 }

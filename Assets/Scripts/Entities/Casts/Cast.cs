@@ -17,14 +17,36 @@ public interface ICastMessage : IEventSystemHandler {
     void FinishCast();
 }
 
+public static class CastUtils {
+    public static Character GetSnapTarget(Vector3 worldPosition, bool hitsFriendlies, bool hitsEnemies, float maxDistance) {
+        List<Character> characters = (from go in GameObject.FindGameObjectsWithTag("Character") select go.GetComponent<Character>()).ToList();
+        List<float> characterDists = (from ch in characters select (worldPosition-ch.transform.position).magnitude).ToList();
+
+        float minDist = Mathf.Infinity;
+        int minIndex = -1;
+
+        for (int i = 0; i < characterDists.Count; i++) {
+            float dist = characterDists[i];
+            if (dist < minDist && dist<maxDistance) {
+                minDist = dist;
+                minIndex = i;
+            }
+        }
+
+        if (minIndex>=0) {
+            return characters[minIndex];
+        } else {
+            return null;
+        }
+    }
+}
+
 /// <summary>
 /// Default object for evaluating cast behavior
 /// Extend this object for more particular cast logic
 /// </summary>
 public class Cast : MonoBehaviour, ICastMessage {
     // Start is called before the first frame update
-    [SerializeField] List<Effect> effectPefabs;
-    [SerializeField] public CommandMovement commandMovementPrefab;
     [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
     [SerializeField]
     public ConditionCastablesDictionary ConditionCastablesMap = (
@@ -35,8 +57,7 @@ public class Cast : MonoBehaviour, ICastMessage {
     );
 
     [HideInInspector] public int Frame = 0;
-    [SerializeField] public int startupTime = 0;
-    [SerializeField] public bool Encumbering = false;
+    [SerializeField] public float Range = 0;
     [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;
     [SerializeField] public int duration;
     private bool rotatingClockwise = true;
@@ -45,7 +66,6 @@ public class Cast : MonoBehaviour, ICastMessage {
     [HideInInspector] private ICasts Caster;
     [HideInInspector] public Transform Origin;
     [HideInInspector] public List<Castable> ActiveCastables { get; set; } = new();
-    [HideInInspector] public List<Effect> statusEffects;
 
     public static Cast Initiate(Cast _cast, ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
         Cast cast = Instantiate(_cast);
@@ -77,10 +97,10 @@ public class Cast : MonoBehaviour, ICastMessage {
 
     void FixedUpdate() {
         if (FrameCastablesMap.ContainsKey(Frame)) {
-            foreach (Castable Castable in FrameCastablesMap[Frame]) {
+            foreach (Castable CastablePrefab in FrameCastablesMap[Frame]) {
                 ActiveCastables.Add(
                     Castable.CreateCast(
-                        Castable,
+                        CastablePrefab,
                         Caster,
                         Origin,
                         Target,
@@ -90,39 +110,12 @@ public class Cast : MonoBehaviour, ICastMessage {
             }
         }
 
-        if (Frame==startupTime) {
-            if (Caster != null) {
-                foreach (Effect sePrefab in effectPefabs) { // activate effects
-                    Effect se = Instantiate(sePrefab);
-                    se.Initialize(Caster as MonoBehaviour);
-                    statusEffects.Add(se);
-                }
-
-                if (commandMovementPrefab != null) { // set command movement
-                    if ((Caster as MonoBehaviour) is IMoves Mover) {
-                        CommandMovement commandMovement = Instantiate(commandMovementPrefab, transform);
-                        commandMovement.Initialize(Mover, Target);
-                        Mover.CommandMovement = commandMovement;
-                    }
-                }
-            }
-
-            if (ConditionCastablesMap.ContainsKey(CastableCondition.OnFinishStartup)) { // create any casts that required startup
-                foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnFinishStartup]) {
-                    ActiveCastables.Add(
-                        Castable.CreateCast(
-                            Castable,
-                            Caster,
-                            Caster.GetOriginTransform(),
-                            Target,
-                            !Caster.IsRotatingClockwise()
-                        )
-                    );
-                }
-            }
-        }
-
         if (++Frame>=duration) {
+            if (TargetingMethod==TargetingMethod.DiscreteTargeting) {
+                // a target game object was created, and so we need to destroy it
+                // TODO what if the cast ends before the projectile? I think this'll break the projectiles
+                Destroy(Target.gameObject);
+            }
             Destroy(gameObject);
         }
     }
@@ -134,7 +127,7 @@ public class Cast : MonoBehaviour, ICastMessage {
         bool recasted = false;
         
         foreach (Castable Castable in ActiveCastables) {
-            recasted |= Castable.Recast(worldPosition);
+            recasted |= Castable.OnRecast(worldPosition);
         }
 
         return recasted;
@@ -151,7 +144,5 @@ public class Cast : MonoBehaviour, ICastMessage {
         }
     }
 
-    public void OnDestroy() {
-
-    }
+    public void OnDestroy() {}
 }

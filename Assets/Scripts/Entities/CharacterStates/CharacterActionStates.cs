@@ -43,8 +43,7 @@ public class CharacterStateReady : CharacterState {
 }
 
 public class CharacterStateBusy : CharacterState {
-    private int _exposedDuration = 15;
-    private CharacterState[] _validExitParentStates;
+    private readonly CharacterState[] _validExitParentStates;
 
     public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {

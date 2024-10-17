@@ -1,19 +1,20 @@
 using UnityEngine;
 
-public class EffectInvulnerable: Effect {
-    public override void Initialize(MonoBehaviour _target) {
-        base.Initialize(_target);
-        (Target as IDamageable).InvulnerableStack++;
-        _duration = 120;
+public class EffectInvulnerable: Castable {
+    private IDamageable Effected;
+
+    protected override void OnInitialize() {
+        Effected = About.GetComponent<IDamageable>();
+        Effected.InvulnerableStack++;
     }
 
-    public override void Expire() {
-        if (Target != null){
-            (Target as IDamageable).InvulnerableStack--;
+    protected override void OnExpire() {
+        if (Effected != null) {
+            Effected.InvulnerableStack--;
         }
     }
 
-    public override bool CanEffect(MonoBehaviour _target) {
-        return (_target is IDamageable);
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return mono is IDamageable;
     }
 }    

@@ -105,6 +105,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* State WIP */
     CharacterState _state;
     public CharacterState State { get { return _state; } set { _state = value; } }
+
+    public bool StateIsActive(Type state) {
+        return State.StateInHierarchy(state);
+    }
+
     CharacterStateFactory StateFactory;
 
     public int BusyTimer { get; set; } = 0;
@@ -126,7 +131,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this
-            return (CastEncumberedTimer>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
+            return (EncumberedStack>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
         }
     }
 
@@ -161,6 +166,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public bool InputShielding { get; set; } = false;
 
     /* Abilities */
+    private int maxCharges = 5;
+    public int Charges { get; set; } = 4;
+    private int rechargeRate = 300;
+    private int rechargeTimer = 0;
+    private int energy = 100;
+    // private int maxEnergy = 100;
+
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
     public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
@@ -178,17 +190,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    /* Resources */
-    private int maxCharges = 5;
-    public int Charges { get; set; } = 3;
-    private int chargeCooldownMax = 60;
-    private int chargeCooldown = 0;
-    private int rechargeRate = 300;
-    private int rechargeTimer = 0;
-    private int shieldDuration = -1;
-    private int energy = 100;
-    private int maxEnergy = 100;
-
     /* Signals */
     // this is probably not a very good way to implement this, but I just want to propagate damage dealt by my RL agent to learning
     private int _damageDealt;
@@ -198,9 +199,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             _damageDealt=value;
         }
     }
-
-    /* Status Effects */
-    private List<Effect> statusEffects = new();
 
     /* Children */
     [SerializeField] public Shield ShieldPrefab;
@@ -410,17 +408,28 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     }
 
                     _activeCastContainer = castContainer;
+                    Transform castOrigin = transform;
+
+                    if (castContainer.castPrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
+                        Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castPrefab.Range);
+                        
+                        if (t==null) {
+                            return false;
+                        } else {
+                            castOrigin = t.transform;
+                        }
+                    }
+
                     castContainer.cast = Cast.Initiate(
                         castContainer.castPrefab,
                         this,
-                        transform,
+                        castOrigin,
                         CursorTransform,
                         RotatingClockwise);
 
                     castContainer.charges--;
                     castContainer.timer = castContainer.cooldown;
-                    BusyTimer = castContainer.castPrefab.startupTime;
-                    CastEncumberedTimer = (castContainer.castPrefab.Encumbering) ? BusyTimer : 0;
+                    BusyTimer = castContainer.castPrefab.duration;
                     return true;
                 } else {
                     return false;
@@ -434,7 +443,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
-        CastEncumberedTimer--;
+        EncumberedStack--;
 
         // resolve cooldowns and cast expirations
         for (int i = 0; i<CastContainers.Length; i++) {
@@ -468,13 +477,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
-    public IEnumerable<Castable> ActiveCastables {
+    public List<Castable> ActiveCastables {
         get {
             return (
                 from castContainer in CastContainers
                 where castContainer.cast != null
                 select castContainer.cast.ActiveCastables
-            ).SelectMany(castable => castable);
+            ).SelectMany(castable => castable).ToList();
         }
     }
 
@@ -537,7 +546,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Material.color = new Color(255, 255, 0);
         else if (InputCastId >= 0)
             Material.color=Color.magenta;
-        else if (chargeCooldown<0&&Charges>0)
+        else if (Charges>0)
             Material.color=Color.green;
         else
             Material.color=Color.gray;
@@ -593,8 +602,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Charges+=1;
             rechargeTimer=rechargeRate;
         }
-
-        chargeCooldown--;
     }
 
     void FixedUpdate() {
@@ -629,13 +636,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         TickCasts();
         HandleCollisions();
-
-        // apply statusEffects
-        for (int i = 0; i < statusEffects.Count; i++) {
-            statusEffects[i].Tick();
-        }
-
-        statusEffects.RemoveAll((Effect effect) => { return (effect == null); });
     }
 
     public void SetCommandMovement(CommandMovement _commandMovement) {
@@ -667,7 +667,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
     public Vector3 Velocity { get; set; } = Vector3.zero;
-    public int CastEncumberedTimer { get; set; } = 0;
+    public int EncumberedStack { get; set; } = 0;
     public int StunStack { get; set; } // stuns
     public Transform ForceMoveDestination { get; set; } = null; // taunts, fears, etc.
     public CommandMovement CommandMovement { get; set; } = null;
@@ -722,7 +722,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (HitsShield(contactPoint)) {
             if (Shield.ParryWindow > 0) {
                 EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
-                Invulnerability.Initialize(this);
+                Castable.CreateCast(Invulnerability, this, transform, null, false);
                 Parried = true;
                 // TODO:
                 // - reflect projectiles
@@ -745,7 +745,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 CommandMovement = null;
                 KnockBack = knockBackFactor*knockBackVector;
                 HitStunTimer = hitStunDuration;
-                CastEncumberedTimer = 0;
+                EncumberedStack = 0;
                 BusyTimer = 0;
 
                 if (hitStopDuration > 0) {
@@ -836,8 +836,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 ImmaterialStack > 0
                 || otherCharacter.ImmaterialStack > 0
             )
-        ) return;
-        else {
+        ) {
+            return;
+        } else {
             _state.HandleCollisionWithStates(other, info);
         }
     }

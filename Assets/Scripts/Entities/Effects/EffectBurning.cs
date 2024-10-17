@@ -1,25 +1,21 @@
 using UnityEngine;
 
-public class EffectBurning: Effect {
-    [SerializeField] int damage;
+public class EffectBurning : Castable {
+    [SerializeField] int TickRate;
+    [SerializeField] int Damage;
     private IDamageable Damageable;
 
-    public override bool CanEffect(MonoBehaviour _target) {
-        return _target is IDamageable;
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return mono is IDamageable;
     }
 
-    public override void Initialize(MonoBehaviour _target) {
-        // TODO I would like this to work on IDamageable,
-        // but the interface doesn't apply to the gameObject,
-        // so I'm not sure how to actually verify:
-        // (_target is IDamageable)
-        if (_target is IDamageable _damagable){
-            base.Initialize(_target);
-            Damageable = _damagable;
+    protected override void OnInitialize() {
+        Damageable = About.gameObject.GetComponent<IDamageable>();
+    }
+
+    override protected void Tick() {
+        if (Frame % TickRate == 0 && Damageable != null) {
+            Damageable.TakeDamage(Target.transform.position, Damage, HitTier.Pure);
         }
-    }
-
-    public override void Tick() {
-        Damageable.TakeDamage(Target.transform.position, damage, HitTier.Pure);
     }
 }

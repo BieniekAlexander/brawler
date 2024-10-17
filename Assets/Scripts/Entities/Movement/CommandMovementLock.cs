@@ -1,17 +1,18 @@
 using UnityEngine;
 
 public class CommandMovementLock : CommandMovement {
-    [SerializeField] float Offset;
+    private IMoves Effected;
     private IMoves Lock;
 
-    new public void Initialize(IMoves mover, Transform _destination) {
-        base.Initialize(mover, _destination);
-        Lock = _destination.gameObject.GetComponent<IMoves>();
+    protected override void OnInitialize() {
+        Effected = About.GetComponent<IMoves>();
+        Lock = Target.GetComponent<IMoves>();
     }
 
-    public override void FixedUpdate() {
-        Mover.Velocity = Lock.Velocity;
-        base.FixedUpdate();
+    protected override void Tick() {
+        if (Effected != null && Lock != null) {
+            Effected.Velocity = Lock.Velocity;
+        }
     }
 
     public override Quaternion GetRotation(Vector3 _currentPosition, Quaternion _currentRotation) {

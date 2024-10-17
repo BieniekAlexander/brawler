@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class Armor : Effect {
+public class Armor : Castable {
     [SerializeField] public int amount;
 
-    public override bool CanEffect(MonoBehaviour _target) {
-        return (_target is Character);
+    public override bool AppliesTo(MonoBehaviour mono) {
+        return mono is Character;
     }
 
     public int TakeDamage(int damage) {

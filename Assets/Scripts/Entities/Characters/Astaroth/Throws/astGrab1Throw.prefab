@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -4119128982918577192}
   - component: {fileID: 4595245934457464947}
   - component: {fileID: 6828485626068783875}
-  - component: {fileID: -5678351217423108429}
+  - component: {fileID: 224755939417746544}
   m_Layer: 8
   m_Name: astGrab1Throw
   m_TagString: Untagged
@@ -106,7 +106,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8552308439095940280}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &-5678351217423108429
+--- !u!114 &224755939417746544
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,11 +115,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 8552308439095940280}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
+  m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPefabs: []
-  commandMovementPrefab: {fileID: 0}
+  Duration: 20
+  About: {fileID: 0}
+  Target: {fileID: 0}
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 050000000a00000013000000
     m_values:
@@ -132,10 +135,3 @@ MonoBehaviour:
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  Frame: 0
-  startupTime: 0
-  Encumbering: 0
-  TargetingMethod: 0
-  duration: 20
-  Origin: {fileID: 0}
-  statusEffects: []

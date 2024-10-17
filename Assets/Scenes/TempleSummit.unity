@@ -196,6 +196,8 @@ MonoBehaviour:
   - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
   RedundantCollisions: 1
   DissapearOnTrigger: 0
+  HitsEnemies: 1
+  HitsFriendlies: 0
 --- !u!65 &95702828
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -297,8 +299,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CharacterPrefabs:
-  - {fileID: 3614030272537791910, guid: f72ec7dc90e91a74e8eff3cc0dde0185, type: 3}
-  - {fileID: 3614030272537791910, guid: f1edacb468a4cc9438dd10c38930e214, type: 3}
+  - {fileID: 1452099186333517590, guid: fc346559b2a566b449090787913262e6, type: 3}
+  - {fileID: 3825244586456588733, guid: e6a40227efdc08641ba2f36b50a9c696, type: 3}
   HazardHandlerPrefab: {fileID: 0}
 --- !u!4 &101345385
 Transform:

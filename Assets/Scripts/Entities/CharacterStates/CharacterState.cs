@@ -1,3 +1,6 @@
+using System;
+using UnityEditor.Experimental.GraphView;
+
 public abstract class CharacterState {
     // reference: https://www.youtube.com/watch?v=Vt8aZDPzRjI
     private Character _character;
@@ -60,6 +63,16 @@ public abstract class CharacterState {
     }
 
     public abstract void OnCollideWith(ICollidable collidable, CollisionInfo info);
+
+    public virtual bool StateInHierarchy(Type stateType) {
+        if (this.GetType()==stateType) {
+            return true;
+        } else if (_subState != null) {
+            return _subState.StateInHierarchy(stateType);
+        } else {
+            return false;
+        }
+    }
 
     public virtual void HandleCollisionWithStates(ICollidable collidable, CollisionInfo info) {
         OnCollideWith(collidable, info);

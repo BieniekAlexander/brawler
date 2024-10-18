@@ -77,18 +77,19 @@ public class CastPlayer : MonoBehaviour {
         startFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Castable>());
         expireFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Castable>());
 
-        for (int f = 0; f < prefab.duration; f++) {
+        for (int f = 0; f < prefab.Duration; f++) {
             // inefficient, but nice if I want to create new castables
             startFrameCastablesMap[f] = new();
 
             if (prefab.FrameCastablesMap.ContainsKey(f)) {
                 for (int i = 0; i <  prefab.FrameCastablesMap[f].Length; i++) {
-                    Castable newCastable = Castable.CreateCast(
+                    Castable newCastable = Castable.CreateCastable(
                         prefab.FrameCastablesMap[f][i],
                         Caster,
                         Caster.transform,
                         Target,
-                        !_rotatingClockwise
+                        !_rotatingClockwise,
+                        null
                     );
 
                     newCastable.gameObject.SetActive(false);
@@ -108,7 +109,7 @@ public class CastPlayer : MonoBehaviour {
         DeleteInstantiatedCasts();
 
         CastPrefab = Caster.CastContainers[(int)castIds[castId]].castPrefab;
-        duration = CastPrefab.duration;
+        duration = CastPrefab.Duration;
         ActiveCastables = new();
 
         GetActiveFrameCastablesMap(

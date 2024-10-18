@@ -9,6 +9,15 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 [Serializable]
+public enum NewCastResolution {
+    DeleteOld,
+    KeepOld
+    // TODO I think I want a condition for having, at max, N of something - how do I do this?
+    // maybe program some logic that gets resolved with charges - that also lets me modify charge count
+    // e.g. maybe I can have two walls up, and a special lets me have 3
+}
+
+[Serializable]
 public class CastSlot {
     public CastSlot(string _name) {
         name = _name;
@@ -21,26 +30,35 @@ public class CastSlot {
     public Cast castPrefab;
     public int cooldown;
     public int defaultChargeCount;
-    public bool overwriteOnNewCast = true;
+    public NewCastResolution newCastResolution = NewCastResolution.DeleteOld;
 }
 
 public class CastContainer {
-    public CastContainer(CastSlot _castSlot) {
+    static GameObject RootCastablePrefab = Resources.Load<GameObject>("RootCastable");
+
+    public CastContainer(CastSlot _castSlot, Character character, string name) {
         castPrefab = _castSlot.castPrefab;
         cast = null;
         cooldown = _castSlot.cooldown;
         timer = 0;
         charges = _castSlot.defaultChargeCount;
-        overwriteOnNewCast = _castSlot.overwriteOnNewCast;
-}
+        newCastResolution = _castSlot.newCastResolution;
+
+        RootCastable = GameObject.Instantiate(
+            RootCastablePrefab,
+            character.transform
+        ).GetComponent<Castable>();
+
+        RootCastable.name = $"{name}Root";
+    }
 
     public Cast castPrefab;
     public Cast cast;
-    public List<Castable> castables; // TODO if we have castables still active from a previous cast, and we create a new cast, use this to inherit the castables from the old one
     public int cooldown;
     public int timer;
     public int charges;
-    public bool overwriteOnNewCast;
+    public NewCastResolution newCastResolution;
+    public Castable RootCastable;
 }
 
 public enum CastId {
@@ -375,66 +393,64 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private bool StartCast(int castId) {
         ref CastContainer castContainer = ref CastContainers[castId];
 
-        if (
-            castContainer.cast is not null // cast has not expired
-            && castContainer.charges == 0 // cast is still on cooldown
-        ) {
+        if (castContainer.charges == 0) {
             // we're updating another cast - allowed
-            return castContainer.cast.Recast(CursorTransform);
-        } else {
-            if (castContainer.charges==0 || BusyTimer>0) {
-                return false;
-            } else {
-                if (castContainer.castPrefab == null) {
-                    Debug.Log("No cast supplied for cast"+(int)castId);
-                    return true;
-                }
-                if (
-                    (Charges>0 || !boostedIds.Contains(castId))
-                    && (energy >= 50 || !specialIds.Contains(castId))
-                    && (energy >= 100 || castId!=(int)CastId.Ultimate)
-                ) {
-                    if (boostedIds.Contains(castId)) {
-                        Charges--;
-                    } else if (specialIds.Contains(castId)) {
-                        energy -= 50;
-                    } else if (castId == (int)CastId.Ultimate) {
-                        energy -= 100;
-                    }
+            return castContainer.RootCastable.OnRecastCastables(CursorTransform);
+        } else if (castContainer.castPrefab == null) {
+            Debug.Log("No cast supplied for cast"+(int)castId);
+            return true;
+        } else if (
+            (Charges>0 || !boostedIds.Contains(castId))
+            && (energy >= 50 || !specialIds.Contains(castId))
+            && (energy >= 100 || castId!=(int)CastId.Ultimate)
+        ) {
+            if (boostedIds.Contains(castId)) {
+                Charges--;
+            } else if (specialIds.Contains(castId)) {
+                energy -= 50;
+            } else if (castId == (int)CastId.Ultimate) {
+                energy -= 100;
+            }
 
-                    if (_activeCastContainer!=null && _activeCastContainer.cast != null && _activeCastContainer.overwriteOnNewCast) {
-                        // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
-                        Destroy(_activeCastContainer.cast.gameObject);
-                    }
+            if (
+                _activeCastContainer!=null
+                && _activeCastContainer.newCastResolution==NewCastResolution.DeleteOld
+            ) {
+                // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
+                _activeCastContainer.RootCastable.PruneChildren();
+                Destroy(_activeCastContainer.cast);
+            }
 
-                    _activeCastContainer = castContainer;
-                    Transform castOrigin = transform;
+            _activeCastContainer = castContainer;
+            Transform castOrigin = transform;
 
-                    if (castContainer.castPrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
-                        Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castPrefab.Range);
-                        
-                        if (t==null) {
-                            return false;
-                        } else {
-                            castOrigin = t.transform;
-                        }
-                    }
+            if (castContainer.castPrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
+                Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castPrefab.Range);
 
-                    castContainer.cast = Cast.Initiate(
-                        castContainer.castPrefab,
-                        this,
-                        castOrigin,
-                        CursorTransform,
-                        RotatingClockwise);
-
-                    castContainer.charges--;
-                    castContainer.timer = castContainer.cooldown;
-                    BusyTimer = castContainer.castPrefab.duration;
-                    return true;
-                } else {
+                if (t==null) {
                     return false;
+                } else {
+                    castOrigin = t.transform;
                 }
             }
+
+            castContainer.cast = Cast.StartCast(
+                castContainer.castPrefab,
+                this,
+                castOrigin,
+                CursorTransform,
+                RotatingClockwise,
+                castContainer.RootCastable
+            );
+
+            castContainer.charges--;
+            castContainer.timer = castContainer.cooldown;
+            BusyTimer = castContainer.castPrefab.CastTime;
+            return true;
+        } else {
+            // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
+            // I think I need to change this
+            return false;
         }
     }
 
@@ -477,7 +493,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
-    public List<Castable> ActiveCastables {
+    public List<Castable> Children {
         get {
             return (
                 from castContainer in CastContainers
@@ -521,7 +537,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         tr = GetComponent<TrailRenderer>();
 
         for (int i = 0; i<castSlots.Length; i++) {
-            CastContainers[i] = new CastContainer(castSlots[i]);
+            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].name);
         }
     }
 
@@ -722,7 +738,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (HitsShield(contactPoint)) {
             if (Shield.ParryWindow > 0) {
                 EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
-                Castable.CreateCast(Invulnerability, this, transform, null, false);
+                Castable.CreateCastable(Invulnerability, this, transform, null, false, null);
                 Parried = true;
                 // TODO:
                 // - reflect projectiles
@@ -767,7 +783,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             return knockBackFactor;
         }
 
-        
+
     }
 
     /* IDamageable Methods */

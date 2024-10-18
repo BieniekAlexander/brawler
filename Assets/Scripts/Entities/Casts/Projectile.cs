@@ -20,12 +20,12 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         base.Awake();
     }
 
-    public void Start() {
-        // TODO clean this up later - currently copying target's position to a new transform
-        // because I'm having an issue where the Castable's parent cast expires, and the Target is destroyed
-        GameObject go = new("Projectile Target");
-        go.transform.position = Target.transform.position;
-        Target = go.transform;
+    override protected void OnInitialize() {
+        if (Target == null) {
+            GameObject go = new("Projectile Target");
+            go.transform.position = Caster.GetTargetTransform().position;
+            Target = go.transform;
+        }
 
         InitialRotation = transform.rotation;
         Vector3 Direction = About.rotation * Vector3.forward;
@@ -45,21 +45,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         HandleCollisions();
     }
 
-    protected override void OnExpire() {
-        if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
-            foreach (Castable Castable in value) {
-                CreateCast(
-                    Castable,
-                    Caster,
-                    transform,
-                    null,
-                    false
-                );
-            }
-        }
-    }
-
-    public override bool OnRecast(Transform _target) {
+    protected override bool OnRecast(Transform _target) {
         if (!Mathf.Approximately(RotationalControl, 0)) {
             Target.position = _target.position;
             return true;
@@ -116,12 +102,13 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
             foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollide]) {
-                CreateCast(
+                CreateCastable(
                     Castable,
                     Caster,
                     transform,
                     null,
-                    false
+                    false,
+                    Parent
                 );
             }
 
@@ -156,12 +143,13 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     public void OnDeath() {
         if (ConditionCastablesMap.ContainsKey(CastableCondition.OnDeath)) {
             foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnDeath]) {
-                CreateCast(
+                CreateCastable(
                     Castable,
                     Caster,
                     transform,
                     null,
-                    false
+                    false,
+                    Parent
                 );
             }
         }

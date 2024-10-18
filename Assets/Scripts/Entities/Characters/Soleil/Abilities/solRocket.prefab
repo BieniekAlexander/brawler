@@ -121,17 +121,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 480
-  Origin: {fileID: 0}
+  Duration: 600
+  About: {fileID: 0}
   Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
-  indefinite: 0
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 02000000
+    m_keys: 01000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 7701927270b448341a7cab85b03c72af, type: 3}

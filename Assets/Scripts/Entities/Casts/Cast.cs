@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System.Linq;
 
+[Serializable]
 public enum TargetingMethod {
     ContinuousTargeting,
     DiscreteTargeting,
@@ -45,7 +46,7 @@ public static class CastUtils {
 /// Default object for evaluating cast behavior
 /// Extend this object for more particular cast logic
 /// </summary>
-public class Cast : MonoBehaviour, ICastMessage {
+public class Cast : MonoBehaviour/*, ICastMessage*/ {
     // Start is called before the first frame update
     [SerializeField] public FrameCastablesDictionary FrameCastablesMap = new();
     [SerializeField]
@@ -59,17 +60,20 @@ public class Cast : MonoBehaviour, ICastMessage {
     [HideInInspector] public int Frame = 0;
     [SerializeField] public float Range = 0;
     [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;
-    [SerializeField] public int duration;
+    [SerializeField] public int Duration;
+    [SerializeField] public int CastTime;
     private bool rotatingClockwise = true;
     public Transform Target { get; private set; }
 
-    [HideInInspector] private ICasts Caster;
+    private Castable RootCastable;
+    private ICasts Caster;
     [HideInInspector] public Transform Origin;
     [HideInInspector] public List<Castable> ActiveCastables { get; set; } = new();
 
-    public static Cast Initiate(Cast _cast, ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise) {
+    public static Cast StartCast(Cast _cast, ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise, Castable rootCastable) {
         Cast cast = Instantiate(_cast);
         cast.Initialize(_caster, _origin, _castAimPositionTransform, _rotatingClockwise);
+        cast.RootCastable = rootCastable;
         return cast;
     }
 
@@ -81,12 +85,8 @@ public class Cast : MonoBehaviour, ICastMessage {
         if (TargetingMethod == TargetingMethod.ContinuousTargeting) {
             Target = _castAimPositionTransform;
         } else if (TargetingMethod == TargetingMethod.DiscreteTargeting) {
-            GameObject go = new("Cast Target");
-            go.transform.parent = transform;
-            go.transform.position = _castAimPositionTransform.position;
-            Target = go.transform;
+            Target = null;
         }
-        
 
         foreach (KeyValuePair<CastableCondition, Castable[]> CastableEvents in ConditionCastablesMap) {
             foreach (Castable Castable in CastableEvents.Value) {
@@ -99,50 +99,35 @@ public class Cast : MonoBehaviour, ICastMessage {
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Castable CastablePrefab in FrameCastablesMap[Frame]) {
                 ActiveCastables.Add(
-                    Castable.CreateCast(
+                    Castable.CreateCastable(
                         CastablePrefab,
                         Caster,
                         Origin,
                         Target,
-                        !Caster.IsRotatingClockwise()
+                        !Caster.IsRotatingClockwise(),
+                        RootCastable
                     )
                 );
             }
         }
 
-        if (++Frame>=duration) {
-            if (TargetingMethod==TargetingMethod.DiscreteTargeting) {
-                // a target game object was created, and so we need to destroy it
-                // TODO what if the cast ends before the projectile? I think this'll break the projectiles
-                Destroy(Target.gameObject);
-            }
+        if (++Frame>=Duration) {
             Destroy(gameObject);
         }
     }
 
-
-    /// <summary/>
-    /// <param name="worldPosition"></param>
-    public bool Recast(Transform worldPosition) {
-        bool recasted = false;
-        
-        foreach (Castable Castable in ActiveCastables) {
-            recasted |= Castable.OnRecast(worldPosition);
-        }
-
-        return recasted;
-    }
-
-    public void FinishCast() {
+    /*
+     * public void FinishCast() {
         // TODO this was written for that Dash Special that I wrote a long time ago
         // I think, if the ability reached the desired target before max range,
         // it would call the cast to say it was done
-        // maybe this can get reimplemented without events, maybe not, I'm not sure,
+        // maybe this can get reimplemented without events, maybe not, I'm not sure,/*
         // but I'll leave this here for now
         for (int i = 0; i < ActiveCastables.Count; i++) {
             ActiveCastables[i].Duration = 0;
         }
     }
+    */
 
     public void OnDestroy() {}
 }

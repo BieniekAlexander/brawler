@@ -294,12 +294,12 @@ public class Trigger : Castable, ICollidable, ICasts {
         } else {
             if (other is MonoBehaviour mono && mono.enabled) {
                 if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollide)) {
-                    ActiveCastables.InsertRange(
+                    Children.InsertRange(
                         0,
                         from Castable c
                         in ConditionCastablesMap[CastableCondition.OnCollide]
                         where c.AppliesTo(mono)
-                        select CreateCast(c, Caster, mono.transform, Target, Mirrored)
+                        select CreateCastable(c, Caster, mono.transform, Target, Mirrored, this)
                     );
                 }
             }

@@ -44,18 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPefabs: []
-  commandMovementPrefab: {fileID: -6070660620648995026, guid: b8e43f27a6c6c1844bc4ee1bb95c148b,
-    type: 3}
   FrameCastablesMap:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 
-    m_values: []
+    m_keys: 00000000
+    m_values:
+    - data: []
   Frame: 0
-  startupTime: 0
-  Encumbering: 0
+  Range: 0
+  TargetingMethod: 0
   duration: 40
   Origin: {fileID: 0}
-  statusEffects: []

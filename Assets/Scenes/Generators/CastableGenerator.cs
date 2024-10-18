@@ -18,7 +18,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
     [SerializeField] public float TargetJiggle = 30f;
 
     /* Castables */
-    public List<Castable> ActiveCastables { get; set; } = new List<Castable>();
+    public List<Castable> Children { get; set; } = new List<Castable>();
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
 
@@ -47,13 +47,14 @@ public class CastableGenerator : MonoBehaviour, ICasts {
                 RandomNegative() * Random.Range(0, TargetJiggle), Vector3.up
                 ) * transform.rotation;
             if (Target != null) {
-                (ActiveCastables as List<Castable>).Add(
-                    Castable.CreateCast(
+                Children.Add(
+                    Castable.CreateCastable(
                         CastablePrefab,
                         this,
                         transform,
                         Target,
-                        IsRotatingClockwise()
+                        IsRotatingClockwise(),
+                        null
                     )
                 );
             }

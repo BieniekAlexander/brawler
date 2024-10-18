@@ -47,12 +47,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 10
-  Origin: {fileID: 1635544872617382815}
+  Duration: 30
+  About: {fileID: 0}
   Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
-  indefinite: 0
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -90,18 +89,14 @@ MonoBehaviour:
   - PolarPosition: {x: -3.9793625, y: 1.1527792}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
     Rotation: {x: 0, y: 0.81686205, z: 0, w: 0.5768331}
-  Collider: {fileID: 0}
-  effects: []
   RedundantCollisions: 0
   DissapearOnTrigger: 0
-  damage: 1
   HitsEnemies: 1
   HitsFriendlies: 0
+  damage: 1
   KnockbackCoordinateSystem: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 7}
   HitTier: 2
-  hitLagDuration: 4
-  hitStunDuration: 12
 --- !u!23 &-3587656788900788176
 MeshRenderer:
   m_ObjectHideFlags: 0

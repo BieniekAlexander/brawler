@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 
-
-
 /// <summary>
 /// Object that represents a Hitbox, which collides with entities in the game to heal, damage, afflict, etc.
 /// NOTE: I can't get the collider properties to comport with its visualization for the life of me when 

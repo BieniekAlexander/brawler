@@ -1,8 +1,8 @@
-using PlasticPipe.PlasticProtocol.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 [Serializable]
@@ -17,7 +17,6 @@ public enum Positioning {
 [Serializable]
 public enum CastableCondition {
     OnRecast,
-    OnFinishStartup,
     OnCollide,
     OnExpire,
     OnDeath
@@ -27,14 +26,13 @@ public interface ICastableMessage : IEventSystemHandler {
     void OnCast(CastId castId);
 }
 
-public class Castable : MonoBehaviour, ICasts {
+public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     [SerializeField] public int Duration;
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform About;
     [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirrored = false;
     [HideInInspector] public bool Indefinite = false;
-    [HideInInspector] public List<Castable> ActiveCastables { get; set; } = new List<Castable>();
     public int Frame { get; set; } = 0;
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
@@ -79,9 +77,11 @@ public class Castable : MonoBehaviour, ICasts {
     /// <param name="target"></param>
     /// <param name="mirrored"></param>
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
-    public static Castable CreateCast(Castable CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored) {
+    public static Castable CreateCastable(Castable CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Castable parent) {
         Castable Castable = Instantiate(CastablePrefab);
         Castable.Initialize(caster, about, target, mirrored);
+        Castable.Parent = parent;
+        parent.AddChild(Castable);
         return Castable;
     }
 
@@ -92,19 +92,46 @@ public class Castable : MonoBehaviour, ICasts {
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="target"></param>
-    public virtual bool OnRecast(Transform target) {
+    protected virtual bool OnRecast(Transform target) {
         return false;
     }
 
+    public bool OnRecastCastables(Transform target) {
+        bool ret = false;
+
+        foreach (Castable child in Children) {
+            ret |= child.OnRecastCastables(target);
+        }
+
+        ret |= OnRecast(target);
+        return ret;
+    }
+
+
     private void OnExpireCastables() {
-        foreach (Castable Castable in ActiveCastables) {
+        if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
+            foreach (Castable Castable in value) {
+                CreateCastable(
+                    Castable,
+                    Caster,
+                    transform,
+                    null,
+                    Mirrored,
+                    this
+                );
+            }
+        }
+
+        foreach (Castable Castable in Children) {
             Castable.OnExpireCastables();
         }
 
         OnExpire();
     }
 
-    protected virtual void OnExpire() { }
+    protected virtual void OnExpire() {
+        
+    }
 
     /* ICasts Methods */
     public bool IsRotatingClockwise() {
@@ -130,15 +157,16 @@ public class Castable : MonoBehaviour, ICasts {
 
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Castable Castable in FrameCastablesMap[Frame]) {
-                Castable newCast = CreateCast(
+                Castable newCast = CreateCastable(
                         Castable,
                         Caster,
                         About,
                         Caster.GetTargetTransform(),
-                        Mirrored
+                        Mirrored,
+                        this
                     );
 
-                ActiveCastables.Add(newCast);
+                Children.Add(newCast);
 
                 if (newCast is CommandMovement) {
                     (About as IMoves).CommandMovement = (CommandMovement)newCast;
@@ -153,5 +181,31 @@ public class Castable : MonoBehaviour, ICasts {
 
     void OnDestroy() {
         OnExpireCastables();
+        PropagateChildren();
+    }
+
+    /* IHealingTree Methods */
+    public Castable Parent { get; set; } = null;
+    public List<Castable> Children { get; private set; } = new List<Castable>();
+
+    public void PropagateChildren() {
+        if (Parent != null){
+            foreach (var child in Children) {
+                Parent.Children.Add(child);
+            }
+        }
+    }
+
+    public void AddChild(Castable newChild) {
+        Children.Add(newChild);
+    }
+
+    public void PruneChildren() {
+        Children.All(castable => { if (castable!=null) castable.Prune(); return true; });
+    }
+
+    public void Prune() {
+        PruneChildren();
+        Destroy(gameObject);
     }
 }

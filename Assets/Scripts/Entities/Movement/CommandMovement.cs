@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class CommandMovement : Castable {
     protected override void OnExpire() {
-        foreach (Castable activeCastable in ActiveCastables) {
+        foreach (Castable activeCastable in Children) {
             Destroy(activeCastable);
         }
     }

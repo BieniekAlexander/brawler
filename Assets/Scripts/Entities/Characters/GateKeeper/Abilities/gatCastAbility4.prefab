@@ -55,5 +55,7 @@ MonoBehaviour:
   Frame: 0
   Range: 0
   TargetingMethod: 0
-  duration: 20
+  Duration: 20
+  CastTime: 0
+  RootCastable: {fileID: 0}
   Origin: {fileID: 0}

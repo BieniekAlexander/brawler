@@ -61,7 +61,7 @@ public class Cast : MonoBehaviour/*, ICastMessage*/ {
     [SerializeField] public float Range = 0;
     [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;
     [SerializeField] public int Duration;
-    [SerializeField] public int CastTime;
+    [SerializeField] public int EncumberTime;
     private bool rotatingClockwise = true;
     public Transform Target { get; private set; }
 

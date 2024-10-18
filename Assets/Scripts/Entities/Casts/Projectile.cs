@@ -127,7 +127,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     public List<Armor> Armors { get { return null; } set {; } }
     public int ParryWindow { get { return 0; } set {; } }
     public int InvulnerableStack { get { return 0; } set {; } }
-    public int EncumberedStack { get { return 0; } set {; } }
+    public int EncumberedTimer { get { return 0; } set {; } }
 
     public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
         _hp -= damage;

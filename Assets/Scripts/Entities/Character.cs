@@ -149,7 +149,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this
-            return (EncumberedStack>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
+            return (EncumberedTimer>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
         }
     }
 
@@ -444,7 +444,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             castContainer.charges--;
             castContainer.timer = castContainer.cooldown;
-            BusyTimer = castContainer.castPrefab.CastTime;
+            BusyTimer = castContainer.castPrefab.Duration;
+            EncumberedTimer = castContainer.castPrefab.EncumberTime;
             return true;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
@@ -458,7 +459,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
-        EncumberedStack--;
+        EncumberedTimer--;
 
         // resolve cooldowns and cast expirations
         for (int i = 0; i<CastContainers.Length; i++) {
@@ -682,7 +683,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
     public Vector3 Velocity { get; set; } = Vector3.zero;
-    public int EncumberedStack { get; set; } = 0;
+    public int EncumberedTimer { get; set; } = 0;
     public int StunStack { get; set; } // stuns
     public Transform ForceMoveDestination { get; set; } = null; // taunts, fears, etc.
     public CommandMovement CommandMovement { get; set; } = null;
@@ -760,7 +761,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 CommandMovement = null;
                 KnockBack = knockBackFactor*knockBackVector;
                 HitStunTimer = hitStunDuration;
-                EncumberedStack = 0;
+                EncumberedTimer = 0;
                 BusyTimer = 0;
 
                 if (hitStopDuration > 0) {

@@ -33,10 +33,6 @@ public class Hit : Trigger, ICollidable {
         }
     }
 
-    override protected void OnExpire() {
-        Destroy(gameObject);
-    }
-
     /* ICollidable Methods */
     public override void OnCollideWith(ICollidable Other, CollisionInfo info) {
         base.OnCollideWith(Other, info);

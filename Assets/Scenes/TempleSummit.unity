@@ -185,8 +185,10 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 
-    m_values: []
+    m_keys: 01000000
+    m_values:
+    - data:
+      - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 100, y: 0, z: 100}

@@ -14,6 +14,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
     [SerializeField] Positioning Positioning = Positioning.Directional;
     private Quaternion InitialRotation;
+    private bool managingTarget = false;
 
     new public void Awake() {
         _collider = GetComponent<Collider>();
@@ -22,6 +23,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
     override protected void OnInitialize() {
         if (Target == null) {
+            managingTarget = true;
             GameObject go = new("Projectile Target");
             go.transform.position = Caster.GetTargetTransform().position;
             Target = go.transform;
@@ -160,5 +162,13 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
     public override bool AppliesTo(MonoBehaviour mono) {
         return true;
+    }
+
+    override protected void OnDestroy() {
+        if (managingTarget) {
+            Destroy(Target.gameObject);
+        }
+
+        base.OnDestroy();
     }
 }

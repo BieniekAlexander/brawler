@@ -416,7 +416,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 _activeCastContainer!=null
                 && _activeCastContainer.newCastResolution==NewCastResolution.DeleteOld
             ) {
-                // TODO I think I'll want the new Cast to inheret any active Castables from any previous casts
                 _activeCastContainer.RootCastable.PruneChildren();
                 Destroy(_activeCastContainer.cast);
             }

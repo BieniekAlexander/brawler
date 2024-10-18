@@ -179,7 +179,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         }
     }
 
-    void OnDestroy() {
+    protected virtual void OnDestroy() {
         OnExpireCastables();
         PropagateChildren();
     }
@@ -193,6 +193,8 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
             foreach (var child in Children) {
                 Parent.Children.Add(child);
             }
+
+            Parent.Children.Remove(this);
         }
     }
 

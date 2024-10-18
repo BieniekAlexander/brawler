@@ -11,14 +11,11 @@ public enum Positioning {
     Absolute
 }
 
-/// <summary>
-/// A set of potential conditions that might be met for a <typeparamref name="Castable"/>
-/// </summary>
 [Serializable]
 public enum CastableCondition {
     OnRecast,
-    OnCollide,
-    OnExpire,
+    OnCollision,
+    OnDestruction,
     OnDeath
 }
 
@@ -28,6 +25,7 @@ public interface ICastableMessage : IEventSystemHandler {
 
 public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     [SerializeField] public int Duration;
+    [SerializeField] public bool Expires = false;
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform About;
     [HideInInspector] public Transform Target;
@@ -107,9 +105,8 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         return ret;
     }
 
-
-    private void OnExpireCastables() {
-        if (ConditionCastablesMap.TryGetValue(CastableCondition.OnExpire, out Castable[] value)) {
+    private void _castConditionalCastables(CastableCondition castableCondition) {
+        if (ConditionCastablesMap.TryGetValue(castableCondition, out Castable[] value)) {
             foreach (Castable Castable in value) {
                 CreateCastable(
                     Castable,
@@ -121,16 +118,6 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
                 );
             }
         }
-
-        foreach (Castable Castable in Children) {
-            Castable.OnExpireCastables();
-        }
-
-        OnExpire();
-    }
-
-    protected virtual void OnExpire() {
-        
     }
 
     /* ICasts Methods */
@@ -179,8 +166,11 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         }
     }
 
-    protected virtual void OnDestroy() {
-        OnExpireCastables();
+    protected virtual void OnDestruction() {}
+
+    private void OnDestroy() {
+        _castConditionalCastables(CastableCondition.OnDestruction);
+        OnDestruction();
         PropagateChildren();
     }
 
@@ -191,10 +181,15 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     public void PropagateChildren() {
         if (Parent != null){
             foreach (var child in Children) {
-                Parent.Children.Add(child);
+                if (!child.Expires) {
+                    Parent.Children.Add(child);
+                } else {
+                    Destroy(child.gameObject);
+                }
             }
 
             Parent.Children.Remove(this);
+
         }
     }
 

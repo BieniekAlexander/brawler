@@ -8,7 +8,7 @@ public class EffectInvulnerable: Castable {
         Effected.InvulnerableStack++;
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (Effected != null) {
             Effected.InvulnerableStack--;
         }

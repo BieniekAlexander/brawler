@@ -8,7 +8,7 @@ public class EffectSilence: Castable {
         Effected.SilenceStack++;
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (Effected != null) {
             Effected.SilenceStack--;
         }

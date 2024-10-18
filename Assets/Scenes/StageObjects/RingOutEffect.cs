@@ -17,7 +17,7 @@ public class RingOutEffect : Castable
         }
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (Effected != null) {
             Character c = Effected.GetComponent<Character>();
             GameObject[] spawns = SceneController.GetSceneSpawns();

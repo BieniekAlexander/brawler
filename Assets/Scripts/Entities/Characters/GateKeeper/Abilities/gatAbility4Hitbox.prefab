@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: -1
+  Expires: 1
   About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0

@@ -8,7 +8,7 @@ public class EffectSlow: Castable {
         About.GetComponent<IMoves>().BaseSpeed *= slowFactor;
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (About != null) {
             About.GetComponent<IMoves>().BaseSpeed /= slowFactor;
         }

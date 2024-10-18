@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e01174981639c6408a7a56bb414b2b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 15
+  Duration: 20
+  Expires: 1
   About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0

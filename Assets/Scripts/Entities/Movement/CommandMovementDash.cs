@@ -19,7 +19,7 @@ public class CommandMovementDash: CommandMovement {
         Duration = Mathf.FloorToInt(trajectory.magnitude/Speed/Time.fixedDeltaTime);
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (GetComponentInParent<Cast>() is Cast parentCast) {
             GameObject go = GetComponentInParent<Cast>().gameObject;
             ExecuteEvents.Execute<ICastMessage>(go, null, (c, data) => c.FinishCast());

@@ -5,7 +5,7 @@ public class EffectMaim: Castable {
         About.GetComponent<ICasts>().MaimStack++;
     }
 
-    protected override void OnExpire() {
+    protected override void OnDestruction() {
         if (About != null) {
             About.GetComponent<ICasts>().MaimStack--;
         }

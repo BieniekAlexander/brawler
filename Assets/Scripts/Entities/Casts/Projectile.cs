@@ -103,7 +103,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
             other is Character Character
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
-            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollide]) {
+            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollision]) {
                 CreateCastable(
                     Castable,
                     Caster,
@@ -164,11 +164,11 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
         return true;
     }
 
-    override protected void OnDestroy() {
+    override protected void OnDestruction() {
         if (managingTarget) {
             Destroy(Target.gameObject);
         }
 
-        base.OnDestroy();
+        base.OnDestruction();
     }
 }

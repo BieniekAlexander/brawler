@@ -122,6 +122,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: 600
+  ExpiresOnNewCast: 0
+  ExpiresOnRecast: 0
+  DataExpression:
+    expression: 0
   About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0
@@ -134,11 +138,12 @@ MonoBehaviour:
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 7701927270b448341a7cab85b03c72af, type: 3}
-  MaxSpeed: 12
   InitialOffset: 1
   RotationalControl: 120
   Positioning: 0
-  _hp: 0
+  baseSpeedExpression:
+    expression: (+ 10 (Speed (Caster this)))
+  _hp: 100
 --- !u!96 &2350912441906259594
 TrailRenderer:
   serializedVersion: 3

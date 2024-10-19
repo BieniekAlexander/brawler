@@ -48,7 +48,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: -1
-  Expires: 1
+  ExpiresOnNewCast: 0
+  ExpiresOnRecast: 0
+  DataExpression:
+    expression: 0
   About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0
@@ -67,7 +70,8 @@ MonoBehaviour:
   DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0
-  damage: 20
+  damageExpression:
+    expression: 50
   KnockbackCoordinateSystem: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 10}
   HitTier: 1

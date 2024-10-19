@@ -10,9 +10,12 @@ using UnityEngine;
 public class Hit : Trigger, ICollidable {
     /* Effects */
     [SerializeField] private FieldExpression<Hit, int> damageExpression = new("0");
-    private int Damage;
+    private int Damage { get { return damageExpression.Value; } }
 
-    override protected void OnInitialize() => Damage = FieldExpressionParser.instance.RenderValue(this, damageExpression);
+    override protected void OnInitialize() {
+        base.OnInitialize();
+        FieldExpressionParser.instance.RenderValue(this, damageExpression);
+    }
 
     /* Knockback */
     [SerializeField] private CoordinateSystem KnockbackCoordinateSystem;

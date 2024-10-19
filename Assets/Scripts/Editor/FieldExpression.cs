@@ -3,24 +3,24 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-
 // specifies that C must subclass Castable - I'm not sure that this is what I want yet
 [Serializable]
-public class FieldExpression<C, T> where C: Castable {
+public class FieldExpression<C, T> where C : Castable {
     [SerializeField] string expression;
+    public T Value { get; set; }
 
     public FieldExpression(string initialExpression) {
         expression = initialExpression;
     }
 
-    public T GetValue(
+    public void RenderValue(
         C context,
         Lisp.Interpreter interpreter,
         ScriptContext scriptContext
     ) {
         try {
             scriptContext.Args["this"] = context; // I'm just having the supplied "C" implicitly called "this"
-            return (T)Convert.ChangeType(interpreter.ReplEval(scriptContext, null, expression), typeof(T));
+            Value = (T)Convert.ChangeType(interpreter.ReplEval(scriptContext, null, expression), typeof(T));
         } catch (Exception e) {
             Debug.LogError($"Exception on Lisp expression: {expression}");
             throw e;
@@ -28,9 +28,46 @@ public class FieldExpression<C, T> where C: Castable {
     }
 }
 
+public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> {
+    // ref: https://sharpscript.net/lisp/unity#annotated-unity-repl-transcript
+    private Lisp.Interpreter interpreter;
+    private ScriptContext scriptContext;
+
+    public class CastableLispAccessors : ScriptMethods {
+        public float Speed(ICasts c) => (c is IMoves moves) ? moves.Velocity.magnitude : 0f;
+        public ICasts Caster(Castable c) => c.Caster;
+        public string Data(Castable c) => c.Data;
+        public int Duration(Castable c) => c.Duration;
+        public int Frame(Castable c) => c.Frame;
+        public Castable Parent(Castable c) => c.Parent;
+    }
+
+    public void OnEnable() {
+        scriptContext = new ScriptContext {
+            ScriptLanguages = { ScriptLisp.Language },
+            AllowScriptingOfAllTypes = true,
+            ScriptNamespaces = { nameof(UnityEngine) },
+            Args = { },
+            ScriptMethods = {
+                new ProtectedScripts(),
+                new CastableLispAccessors(),
+            }
+        }.Init();
+
+        interpreter = Lisp.CreateInterpreter();
+
+        // NOTE: running an empty call on interpreter because it seems to be lazily setting itself up,
+        // leading to a lot of overhead on the first call of ReplEval
+        interpreter.ReplEval(scriptContext, null, "\"wtf\"");
+    }
+
+    public void RenderValue<C, T>(C context, FieldExpression<C, T> fieldExpression) where C : Castable {
+        fieldExpression.RenderValue(context, interpreter, scriptContext);
+    }
+}
 
 [CustomPropertyDrawer(typeof(FieldExpression<,>))]
-public class FieldExpressionPropertyDrawer: PropertyDrawer {
+public class FieldExpressionPropertyDrawer : PropertyDrawer {
     // reference: https://www.youtube.com/watch?v=ur-qy6SjVQw
     private SerializedProperty expression;
 

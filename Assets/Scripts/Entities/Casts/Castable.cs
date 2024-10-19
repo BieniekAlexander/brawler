@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using ServiceStack.Script;
-using UnityEditor;
 
 [Serializable]
 public enum Positioning {
@@ -24,54 +22,20 @@ public interface ICastableMessage : IEventSystemHandler {
     void OnCast(CastId castId);
 }
 
-public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> {
-    // ref: https://sharpscript.net/lisp/unity#annotated-unity-repl-transcript
-    private Lisp.Interpreter interpreter;
-    private ScriptContext scriptContext;
 
-    public class CastableLispAccessors : ScriptMethods {
-        public string Data(Castable c) => c.Data;
-        public int Duration(Castable c) => c.Duration;
-        public int Frame(Castable c) => c.Frame;
-        public Castable Parent(Castable c) => c.Parent;
-    }
-
-    public void OnEnable() {
-        scriptContext = new ScriptContext {
-            ScriptLanguages = { ScriptLisp.Language },
-            AllowScriptingOfAllTypes = true,
-            ScriptNamespaces = { nameof(UnityEngine) },
-            Args = { },
-            ScriptMethods = {
-                new ProtectedScripts(),
-                new CastableLispAccessors(),
-            }
-        }.Init();
-
-        interpreter = Lisp.CreateInterpreter();
-
-        // NOTE: running an empty call on interpreter because it seems to be lazily setting itself up,
-        // leading to a lot of overhead on the first call of ReplEval
-        interpreter.ReplEval(scriptContext, null, "\"wtf\"");
-    }
-
-    public T RenderValue<C, T>(C context, FieldExpression<C, T> fieldExpression) where C : Castable {
-        return fieldExpression.GetValue(context, interpreter, scriptContext);
-    }
-}
 
 public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     [SerializeField] public int Duration;
     [SerializeField] public bool ExpiresOnNewCast = false;
     [SerializeField] public bool ExpiresOnRecast = false;
     [SerializeField] private FieldExpression<Castable, string> DataExpression = new("0");
+    public string Data { get { return DataExpression.Value; } }
 
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform About;
     [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirrored = false;
     [HideInInspector] public bool Indefinite = false;
-    public string Data { get; set; } = "";
     public int Frame { get; set; } = 0;
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
@@ -102,7 +66,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         OnInitialize();
     }
 
-    protected virtual void OnInitialize() => Data = FieldExpressionParser.instance.RenderValue(this, DataExpression);
+    protected virtual void OnInitialize() => FieldExpressionParser.instance.RenderValue(this, DataExpression);
 
     /// <summary/>
     /// <param name="CastablePrefab"></param>
@@ -213,7 +177,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
 
     /* IHealingTree Methods */
     public Castable Parent { get; set; } = null;
-    public List<Castable> CastableChlidren { get; private set; } = new List<Castable>();
+    public List<Castable> CastableChlidren { get; private set; } = new();
 
     public void PropagateChildren() {
         if (Parent != null) {

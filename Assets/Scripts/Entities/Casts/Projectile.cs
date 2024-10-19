@@ -5,7 +5,6 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     /* Movement */
     public Vector3 Velocity { get; set; } = new();
     public CommandMovement CommandMovement { get; set; }
-    [SerializeField] float MaxSpeed = 15f;
     [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
@@ -23,6 +22,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
     override protected void OnInitialize() {
         base.OnInitialize();
+        FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
 
         if (Target == null) {
             managingTarget = true;
@@ -33,7 +33,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
         InitialRotation = transform.rotation;
         Vector3 Direction = About.rotation * Vector3.forward;
-        Velocity = MaxSpeed * Direction;
+        Velocity = BaseSpeed * Direction;
 
         if (Positioning == Positioning.Directional) {
             transform.position = About.position + InitialOffset*Direction;
@@ -60,9 +60,10 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     /* IMoves Methods */
+    [SerializeField] private FieldExpression<Projectile, float> baseSpeedExpression = new("0");
+    public float BaseSpeed { get { return baseSpeedExpression.Value; } set { baseSpeedExpression.Value = value; } }
     public Transform ForceMoveDestination { get; set; } = null;
     public int StunStack { get { return 0; } set {; } } // do I want these to be stunnable? doubt it
-    public float BaseSpeed { get { return MaxSpeed; } set { MaxSpeed = value; } }
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) {
         return 0f;
     }
@@ -79,7 +80,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
                 RotationalControl * Time.deltaTime);
 
             // force movement only in XZ
-            Velocity = MovementUtils.inXZ(newRotation * Velocity.normalized * MaxSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
+            Velocity = MovementUtils.inXZ(newRotation * Velocity.normalized * BaseSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
             transform.rotation = Quaternion.LookRotation(Velocity.normalized, Vector3.up)*InitialRotation;
         }
 

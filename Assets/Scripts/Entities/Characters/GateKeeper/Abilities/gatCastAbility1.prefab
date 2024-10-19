@@ -45,8 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FrameCastablesMap:
-    m_keys: 
-    m_values: []
+    m_keys: 1e000000
+    m_values:
+    - data:
+      - {fileID: 3633083825316457327, guid: 79243ad689f817d4798ad60a5ba40088, type: 3}
   ConditionCastablesMap:
     m_keys: 00000000
     m_values:
@@ -54,5 +56,6 @@ MonoBehaviour:
   Frame: 0
   Range: 0
   TargetingMethod: 0
-  duration: 40
+  Duration: 40
+  EncumberTime: 0
   Origin: {fileID: 0}

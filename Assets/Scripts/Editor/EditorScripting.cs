@@ -1,9 +1,7 @@
 using System;
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.ShortcutManagement;
-using UnityEngine;
-using System.Linq;
+
 public class InspectorLockToggle {
     /// <summary>
     /// Source: https://discussions.unity.com/t/shortcut-key-for-lock-inspector/449578/18

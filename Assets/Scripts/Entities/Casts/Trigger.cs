@@ -294,7 +294,7 @@ public class Trigger : Castable, ICollidable, ICasts {
         } else {
             if (other is MonoBehaviour mono && mono.enabled) {
                 if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)) {
-                    Children.InsertRange(
+                    CastableChlidren.InsertRange(
                         0,
                         from Castable c
                         in ConditionCastablesMap[CastableCondition.OnCollision]

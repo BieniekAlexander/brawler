@@ -68,7 +68,6 @@ public class Cast : MonoBehaviour/*, ICastMessage*/ {
     private Castable RootCastable;
     private ICasts Caster;
     [HideInInspector] public Transform Origin;
-    [HideInInspector] public List<Castable> ActiveCastables { get; set; } = new();
 
     public static Cast StartCast(Cast _cast, ICasts _caster, Transform _origin, Transform _castAimPositionTransform, bool _rotatingClockwise, Castable rootCastable) {
         Cast cast = Instantiate(_cast);
@@ -98,16 +97,14 @@ public class Cast : MonoBehaviour/*, ICastMessage*/ {
     void FixedUpdate() {
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Castable CastablePrefab in FrameCastablesMap[Frame]) {
-                ActiveCastables.Add(
-                    Castable.CreateCastable(
-                        CastablePrefab,
-                        Caster,
-                        Origin,
-                        Target,
-                        !Caster.IsRotatingClockwise(),
-                        RootCastable
-                    )
-                );
+                Castable.CreateCastable(
+                    CastablePrefab,
+                    Caster,
+                    Origin,
+                    Target,
+                    !Caster.IsRotatingClockwise(),
+                    RootCastable
+            );
             }
         }
 
@@ -129,5 +126,5 @@ public class Cast : MonoBehaviour/*, ICastMessage*/ {
     }
     */
 
-    public void OnDestroy() {}
+    public void OnDestroy() { }
 }

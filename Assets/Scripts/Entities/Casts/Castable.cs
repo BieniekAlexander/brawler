@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using ServiceStack.Script;
+using UnityEditor;
 
 [Serializable]
 public enum Positioning {
@@ -23,14 +24,54 @@ public interface ICastableMessage : IEventSystemHandler {
     void OnCast(CastId castId);
 }
 
+public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> {
+    // ref: https://sharpscript.net/lisp/unity#annotated-unity-repl-transcript
+    private Lisp.Interpreter interpreter;
+    private ScriptContext scriptContext;
+
+    public class CastableLispAccessors : ScriptMethods {
+        public string Data(Castable c) => c.Data;
+        public int Duration(Castable c) => c.Duration;
+        public int Frame(Castable c) => c.Frame;
+        public Castable Parent(Castable c) => c.Parent;
+    }
+
+    public void OnEnable() {
+        scriptContext = new ScriptContext {
+            ScriptLanguages = { ScriptLisp.Language },
+            AllowScriptingOfAllTypes = true,
+            ScriptNamespaces = { nameof(UnityEngine) },
+            Args = { },
+            ScriptMethods = {
+                new ProtectedScripts(),
+                new CastableLispAccessors(),
+            }
+        }.Init();
+
+        interpreter = Lisp.CreateInterpreter();
+
+        // NOTE: running an empty call on interpreter because it seems to be lazily setting itself up,
+        // leading to a lot of overhead on the first call of ReplEval
+        interpreter.ReplEval(scriptContext, null, "\"wtf\"");
+    }
+
+    public T RenderValue<C, T>(C context, FieldExpression<C, T> fieldExpression) where C : Castable {
+        return fieldExpression.GetValue(context, interpreter, scriptContext);
+    }
+}
+
 public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     [SerializeField] public int Duration;
-    [SerializeField] public bool Expires = false;
+    [SerializeField] public bool ExpiresOnNewCast = false;
+    [SerializeField] public bool ExpiresOnRecast = false;
+    [SerializeField] private FieldExpression<Castable, string> DataExpression = new("0");
+
     [HideInInspector] public ICasts Caster;
     [HideInInspector] public Transform About;
     [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirrored = false;
     [HideInInspector] public bool Indefinite = false;
+    public string Data { get; set; } = "";
     public int Frame { get; set; } = 0;
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
@@ -44,10 +85,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         as ConditionCastablesDictionary
     );
 
-    public void Awake() {
-        if (Duration<0)
-            Indefinite = true;
-    }
+    public void Awake() => Indefinite = (Duration<0);
 
     /// <summary>
     /// To be run right when the Castable is casted by a caster.
@@ -64,9 +102,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         OnInitialize();
     }
 
-    protected virtual void OnInitialize() {
-        
-    }
+    protected virtual void OnInitialize() => Data = FieldExpressionParser.instance.RenderValue(this, DataExpression);
 
     /// <summary/>
     /// <param name="CastablePrefab"></param>
@@ -77,9 +113,9 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
     public static Castable CreateCastable(Castable CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Castable parent) {
         Castable Castable = Instantiate(CastablePrefab);
-        Castable.Initialize(caster, about, target, mirrored);
         Castable.Parent = parent;
         parent.AddChild(Castable);
+        Castable.Initialize(caster, about, target, mirrored);
         return Castable;
     }
 
@@ -90,54 +126,55 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="target"></param>
-    protected virtual bool OnRecast(Transform target) {
-        return false;
-    }
+    protected virtual bool OnRecast(Transform target) => false;
 
     public bool OnRecastCastables(Transform target) {
         bool ret = false;
 
-        foreach (Castable child in Children) {
+        foreach (Castable child in CastableChlidren) {
             ret |= child.OnRecastCastables(target);
         }
 
+        ret |= _castConditionalCastables(CastableCondition.OnRecast);
         ret |= OnRecast(target);
+
+        if (ExpiresOnRecast) {
+            Destroy(gameObject);
+        }
+
         return ret;
     }
 
-    private void _castConditionalCastables(CastableCondition castableCondition) {
+    private bool _castConditionalCastables(CastableCondition castableCondition) {
         if (ConditionCastablesMap.TryGetValue(castableCondition, out Castable[] value)) {
-            foreach (Castable Castable in value) {
-                CreateCastable(
-                    Castable,
-                    Caster,
-                    transform,
-                    null,
-                    Mirrored,
-                    this
-                );
+            if (value.Count() == 0) {
+                return false;
+            } else {
+                foreach (Castable Castable in value) {
+                    CreateCastable(
+                        Castable,
+                        Caster,
+                        About,
+                        null,
+                        Mirrored,
+                        this
+                    );
+                }
             }
+
+            return true;
+        } else {
+            return false;
         }
     }
 
     /* ICasts Methods */
-    public bool IsRotatingClockwise() {
-        return true; // TODO actually implement this later :)
-    }
+    public bool IsRotatingClockwise() => !Mirrored;
+    public Transform GetOriginTransform() => transform;
+    public Transform GetTargetTransform() => Target; // TODO this will probably depend on the cast, and I think this is a good default?
+    public virtual bool AppliesTo(MonoBehaviour mono) => true;
 
-    public Transform GetOriginTransform() {
-        return transform;
-    }
-
-    public Transform GetTargetTransform() {
-        return Target; // TODO this will probably depend on the cast, and I think this is a good default?
-    }
-
-    public virtual bool AppliesTo(MonoBehaviour mono) {
-        return true;
-    }
-
-    protected virtual void Tick() {}
+    protected virtual void Tick() { }
 
     private void FixedUpdate() {
         Tick();
@@ -153,7 +190,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
                         this
                     );
 
-                Children.Add(newCast);
+                CastableChlidren.Add(newCast);
 
                 if (newCast is CommandMovement) {
                     (About as IMoves).CommandMovement = (CommandMovement)newCast;
@@ -166,7 +203,7 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
         }
     }
 
-    protected virtual void OnDestruction() {}
+    protected virtual void OnDestruction() { }
 
     private void OnDestroy() {
         _castConditionalCastables(CastableCondition.OnDestruction);
@@ -176,29 +213,28 @@ public class Castable : MonoBehaviour, ICasts, IHealingTree<Castable> {
 
     /* IHealingTree Methods */
     public Castable Parent { get; set; } = null;
-    public List<Castable> Children { get; private set; } = new List<Castable>();
+    public List<Castable> CastableChlidren { get; private set; } = new List<Castable>();
 
     public void PropagateChildren() {
-        if (Parent != null){
-            foreach (var child in Children) {
-                if (!child.Expires) {
-                    Parent.Children.Add(child);
+        if (Parent != null) {
+            foreach (var child in CastableChlidren) {
+                if (!child.ExpiresOnNewCast) {
+                    Parent.CastableChlidren.Add(child);
                 } else {
                     Destroy(child.gameObject);
                 }
             }
 
-            Parent.Children.Remove(this);
-
+            Parent.CastableChlidren.Remove(this);
         }
     }
 
     public void AddChild(Castable newChild) {
-        Children.Add(newChild);
+        CastableChlidren.Add(newChild);
     }
 
     public void PruneChildren() {
-        Children.All(castable => { if (castable!=null) castable.Prune(); return true; });
+        CastableChlidren.All(castable => { if (castable!=null) castable.Prune(); return true; });
     }
 
     public void Prune() {

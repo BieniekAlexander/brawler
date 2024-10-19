@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2539052894070233830}
   - component: {fileID: 1599280204520550164}
   m_Layer: 8
-  m_Name: gatAbility4Hitbox
+  m_Name: gatAbility4Hit
   m_TagString: Untagged
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0

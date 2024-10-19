@@ -10,8 +10,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 [Serializable]
 public enum NewCastResolution {
-    DeleteOld,
-    KeepOld
+    Delete,
+    Keep
     // TODO I think I want a condition for having, at max, N of something - how do I do this?
     // maybe program some logic that gets resolved with charges - that also lets me modify charge count
     // e.g. maybe I can have two walls up, and a special lets me have 3
@@ -30,7 +30,7 @@ public class CastSlot {
     public Cast castPrefab;
     public int cooldown;
     public int defaultChargeCount;
-    public NewCastResolution newCastResolution = NewCastResolution.DeleteOld;
+    public NewCastResolution newCastResolution = NewCastResolution.Delete;
 }
 
 public class CastContainer {
@@ -414,7 +414,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             if (
                 _activeCastContainer!=null
-                && _activeCastContainer.newCastResolution==NewCastResolution.DeleteOld
+                && _activeCastContainer.newCastResolution==NewCastResolution.Delete
             ) {
                 _activeCastContainer.RootCastable.PruneChildren();
                 Destroy(_activeCastContainer.cast);
@@ -493,13 +493,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
-    public List<Castable> Children {
+    public List<Castable> CastableChlidren {
         get {
-            return (
-                from castContainer in CastContainers
-                where castContainer.cast != null
-                select castContainer.cast.ActiveCastables
-            ).SelectMany(castable => castable).ToList();
+            return (from CastContainer cc in CastContainers select cc.RootCastable).ToList();
         }
     }
 

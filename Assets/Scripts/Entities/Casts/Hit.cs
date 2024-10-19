@@ -9,7 +9,10 @@ using UnityEngine;
 [Serializable]
 public class Hit : Trigger, ICollidable {
     /* Effects */
-    [SerializeField] private int damage;
+    [SerializeField] private FieldExpression<Hit, int> damageExpression = new("0");
+    private int Damage;
+
+    override protected void OnInitialize() => Damage = FieldExpressionParser.instance.RenderValue(this, damageExpression);
 
     /* Knockback */
     [SerializeField] private CoordinateSystem KnockbackCoordinateSystem;
@@ -53,9 +56,10 @@ public class Hit : Trigger, ICollidable {
             } else {
                 int damageTaken = OtherDamagable.TakeDamage(
                     hitInfo.point,
-                    damage,
+                    Damage,
                     HitTier
                 );
+                Debug.Log($"dealing {Damage} damage");
 
                 if (Caster is Character c) { // Throwing this in for RL agent - TODO clean this up
                     c.DamageDealt = damageTaken;

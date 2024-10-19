@@ -22,6 +22,8 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     override protected void OnInitialize() {
+        base.OnInitialize();
+
         if (Target == null) {
             managingTarget = true;
             GameObject go = new("Projectile Target");
@@ -110,7 +112,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
                     transform,
                     null,
                     false,
-                    Parent
+                    this
                 );
             }
 
@@ -151,7 +153,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
                     transform,
                     null,
                     false,
-                    Parent
+                    this
                 );
             }
         }

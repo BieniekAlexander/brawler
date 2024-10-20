@@ -142,7 +142,7 @@ GameObject:
   - component: {fileID: 95702829}
   - component: {fileID: 95702828}
   - component: {fileID: 95702827}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: RingOutZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -176,11 +176,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afab953a169b7264aa242dba2fcbaecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetingMethod: 0
   Duration: 360000
   EncumberTime: 0
   Range: 0
-  TargetingMethod: 0
   DestroyOnRecast: 0
+  DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
     expression: 0
@@ -196,6 +198,7 @@ MonoBehaviour:
     m_values:
     - data:
       - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
+  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 100, y: 0, z: 100}

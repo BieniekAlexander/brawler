@@ -702,7 +702,8 @@ MonoBehaviour:
     cooldown: -1
     defaultChargeCount: 1
   - name: Ability4
-    castablePrefab: {fileID: 0}
+    castablePrefab: {fileID: 3442410745517630681, guid: caab8487e143fc84d993b0c69bfcff39,
+      type: 3}
     costs:
       charges: 0
       energy: 0

@@ -19,7 +19,5 @@ public class EffectImmaterial: Cast {
         }
     }
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono is ICollidable;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<ICollidable>() != null;
 }    

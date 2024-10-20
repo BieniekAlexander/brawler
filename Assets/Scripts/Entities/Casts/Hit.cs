@@ -62,7 +62,6 @@ public class Hit : Trigger, ICollidable {
                     Damage,
                     HitTier
                 );
-                Debug.Log($"dealing {Damage} damage");
 
                 if (Caster is Character c) { // Throwing this in for RL agent - TODO clean this up
                     c.DamageDealt = damageTaken;

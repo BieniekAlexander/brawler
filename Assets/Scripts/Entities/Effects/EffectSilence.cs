@@ -14,7 +14,5 @@ public class EffectSilence: Cast {
         }
     }
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono is ICasts;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<ICasts>() != null;
 }

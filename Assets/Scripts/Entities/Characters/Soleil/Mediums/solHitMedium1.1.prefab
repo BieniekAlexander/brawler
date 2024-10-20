@@ -47,9 +47,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetingMethod: 0
   Duration: 5
-  ExpiresOnNewCast: 0
-  ExpiresOnRecast: 0
+  EncumberTime: 0
+  Range: 0
+  DestroyOnRecast: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
   DataExpression:
     expression: 0
   About: {fileID: 0}
@@ -62,13 +67,8 @@ MonoBehaviour:
   ConditionCastablesMap:
     m_keys: 
     m_values: []
+  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.5, y: 0.5, z: 0.5}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
-  - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 0.5, y: 0.5, z: 0.5}
-    Rotation: {x: 0, y: 0, z: 0, w: 1}
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.5, z: 0.5}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
@@ -77,9 +77,9 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 10
+    expression: 25
   KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 5}
+  BaseKnockbackVector: {x: 0, y: 0, z: 6}
   HitTier: 1
 --- !u!136 &7506723417326245698
 CapsuleCollider:

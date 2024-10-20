@@ -121,9 +121,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetingMethod: 1
   Duration: 600
-  ExpiresOnNewCast: 0
-  ExpiresOnRecast: 0
+  EncumberTime: 0
+  Range: 1
+  DestroyOnRecast: 0
+  DestroyOnCollision: 1
+  DestroyWithParent: 0
   DataExpression:
     expression: 0
   About: {fileID: 0}
@@ -138,9 +143,8 @@ MonoBehaviour:
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 7701927270b448341a7cab85b03c72af, type: 3}
-  InitialOffset: 1
+  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   RotationalControl: 120
-  Positioning: 0
   baseSpeedExpression:
     expression: (+ 10 (Speed (Caster this)))
   _hp: 100

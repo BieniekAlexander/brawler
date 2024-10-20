@@ -27,7 +27,5 @@ public class RingOutEffect : Cast
         }
     }
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono.CompareTag("Character");
-    }
+    public override bool AppliesTo(GameObject go) => go.CompareTag("Character");
 }

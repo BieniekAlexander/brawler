@@ -5,9 +5,7 @@ public class EffectBurning : Cast {
     [SerializeField] int Damage;
     private IDamageable Damageable;
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono is IDamageable;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<IDamageable>()!=null;
 
     protected override void OnInitialize() {
         Damageable = About.gameObject.GetComponent<IDamageable>();

@@ -83,7 +83,7 @@ public class CastPlayer : MonoBehaviour {
 
             if (prefab.FrameCastablesMap.ContainsKey(f)) {
                 for (int i = 0; i <  prefab.FrameCastablesMap[f].Length; i++) {
-                    Cast newCastable = Cast.Instantiate(
+                    Cast newCastable = Cast.Initiate(
                         prefab.FrameCastablesMap[f][i],
                         Caster,
                         Caster.transform,

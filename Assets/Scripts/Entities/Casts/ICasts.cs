@@ -17,12 +17,6 @@ public interface ICasts {
     /// <returns>true, if the Caster is rotating clockwise</returns>
     public bool IsRotatingClockwise();
 
-    /// <summary>
-    /// Get a list of all of the things that the ICasts has casted
-    /// </summary>
-    /// <returns></returns>
-    public List<Cast> CastableChlidren { get; }
-
     // status effects
     public int MaimStack { get; set; } // can't use attacks
     public int SilenceStack { get; set; } // can't cast spells

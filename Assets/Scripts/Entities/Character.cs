@@ -43,7 +43,7 @@ public class CastContainer {
     }
 
     public Cast castablePrefab;
-    public Cast RootCastable;
+    public Cast RootCastable { get; private set; }
     public CastableCosts Costs;
     public int cooldown;
     public int timer;
@@ -406,7 +406,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             Transform castOrigin = transform;
 
-            if (castContainer.castablePrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
+            if (castContainer.castablePrefab.TargetingMethod == TargetingMethod.HardCopy) {
                 Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castablePrefab.Range);
 
                 if (t==null) {
@@ -416,7 +416,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 }
             }
 
-            _activeCastable = Cast.Instantiate(
+            _activeCastable = Cast.Initiate(
                 castContainer.castablePrefab,
                 this,
                 castOrigin,
@@ -473,7 +473,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
-    public List<Cast> CastableChlidren {
+    public List<Cast> Children {
         get {
             return (from CastContainer cc in CastContainers select cc.RootCastable).ToList();
         }
@@ -714,7 +714,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (HitsShield(contactPoint)) {
             if (Shield.ParryWindow > 0) {
                 EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
-                Cast.Instantiate(Invulnerability, this, transform, null, false, null);
+                Cast.Initiate(Invulnerability, this, transform, null, false, null);
                 Parried = true;
                 // TODO:
                 // - reflect projectiles

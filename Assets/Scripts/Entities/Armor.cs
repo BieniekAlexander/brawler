@@ -3,9 +3,7 @@ using UnityEngine;
 public class Armor : Cast {
     [SerializeField] public int amount;
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono is Character;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<Character>()!=null;
 
     public int TakeDamage(int damage) {
         amount -= damage;

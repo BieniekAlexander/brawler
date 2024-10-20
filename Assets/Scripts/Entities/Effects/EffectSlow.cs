@@ -14,7 +14,5 @@ public class EffectSlow: Cast {
         }
     }
 
-    public override bool AppliesTo(MonoBehaviour _target) {
-        return _target is IMoves;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<IMoves>() != null;
 }

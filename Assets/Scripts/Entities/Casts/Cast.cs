@@ -5,8 +5,8 @@ using UnityEngine;
 
 [Serializable]
 public enum TargetingMethod {
-    ContinuousTargeting,
-    DiscreteTargeting,
+    ShallowCopy,
+    HardCopy,
     SnapTarget,
     SelfTarget
 }
@@ -64,7 +64,7 @@ public static class CastUtils {
 
 public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     [SerializeField] public Positioning Positioning = Positioning.Relative;
-    [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ContinuousTargeting;
+    [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ShallowCopy;
     [SerializeField] public int Duration;
     [SerializeField] public int EncumberTime;
     [SerializeField] public float Range = 0;
@@ -107,7 +107,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         Target = target;
         Mirrored = mirrored;
 
-        if (TargetingMethod == TargetingMethod.DiscreteTargeting) {
+        if (TargetingMethod == TargetingMethod.HardCopy) {
             Target = CastUtils.GetTransformDeepCopy(Target);
         }
 
@@ -120,15 +120,6 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     protected virtual void OnInitialize() {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
         InitialRotation = transform.rotation;
-        
-        if (Positioning == Positioning.Relative) {
-            transform.position = About.position + About.rotation * Vector3.forward * Range;
-            transform.rotation = About.rotation;
-        } else if (Positioning == Positioning.Absolute) { // Positioning == Positioning.Absolute
-            float CastDistance = (Target.position - About.position).magnitude;
-            transform.position = About.position + Mathf.Min(Range, CastDistance)*(About.rotation * Vector3.forward);
-            transform.rotation = About.rotation * transform.rotation;
-        }
     }
 
     /// <summary/>
@@ -138,12 +129,16 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// <param name="target"></param>
     /// <param name="mirrored"></param>
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
-    public static Cast Instantiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
-        Cast Castable = Instantiate(CastablePrefab);
-        Castable.Parent = parent;
-        parent.AddChild(Castable);
-        Castable.Initialize(caster, about, target, mirrored);
-        return Castable;
+    public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
+        if (CastablePrefab.AppliesTo(about.gameObject)) {
+            Cast Castable = Instantiate(CastablePrefab);
+            Castable.Parent = parent;
+            parent._children.Add(Castable);
+            Castable.Initialize(caster, about, target, mirrored);
+            return Castable;
+        } else {
+            return null;
+        }
     }
 
     /// <summary>
@@ -158,7 +153,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     public bool OnRecastCastables(Transform target) {
         bool ret = false;
 
-        foreach (Cast child in CastableChlidren) {
+        foreach (Cast child in _children) {
             ret |= child.OnRecastCastables(target);
         }
 
@@ -178,7 +173,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
                 return false;
             } else {
                 foreach (Cast Castable in value) {
-                    Instantiate(
+                    Initiate(
                         Castable,
                         Caster,
                         transform,
@@ -199,7 +194,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     public bool IsRotatingClockwise() => !Mirrored;
     public Transform GetOriginTransform() => transform;
     public Transform GetTargetTransform() => Target; // TODO this will probably depend on the cast, and I think this is a good default?
-    public virtual bool AppliesTo(MonoBehaviour mono) => true;
+    public virtual bool AppliesTo(GameObject go) => true;
 
     protected virtual void Tick() { }
 
@@ -208,7 +203,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
 
         if (FrameCastablesMap.ContainsKey(Frame)) {
             foreach (Cast Castable in FrameCastablesMap[Frame]) {
-                Cast newCast = Instantiate(
+                Cast newCast = Initiate(
                     Castable,
                     Caster,
                     About,
@@ -217,11 +212,9 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
                     this
                 );
 
-                CastableChlidren.Add(newCast);
-
                 if (newCast is CommandMovement) {
                     // TODO should this be the caster or the Castable?
-                    (About as IMoves).CommandMovement = (CommandMovement)newCast;
+                    About.GetComponent<IMoves>().CommandMovement = (CommandMovement)newCast;
                 }
             }
         }
@@ -243,7 +236,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     }
 
     private void OnDestroy() {
-        if (TargetingMethod == TargetingMethod.DiscreteTargeting) {
+        if (TargetingMethod == TargetingMethod.HardCopy) {
             Destroy(Target.gameObject);
         }
         
@@ -254,35 +247,23 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
 
     /* IHealingTree Methods */
     public Cast Parent { get; set; } = null;
-    public List<Cast> CastableChlidren { get; private set; } = new();
+    public List<Cast> Children => _children;
+    private List<Cast> _children = new();
 
     public void PropagateChildren() {
         if (Parent != null) {
-            foreach (var child in CastableChlidren) {
+            foreach (var child in _children) {
                 if (child != null) {
                     if (child.DestroyWithParent) {
                         Destroy(child.gameObject);
                     } else {
-                        Parent.CastableChlidren.Add(child);
+                        Parent._children.Add(child);
                         child.Parent = Parent;
                     }
                 }
             }
 
-            Parent.CastableChlidren.Remove(this);
+            Parent._children.Remove(this);
         }
-    }
-
-    public void AddChild(Cast newChild) {
-        CastableChlidren.Add(newChild);
-    }
-
-    public void PruneChildren() {
-        CastableChlidren.All(castable => { if (castable!=null) castable.Prune(); return true; });
-    }
-
-    public void Prune() {
-        PruneChildren();
-        Destroy(gameObject);
     }
 }

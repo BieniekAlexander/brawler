@@ -239,7 +239,7 @@ public class Trigger : Cast, ICollidable, ICasts {
         HandleCollisions();
     }
 
-    public override bool AppliesTo(MonoBehaviour mono) {
+    public override bool AppliesTo(GameObject go) {
         // TODO check
         return true;
     }
@@ -294,13 +294,7 @@ public class Trigger : Cast, ICollidable, ICasts {
         } else {
             if (other is MonoBehaviour mono && mono.enabled) {
                 if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)) {
-                    CastableChlidren.InsertRange(
-                        0,
-                        from Cast c
-                        in ConditionCastablesMap[CastableCondition.OnCollision]
-                        where c.AppliesTo(mono)
-                        select Instantiate(c, Caster, mono.transform, Target, Mirrored, this)
-                    );
+                    OnCollision();
                 }
             }
         }

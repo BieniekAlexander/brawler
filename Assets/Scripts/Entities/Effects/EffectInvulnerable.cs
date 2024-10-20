@@ -14,7 +14,5 @@ public class EffectInvulnerable: Cast {
         }
     }
 
-    public override bool AppliesTo(MonoBehaviour mono) {
-        return mono is IDamageable;
-    }
+    public override bool AppliesTo(GameObject go) => go.GetComponent<IDamageable>()!=null;
 }    

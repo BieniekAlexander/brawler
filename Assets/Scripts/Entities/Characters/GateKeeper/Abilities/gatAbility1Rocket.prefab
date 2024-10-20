@@ -121,9 +121,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 0
-  TargetingMethod: 0
-  Duration: 400
+  Positioning: 2
+  TargetResolution: 0
+  Duration: 60
   EncumberTime: 0
   Range: 1
   DestroyOnRecast: 1
@@ -131,7 +131,6 @@ MonoBehaviour:
   DestroyWithParent: 0
   DataExpression:
     expression: (Frame (Parent this))
-  About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0
   Indefinite: 0
@@ -145,7 +144,6 @@ MonoBehaviour:
       - {fileID: 1916127504584190134, guid: 1201ee918149d3f46a19b8f6b00593a6, type: 3}
     - data:
       - {fileID: 1916127504584190134, guid: 1201ee918149d3f46a19b8f6b00593a6, type: 3}
-  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   RotationalControl: 0
   baseSpeedExpression:
     expression: 15

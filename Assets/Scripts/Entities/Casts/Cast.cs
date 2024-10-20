@@ -4,17 +4,19 @@ using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public enum TargetingMethod {
+public enum AboutResolution {
+    ShallowCopyAbout,
+    ShallowCopyTarget,
+    HardCopyAbout,
+    HardCopyTarget
+}
+
+[Serializable]
+public enum TargetResolution {
     ShallowCopy,
     HardCopy,
     SnapTarget,
     SelfTarget
-}
-
-[Serializable]
-public enum Positioning {
-    Relative,
-    Absolute
 }
 
 [Serializable]
@@ -54,8 +56,8 @@ public static class CastUtils {
         }
     }
 
-    public static Transform GetTransformDeepCopy(Transform transform) {
-        GameObject go = new("Projectile Target");
+    public static Transform GetTransformDeepCopy(Transform transform, string name) {
+        GameObject go = new(name);
         go.transform.position = transform.position;
         go.transform.rotation = transform.rotation;
         return go.transform;
@@ -63,8 +65,8 @@ public static class CastUtils {
 }
 
 public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
-    [SerializeField] public Positioning Positioning = Positioning.Relative;
-    [SerializeField] public TargetingMethod TargetingMethod = TargetingMethod.ShallowCopy;
+    [SerializeField] public AboutResolution Positioning = AboutResolution.ShallowCopyAbout;
+    [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
     [SerializeField] public int EncumberTime;
     [SerializeField] public float Range = 0;
@@ -75,7 +77,8 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     public string Data { get { return DataExpression.Value; } }
 
     [HideInInspector] public ICasts Caster;
-    [HideInInspector] public Transform About;
+    private Transform _about = null; // TODO hacking this in - Trigger starts in scene without an About - how to handle?
+    [HideInInspector] public Transform About {get {return _about==null?transform:_about; } set {_about = value;}}
     [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirrored = false;
     [HideInInspector] public bool Indefinite = false;
@@ -107,8 +110,13 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         Target = target;
         Mirrored = mirrored;
 
-        if (TargetingMethod == TargetingMethod.HardCopy) {
-            Target = CastUtils.GetTransformDeepCopy(Target);
+        // TODO clean these configs up
+        if (Positioning == AboutResolution.HardCopyTarget) {
+            About = CastUtils.GetTransformDeepCopy(target, "Cast About");
+        }
+
+        if (TargetResolution == TargetResolution.HardCopy) {
+            Target = CastUtils.GetTransformDeepCopy(target, "Projectile About");
         }
 
         OnInitialize();
@@ -116,8 +124,14 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
 
     protected virtual void OnInitialize() {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
-        transform.position = About.position;
-        transform.rotation = About.rotation;
+        transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
+
+        if (Positioning == AboutResolution.HardCopyAbout) {
+            transform.position = About.position + transform.rotation*Vector3.forward*Range;
+        } else if (Positioning == AboutResolution.HardCopyTarget) {
+            float CastDistance = (Target.position - About.position).magnitude;
+            transform.position = About.position + Mathf.Min(Range, CastDistance)*(transform.rotation * Vector3.forward);
+        } 
     }
 
     /// <summary/>
@@ -129,6 +143,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
     public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
         if (CastablePrefab.AppliesTo(about.gameObject)) {
+            // TODO this check is used for effects - the effect is applied to the About, but maybe factor
             Cast Castable = Instantiate(CastablePrefab);
             Castable.Parent = parent;
             parent._children.Add(Castable);
@@ -155,8 +170,12 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
             ret |= child.OnRecastCastables(target);
         }
 
-        ret |= _castConditionalCastables(CastableCondition.OnRecast);
         ret |= OnRecast(target);
+        ret |= _castConditionalCastables( // sinister bug here - if set to destroy on recast, both will happen, but I only want one
+            DestroyOnRecast
+            ? CastableCondition.OnDestruction
+            : CastableCondition.OnRecast
+        );
 
         if (DestroyOnRecast) {
             Destroy(gameObject);
@@ -165,24 +184,33 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         return ret;
     }
 
-    private bool _castConditionalCastables(CastableCondition castableCondition) {
-        if (ConditionCastablesMap.TryGetValue(castableCondition, out Cast[] value)) {
-            if (value.Count() == 0) {
+    private bool _castCastables(Cast[] casts) {
+        if (casts==null && casts.Count() == 0) {
                 return false;
-            } else {
-                foreach (Cast Castable in value) {
-                    Initiate(
-                        Castable,
-                        Caster,
-                        transform,
-                        Target,
-                        Mirrored,
-                        this
-                    );
+        } else {
+            foreach (Cast Castable in casts) {
+                Cast newCast = Initiate(
+                    Castable,
+                    Caster,
+                    About,
+                    Target,
+                    Mirrored,
+                    this
+                );
+
+                if (newCast is CommandMovement) {
+                    // TODO should this be the caster or the Castable?
+                    About.GetComponent<IMoves>().CommandMovement = (CommandMovement)newCast;
                 }
             }
 
             return true;
+        }
+    }
+
+    private bool _castConditionalCastables(CastableCondition castableCondition) {
+        if (ConditionCastablesMap.ContainsKey(castableCondition)) {
+            return _castCastables(ConditionCastablesMap[castableCondition]);
         } else {
             return false;
         }
@@ -200,21 +228,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         Tick();
 
         if (FrameCastablesMap.ContainsKey(Frame)) {
-            foreach (Cast Castable in FrameCastablesMap[Frame]) {
-                Cast newCast = Initiate(
-                    Castable,
-                    Caster,
-                    About,
-                    Target,
-                    Mirrored,
-                    this
-                );
-
-                if (newCast is CommandMovement) {
-                    // TODO should this be the caster or the Castable?
-                    About.GetComponent<IMoves>().CommandMovement = (CommandMovement)newCast;
-                }
-            }
+            _castCastables(FrameCastablesMap[Frame]);
         }
 
         if (++Frame >= Duration && !Indefinite) {
@@ -234,7 +248,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     }
 
     private void OnDestroy() {
-        if (TargetingMethod == TargetingMethod.HardCopy) {
+        if (TargetResolution == TargetResolution.HardCopy) {
             Destroy(Target.gameObject);
         }
         

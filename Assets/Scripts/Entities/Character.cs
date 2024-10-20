@@ -406,7 +406,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             Transform castOrigin = transform;
 
-            if (castContainer.castablePrefab.TargetingMethod == TargetingMethod.HardCopy) {
+            if (castContainer.castablePrefab.TargetResolution == TargetResolution.HardCopy) {
                 Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castablePrefab.Range);
 
                 if (t==null) {

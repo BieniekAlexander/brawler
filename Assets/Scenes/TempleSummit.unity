@@ -142,7 +142,7 @@ GameObject:
   - component: {fileID: 95702829}
   - component: {fileID: 95702828}
   - component: {fileID: 95702827}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: RingOutZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +186,6 @@ MonoBehaviour:
   DestroyWithParent: 0
   DataExpression:
     expression: 0
-  About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0
   Indefinite: 0
@@ -198,7 +197,6 @@ MonoBehaviour:
     m_values:
     - data:
       - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
-  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 100, y: 0, z: 100}

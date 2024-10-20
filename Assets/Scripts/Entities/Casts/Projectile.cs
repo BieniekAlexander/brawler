@@ -16,15 +16,6 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
         base.OnInitialize();
         FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
         Velocity = transform.rotation*Vector3.forward*BaseSpeed;
-
-        if (Positioning == Positioning.Relative) {
-            transform.position = About.position + transform.rotation * Vector3.forward * Range;
-            transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
-        } else if (Positioning == Positioning.Absolute) {
-            float CastDistance = (Target.position - About.position).magnitude;
-            transform.position = About.position + Mathf.Min(Range, CastDistance)*(About.rotation * Vector3.forward);
-            transform.rotation = About.rotation * transform.rotation;
-        }
     }
 
     protected override void Tick() {

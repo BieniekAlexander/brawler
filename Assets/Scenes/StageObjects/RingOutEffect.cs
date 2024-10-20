@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RingOutEffect : Castable
+public class RingOutEffect : Cast
 {
     [SerializeField] public int RingOutDamage = 250;
     private Character Effected;

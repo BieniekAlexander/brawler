@@ -1,18 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
+public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     /* Movement */
     public Vector3 Velocity { get; set; } = new();
     public CommandMovement CommandMovement { get; set; }
-    [SerializeField] float InitialOffset = 1f;
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
     // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
     // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
     // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
-    [SerializeField] Positioning Positioning = Positioning.Directional;
-    private Quaternion InitialRotation;
     private bool managingTarget = false;
 
     new public void Awake() {
@@ -23,25 +20,8 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     override protected void OnInitialize() {
         base.OnInitialize();
         FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
-
-        if (Target == null) {
-            managingTarget = true;
-            GameObject go = new("Projectile Target");
-            go.transform.position = Caster.GetTargetTransform().position;
-            Target = go.transform;
-        }
-
-        InitialRotation = transform.rotation;
         Vector3 Direction = About.rotation * Vector3.forward;
         Velocity = BaseSpeed * Direction;
-
-        if (Positioning == Positioning.Directional) {
-            transform.position = About.position + InitialOffset*Direction;
-        } else if (Positioning == Positioning.Absolute) { // Positioning == Positioning.Absolute
-            float CastDistance = (Target.position - About.position).magnitude;
-            transform.position = About.position + Mathf.Min(InitialOffset, CastDistance)*Direction;
-            transform.rotation = About.rotation * transform.rotation;
-        }
     }
 
     protected override void Tick() {
@@ -106,19 +86,7 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
             other is Character Character
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
-            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnCollision]) {
-                CreateCastable(
-                    Castable,
-                    Caster,
-                    transform,
-                    null,
-                    false,
-                    this
-                );
-            }
-
-            // Might I not want a projectile to Destroy on collision? I can't think of a case, but maybe?
-            Destroy(gameObject);
+            OnCollision();
         }
     }
 
@@ -147,13 +115,13 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
 
     public void OnDeath() {
         if (ConditionCastablesMap.ContainsKey(CastableCondition.OnDeath)) {
-            foreach (Castable Castable in ConditionCastablesMap[CastableCondition.OnDeath]) {
-                CreateCastable(
+            foreach (Cast Castable in ConditionCastablesMap[CastableCondition.OnDeath]) {
+                Instantiate(
                     Castable,
                     Caster,
                     transform,
                     null,
-                    false,
+                    Mirrored,
                     this
                 );
             }
@@ -168,10 +136,6 @@ public class Projectile : Castable, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     override protected void OnDestruction() {
-        if (managingTarget) {
-            Destroy(Target.gameObject);
-        }
-
         base.OnDestruction();
     }
 }

@@ -9,56 +9,45 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 [Serializable]
-public enum NewCastResolution {
-    Delete,
-    Keep
-    // TODO I think I want a condition for having, at max, N of something - how do I do this?
-    // maybe program some logic that gets resolved with charges - that also lets me modify charge count
-    // e.g. maybe I can have two walls up, and a special lets me have 3
-}
-
-[Serializable]
 public class CastSlot {
     public CastSlot(string _name) {
         name = _name;
-        castPrefab = null;
+        castablePrefab = null;
         cooldown = -1;
         defaultChargeCount = 1;
     }
 
     public string name;
-    public Cast castPrefab;
+    public Cast castablePrefab;
+    public CastableCosts costs;
     public int cooldown;
     public int defaultChargeCount;
-    public NewCastResolution newCastResolution = NewCastResolution.Delete;
 }
 
 public class CastContainer {
     static GameObject RootCastablePrefab = Resources.Load<GameObject>("RootCastable");
 
-    public CastContainer(CastSlot _castSlot, Character character, string name) {
-        castPrefab = _castSlot.castPrefab;
-        cast = null;
-        cooldown = _castSlot.cooldown;
+    public CastContainer(CastSlot castSlot, Character character, string name) {
+        castablePrefab = castSlot.castablePrefab;
+        cooldown = castSlot.cooldown;
         timer = 0;
-        charges = _castSlot.defaultChargeCount;
-        newCastResolution = _castSlot.newCastResolution;
+        charges = castSlot.defaultChargeCount;
+        Costs = castSlot.costs;
 
         RootCastable = GameObject.Instantiate(
             RootCastablePrefab,
             character.transform
-        ).GetComponent<Castable>();
+        ).GetComponent<Cast>();
 
         RootCastable.name = $"{name}Root";
     }
 
-    public Cast castPrefab;
-    public Cast cast;
+    public Cast castablePrefab;
+    public Cast RootCastable;
+    public CastableCosts Costs;
     public int cooldown;
     public int timer;
     public int charges;
-    public NewCastResolution newCastResolution;
-    public Castable RootCastable;
 }
 
 public enum CastId {
@@ -196,7 +185,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     public int CastBufferTimer { get; private set; } = 0;
-    private CastContainer _activeCastContainer = null;
+    private bool _hasResourcesForCast(CastableCosts costs) => energy >= costs.energy && Charges >= costs.charges;
+    private Cast _activeCastable = null;
     private int _nextCastId;
     public int InputCastId {
         get { return _nextCastId; }
@@ -207,6 +197,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
     }
+
+    
 
     /* Signals */
     // this is probably not a very good way to implement this, but I just want to propagate damage dealt by my RL agent to learning
@@ -396,14 +388,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (castContainer.charges == 0) {
             // we're updating another cast - allowed
             return castContainer.RootCastable.OnRecastCastables(CursorTransform);
-        } else if (castContainer.castPrefab == null) {
+        } else if (castContainer.castablePrefab == null) {
             Debug.Log("No cast supplied for cast"+(int)castId);
             return true;
-        } else if (
-            (Charges>0 || !boostedIds.Contains(castId))
-            && (energy >= 50 || !specialIds.Contains(castId))
-            && (energy >= 100 || castId!=(int)CastId.Ultimate)
-        ) {
+        } else if (_hasResourcesForCast(castContainer.Costs)) {
             if (boostedIds.Contains(castId)) {
                 Charges--;
             } else if (specialIds.Contains(castId)) {
@@ -412,19 +400,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 energy -= 100;
             }
 
-            if (
-                _activeCastContainer!=null
-                && _activeCastContainer.newCastResolution==NewCastResolution.Delete
-            ) {
-                _activeCastContainer.RootCastable.PruneChildren();
-                Destroy(_activeCastContainer.cast);
+            if (_activeCastable!=null && _activeCastable.DestroyOnRecast) {
+                Destroy(_activeCastable);
             }
 
-            _activeCastContainer = castContainer;
             Transform castOrigin = transform;
 
-            if (castContainer.castPrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
-                Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castPrefab.Range);
+            if (castContainer.castablePrefab.TargetingMethod == TargetingMethod.DiscreteTargeting) {
+                Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castablePrefab.Range);
 
                 if (t==null) {
                     return false;
@@ -433,19 +416,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 }
             }
 
-            castContainer.cast = Cast.StartCast(
-                castContainer.castPrefab,
+            _activeCastable = Cast.Instantiate(
+                castContainer.castablePrefab,
                 this,
                 castOrigin,
                 CursorTransform,
                 RotatingClockwise,
                 castContainer.RootCastable
+                // TODO might be cleaner to write if I have the parent collect the castable ref
             );
 
             castContainer.charges--;
             castContainer.timer = castContainer.cooldown;
-            BusyTimer = castContainer.castPrefab.Duration;
-            EncumberedTimer = castContainer.castPrefab.EncumberTime;
+            BusyTimer = castContainer.castablePrefab.Duration;
+            EncumberedTimer = castContainer.castablePrefab.EncumberTime;
             return true;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
@@ -469,10 +453,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     CastContainers[i].timer = castSlots[i].cooldown;
                 }
             }
-
-            if (CastContainers[i].cast == null) {
-                CastContainers[i].cast = null;
-            }
         }
     }
 
@@ -493,7 +473,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return CursorTransform;
     }
 
-    public List<Castable> CastableChlidren {
+    public List<Cast> CastableChlidren {
         get {
             return (from CastContainer cc in CastContainers select cc.RootCastable).ToList();
         }
@@ -734,7 +714,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (HitsShield(contactPoint)) {
             if (Shield.ParryWindow > 0) {
                 EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
-                Castable.CreateCastable(Invulnerability, this, transform, null, false, null);
+                Cast.Instantiate(Invulnerability, this, transform, null, false, null);
                 Parried = true;
                 // TODO:
                 // - reflect projectiles

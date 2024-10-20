@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectMaim: Castable {
+public class EffectMaim: Cast {
     protected override void OnInitialize() {
         About.GetComponent<ICasts>().MaimStack++;
     }

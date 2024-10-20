@@ -193,7 +193,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 /// <summary>
 /// Class that generically handles the changing of object states when the object collides with it
 /// </summary>
-public class Trigger : Castable, ICollidable, ICasts {
+public class Trigger : Cast, ICollidable, ICasts {
     /* Transform */
     [SerializeField] public List<TriggerTransformation> TriggerTransformations;
 
@@ -296,10 +296,10 @@ public class Trigger : Castable, ICollidable, ICasts {
                 if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)) {
                     CastableChlidren.InsertRange(
                         0,
-                        from Castable c
+                        from Cast c
                         in ConditionCastablesMap[CastableCondition.OnCollision]
                         where c.AppliesTo(mono)
-                        select CreateCastable(c, Caster, mono.transform, Target, Mirrored, this)
+                        select Instantiate(c, Caster, mono.transform, Target, Mirrored, this)
                     );
                 }
             }

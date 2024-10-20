@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EffectSlow: Castable {
+public class EffectSlow: Cast {
     [SerializeField] public float slowFactor = .7f;
 
     protected override void OnInitialize() {

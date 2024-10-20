@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectBurning : Castable {
+public class EffectBurning : Cast {
     [SerializeField] int TickRate;
     [SerializeField] int Damage;
     private IDamageable Damageable;

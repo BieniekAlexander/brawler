@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CommandMovementDash: CommandMovement {
+public class CommandMovementBolt: CommandMovement {
     [SerializeField] public float Speed;
     private float initialSpeed;
     private IMoves Mover;
@@ -20,11 +20,6 @@ public class CommandMovementDash: CommandMovement {
     }
 
     protected override void OnDestruction() {
-        if (GetComponentInParent<Cast>() is Cast parentCast) {
-            GameObject go = GetComponentInParent<Cast>().gameObject;
-            ExecuteEvents.Execute<ICastMessage>(go, null, (c, data) => c.FinishCast());
-        }
-
         Mover.Velocity = Vector3.ClampMagnitude(Mover.Velocity, initialSpeed);
     }
 }

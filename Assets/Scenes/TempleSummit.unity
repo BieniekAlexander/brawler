@@ -177,8 +177,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: 360000
-  ExpiresOnNewCast: 0
-  ExpiresOnRecast: 0
+  EncumberTime: 0
+  Range: 0
+  TargetingMethod: 0
+  DestroyOnRecast: 0
+  DestroyWithParent: 0
   DataExpression:
     expression: 0
   About: {fileID: 0}
@@ -302,8 +305,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CharacterPrefabs:
-  - {fileID: 6377833502345791155, guid: e3c01419408d2f44495f94aee4c6713b, type: 3}
   - {fileID: 1452099186333517590, guid: fc346559b2a566b449090787913262e6, type: 3}
+  - {fileID: 6377833502345791155, guid: e3c01419408d2f44495f94aee4c6713b, type: 3}
   HazardHandlerPrefab: {fileID: 0}
 --- !u!4 &101345385
 Transform:

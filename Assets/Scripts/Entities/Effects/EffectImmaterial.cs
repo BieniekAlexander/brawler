@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectImmaterial: Castable {
+public class EffectImmaterial: Cast {
     private int originalLayer;
 
     protected override void OnInitialize() {

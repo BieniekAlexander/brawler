@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Armor : Castable {
+public class Armor : Cast {
     [SerializeField] public int amount;
 
     public override bool AppliesTo(MonoBehaviour mono) {

@@ -19,11 +19,11 @@ public class CastPlayer : MonoBehaviour {
     // https://discussions.unity.com/t/prefabutility-check-if-changes-have-been-made-to-prefab/167857
     [SerializeField] Character Caster;
     [SerializeField] Transform Target;
-    private Cast CastPrefab;
-    private Dictionary<int, List<Castable>> StartFrameCastablesMap = null;
-    private Dictionary<int, List<Castable>> ExpireFrameCastablesMap = null;
-    private List<Castable> ActiveCastables = null;
-    private Cast cast;
+    private Cast CastablePrefab;
+    private Dictionary<int, List<Cast>> StartFrameCastablesMap = null;
+    private Dictionary<int, List<Cast>> ExpireFrameCastablesMap = null;
+    private List<Cast> ActiveCastables = null;
+    private Cast castable;
     private bool _rotatingClockwise = true; // let's assume that all editing assumes a cast direction of clockwise
     private int castId;
     private int frame;
@@ -70,12 +70,12 @@ public class CastPlayer : MonoBehaviour {
 
     private void GetActiveFrameCastablesMap(
         Cast prefab,
-        out Dictionary<int, List<Castable>> startFrameCastablesMap,
-        out Dictionary<int, List<Castable>> expireFrameCastablesMap
+        out Dictionary<int, List<Cast>> startFrameCastablesMap,
+        out Dictionary<int, List<Cast>> expireFrameCastablesMap
     ) {
         // TODO recursive
-        startFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Castable>());
-        expireFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Castable>());
+        startFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Cast>());
+        expireFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Cast>());
 
         for (int f = 0; f < prefab.Duration; f++) {
             // inefficient, but nice if I want to create new castables
@@ -83,7 +83,7 @@ public class CastPlayer : MonoBehaviour {
 
             if (prefab.FrameCastablesMap.ContainsKey(f)) {
                 for (int i = 0; i <  prefab.FrameCastablesMap[f].Length; i++) {
-                    Castable newCastable = Castable.CreateCastable(
+                    Cast newCastable = Cast.Instantiate(
                         prefab.FrameCastablesMap[f][i],
                         Caster,
                         Caster.transform,
@@ -108,14 +108,14 @@ public class CastPlayer : MonoBehaviour {
     private void InitializeCast(int castId) {
         DeleteInstantiatedCasts();
 
-        CastPrefab = Caster.CastContainers[(int)castIds[castId]].castPrefab;
-        duration = CastPrefab.Duration;
+        CastablePrefab = Caster.CastContainers[(int)castIds[castId]].castablePrefab;
+        duration = CastablePrefab.Duration;
         ActiveCastables = new();
 
         GetActiveFrameCastablesMap(
-            CastPrefab,
-            out Dictionary<int, List<Castable>> starts,
-            out Dictionary<int, List<Castable>> expirations
+            CastablePrefab,
+            out Dictionary<int, List<Cast>> starts,
+            out Dictionary<int, List<Cast>> expirations
         );
 
         StartFrameCastablesMap = starts;
@@ -131,7 +131,7 @@ public class CastPlayer : MonoBehaviour {
     }
 
     private void UpdateCastableTransformations() {
-        foreach (Castable activeCastable in ActiveCastables) {
+        foreach (Cast activeCastable in ActiveCastables) {
             if (activeCastable is Trigger activeTrigger) {
                 TriggerTransformation newTransformation = TriggerTransformation.FromTransformCoordinates(activeTrigger.transform, Caster.transform, !_rotatingClockwise);
 
@@ -173,7 +173,7 @@ public class CastPlayer : MonoBehaviour {
             }
         }
 
-        foreach (Castable castable in ActiveCastables) {
+        foreach (Cast castable in ActiveCastables) {
             if (castable is Trigger trigger) {
                 // NOTE - this will apply to all active casts - I don't have a means of selecting hits for copying, yet
                 trigger.Frame += direction;
@@ -219,7 +219,7 @@ public class CastPlayer : MonoBehaviour {
     }
 
     private void MirrorFrame() {
-        foreach (Castable activeCastable in ActiveCastables) {
+        foreach (Cast activeCastable in ActiveCastables) {
             if (activeCastable is Trigger activeTrigger) {
                 activeTrigger.TriggerTransformations[activeTrigger.Frame].Mirror();
                 activeTrigger.UpdateTransform(activeTrigger.Frame);
@@ -231,16 +231,16 @@ public class CastPlayer : MonoBehaviour {
         UpdateCastableTransformations();
 
         for (int i = 0; i < duration; i++) {
-            if (!CastPrefab.FrameCastablesMap.ContainsKey(i))
+            if (!CastablePrefab.FrameCastablesMap.ContainsKey(i))
                 continue;
 
             // https://discussions.unity.com/t/test-if-prefab-is-an-instance/716592/3
-            List<Castable> startFrameCastables = StartFrameCastablesMap[i];
-            Castable[] prefabMap = CastPrefab.FrameCastablesMap[i];
+            List<Cast> startFrameCastables = StartFrameCastablesMap[i];
+            Cast[] prefabMap = CastablePrefab.FrameCastablesMap[i];
 
             for (int j = 0; j < prefabMap.Length; j++) {
-                Castable toCopy = startFrameCastables[j];
-                Castable copyToPrefab = prefabMap[j];
+                Cast toCopy = startFrameCastables[j];
+                Cast copyToPrefab = prefabMap[j];
 
                 Assert.IsTrue(toCopy.Duration==copyToPrefab.Duration); // TODO not sure how to check that these refer to the same hit
 
@@ -256,13 +256,13 @@ public class CastPlayer : MonoBehaviour {
 
     private void DeleteInstantiatedCasts() {
         for (int i = 0; i < duration; i++) {
-            if (!CastPrefab.FrameCastablesMap.ContainsKey(i))
+            if (!CastablePrefab.FrameCastablesMap.ContainsKey(i))
                 continue;
 
-            List<Castable> startFrameCastables = StartFrameCastablesMap[i];
+            List<Cast> startFrameCastables = StartFrameCastablesMap[i];
 
             for (int j = 0; j < startFrameCastables.Count; j++) {
-                Castable instantiatedCastable = startFrameCastables[j];
+                Cast instantiatedCastable = startFrameCastables[j];
                 Destroy(instantiatedCastable.gameObject);
             }
         }

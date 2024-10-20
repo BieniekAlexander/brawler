@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CastableGenerator : MonoBehaviour, ICasts {
-    [SerializeField] private Castable CastablePrefab;
+    [SerializeField] private Cast CastablePrefab;
 
     /* Timing */
     [SerializeField] public int ReloadTime = 300;
@@ -18,7 +18,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
     [SerializeField] public float TargetJiggle = 30f;
 
     /* Castables */
-    public List<Castable> CastableChlidren { get; set; } = new List<Castable>();
+    public List<Cast> CastableChlidren { get; set; } = new List<Cast>();
     public int MaimStack { get { return 0; } set {; } }
     public int SilenceStack { get { return 0; } set {; } }
 
@@ -48,7 +48,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
                 ) * transform.rotation;
             if (Target != null) {
                 CastableChlidren.Add(
-                    Castable.CreateCastable(
+                    Cast.Instantiate(
                         CastablePrefab,
                         this,
                         transform,

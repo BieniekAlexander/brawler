@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public abstract class CommandMovement : Castable {
+public abstract class CommandMovement : Cast {
     protected override void OnDestruction() {
-        foreach (Castable activeCastable in CastableChlidren) {
+        foreach (Cast activeCastable in CastableChlidren) {
             Destroy(activeCastable);
         }
     }

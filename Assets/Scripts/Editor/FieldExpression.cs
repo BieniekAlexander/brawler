@@ -5,7 +5,7 @@ using UnityEngine;
 
 // specifies that C must subclass Castable - I'm not sure that this is what I want yet
 [Serializable]
-public class FieldExpression<C, T> where C : Castable {
+public class FieldExpression<C, T> where C : Cast {
     [SerializeField] string expression;
     public T Value { get; set; }
 
@@ -35,11 +35,11 @@ public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> 
 
     public class CastableLispAccessors : ScriptMethods {
         public float Speed(ICasts c) => (c is IMoves moves) ? moves.Velocity.magnitude : 0f;
-        public ICasts Caster(Castable c) => c.Caster;
-        public string Data(Castable c) => c.Data;
-        public int Duration(Castable c) => c.Duration;
-        public int Frame(Castable c) => c.Frame;
-        public Castable Parent(Castable c) => c.Parent;
+        public ICasts Caster(Cast c) => c.Caster;
+        public string Data(Cast c) => c.Data;
+        public int Duration(Cast c) => c.Duration;
+        public int Frame(Cast c) => c.Frame;
+        public Cast Parent(Cast c) => c.Parent;
     }
 
     public void OnEnable() {
@@ -61,7 +61,7 @@ public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> 
         interpreter.ReplEval(scriptContext, null, "\"wtf\"");
     }
 
-    public void RenderValue<C, T>(C context, FieldExpression<C, T> fieldExpression) where C : Castable {
+    public void RenderValue<C, T>(C context, FieldExpression<C, T> fieldExpression) where C : Cast {
         fieldExpression.RenderValue(context, interpreter, scriptContext);
     }
 }

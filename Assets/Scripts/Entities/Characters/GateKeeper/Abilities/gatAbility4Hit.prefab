@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: -1
-  ExpiresOnNewCast: 0
-  ExpiresOnRecast: 0
+  DestroyOnRecast: 0
+  DestroyWithParent: 1
   DataExpression:
     expression: 0
   About: {fileID: 0}

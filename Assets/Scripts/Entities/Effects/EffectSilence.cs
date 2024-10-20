@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectSilence: Castable {
+public class EffectSilence: Cast {
     private ICasts Effected;
 
     protected override void OnInitialize() {

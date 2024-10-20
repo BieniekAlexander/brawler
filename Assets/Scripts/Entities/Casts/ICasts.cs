@@ -21,7 +21,7 @@ public interface ICasts {
     /// Get a list of all of the things that the ICasts has casted
     /// </summary>
     /// <returns></returns>
-    public List<Castable> CastableChlidren { get; }
+    public List<Cast> CastableChlidren { get; }
 
     // status effects
     public int MaimStack { get; set; } // can't use attacks

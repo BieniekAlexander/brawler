@@ -45,7 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Duration: 20
-  Expires: 1
+  DestroyOnRecast: 0
+  DestroyWithParent: 1
+  DataExpression:
+    expression: 0
   About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0

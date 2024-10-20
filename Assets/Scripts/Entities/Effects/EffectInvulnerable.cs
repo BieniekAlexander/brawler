@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectInvulnerable: Castable {
+public class EffectInvulnerable: Cast {
     private IDamageable Effected;
 
     protected override void OnInitialize() {

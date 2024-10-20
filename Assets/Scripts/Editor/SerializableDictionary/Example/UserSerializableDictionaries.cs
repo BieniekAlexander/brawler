@@ -5,13 +5,13 @@ using UnityEngine;
 
 /* START MINE */
 [Serializable]
-public class FrameCastablesDictionary : SerializableDictionary<int, Castable[], CastableArrayStorage> { }
+public class FrameCastablesDictionary : SerializableDictionary<int, Cast[], CastableArrayStorage> { }
 
 [Serializable]
-public class ConditionCastablesDictionary : SerializableDictionary<CastableCondition, Castable[], CastableArrayStorage> { }
+public class ConditionCastablesDictionary : SerializableDictionary<CastableCondition, Cast[], CastableArrayStorage> { }
 
 [Serializable]
-public class CastableArrayStorage : SerializableDictionary.Storage<Castable[]> { }
+public class CastableArrayStorage : SerializableDictionary.Storage<Cast[]> { }
 /* END MINE */
 
 [Serializable]

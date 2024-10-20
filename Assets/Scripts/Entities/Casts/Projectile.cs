@@ -7,11 +7,6 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     public CommandMovement CommandMovement { get; set; }
     [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
-    // TODO currently, it seems to make the most sense to me that all projectile movement is directional,
-    // but for absolute casts (e.g. an AOE stun), it works to act as a projectile,
-    // so I'll cast AOEs and such as projectiles for now and change it if it no longer makes sense
-    private bool managingTarget = false;
-
     new public void Awake() {
         _collider = GetComponent<Collider>();
         base.Awake();

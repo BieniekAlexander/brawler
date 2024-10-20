@@ -115,10 +115,12 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     }
 
     [HideInInspector]
-    public Quaternion InitialRotation; // TODO I think I don't need this - remove
+    public Quaternion InitialRotation; // TODO I think I don't need this - refactor & remove
 
     protected virtual void OnInitialize() {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
+        transform.position = About.position;
+        transform.rotation = About.rotation;
         InitialRotation = transform.rotation;
     }
 

@@ -47,8 +47,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetingMethod: 0
   Duration: -1
+  EncumberTime: 0
+  Range: 0
   DestroyOnRecast: 0
+  DestroyOnCollision: 0
   DestroyWithParent: 1
   DataExpression:
     expression: 0
@@ -62,6 +67,7 @@ MonoBehaviour:
   ConditionCastablesMap:
     m_keys: 
     m_values: []
+  InitialRotation: {x: 0, y: 0, z: 0, w: 0}
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 0.25}
     Dimension: {x: 1.2, y: 1.2, z: 1.2}

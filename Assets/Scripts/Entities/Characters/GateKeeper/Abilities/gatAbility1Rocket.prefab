@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2445238925043839964}
   - component: {fileID: 2350912441906259594}
   m_Layer: 7
-  m_Name: gatRocket
+  m_Name: gatAbility1Rocket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,7 +123,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Positioning: 0
   TargetingMethod: 0
-  Duration: 40
+  Duration: 400
   EncumberTime: 0
   Range: 1
   DestroyOnRecast: 1

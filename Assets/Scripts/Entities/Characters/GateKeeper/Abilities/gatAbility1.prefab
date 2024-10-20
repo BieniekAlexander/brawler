@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1635544872617382815}
   - component: {fileID: 7405340235297773501}
   m_Layer: 9
-  m_Name: gatCastAbility1
+  m_Name: gatAbility1
   m_TagString: Untagged
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -44,11 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetingMethod: 0
   Duration: 60
   EncumberTime: 60
   Range: 0
-  TargetingMethod: 0
   DestroyOnRecast: 1
+  DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
     expression: 0
@@ -60,9 +62,8 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 0000000002000000
+    m_keys: 02000000
     m_values:
     - data:
       - {fileID: 2445238925043839964, guid: d1fe1257f13f64447b9e72e55d1ecacd, type: 3}
-    - data:
-      - {fileID: 2445238925043839964, guid: d1fe1257f13f64447b9e72e55d1ecacd, type: 3}
+  InitialRotation: {x: 0, y: 0, z: 0, w: 0}

@@ -57,14 +57,13 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
             Vector3 targetDirection = Target.position - transform.position;
             Quaternion targetRotation = Quaternion.FromToRotation(Velocity, targetDirection);
 
-            Quaternion newRotation = Quaternion.RotateTowards(
+            transform.rotation = Quaternion.RotateTowards(
                 Quaternion.Euler(Velocity.normalized),
                 targetRotation,
                 RotationalControl * Time.deltaTime);
 
             // force movement only in XZ
-            Velocity = MovementUtils.inXZ(newRotation * Velocity.normalized * BaseSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
-            transform.rotation = Quaternion.LookRotation(Velocity.normalized, Vector3.up)*InitialRotation;
+            Velocity = MovementUtils.inXZ(transform.rotation * Velocity.normalized * BaseSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
         }
 
         transform.position += Velocity * Time.deltaTime;

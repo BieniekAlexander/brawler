@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// https://discussions.unity.com/t/how-to-convert-from-world-space-to-canvas-space/117981/3
 /// </summary>
-public class Canvas : MonoBehaviour {
+public class CanvasController : MonoBehaviour {
     [SerializeField] HPBarVisuals HPBarVisualsPrefab;
     [SerializeField] Vector3 offset = new Vector3(0, 1, .5f);
     
@@ -29,8 +29,7 @@ public class Canvas : MonoBehaviour {
         }
     }
 
-    // Update is called once per frame
-    void FixedUpdate() {
+    void Update() {
         HealthBars.RemoveAll(bar => bar==null);
 
         for (int i = 0; i < HealthBars.Count; i++) {

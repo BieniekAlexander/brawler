@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectImmaterial: Cast {
+public class EffectImmaterial: Effect {
     private int originalLayer;
 
     protected override void OnInitialize() {
@@ -19,5 +19,5 @@ public class EffectImmaterial: Cast {
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.GetComponent<ICollidable>() != null;
+    override public bool AppliesTo(GameObject go) => go.GetComponent<ICollidable>() != null;
 }    

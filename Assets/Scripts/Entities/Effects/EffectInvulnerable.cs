@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectInvulnerable: Cast {
+public class EffectInvulnerable: Effect {
     private IDamageable Effected;
 
     protected override void OnInitialize() {
@@ -14,5 +14,5 @@ public class EffectInvulnerable: Cast {
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.GetComponent<IDamageable>()!=null;
+    override public bool AppliesTo(GameObject go) => go.GetComponent<IDamageable>()!=null;
 }    

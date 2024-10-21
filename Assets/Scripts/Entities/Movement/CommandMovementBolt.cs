@@ -4,10 +4,9 @@ using UnityEngine.EventSystems;
 public class CommandMovementBolt: CommandMovement {
     [SerializeField] public float Speed;
     private float initialSpeed;
-    private IMoves Mover;
 
     protected override void OnInitialize() {
-        Mover = About.GetComponent<IMoves>();
+        base.OnInitialize();
         Vector3 trajectory = (Target.position-About.position).normalized
             * Mathf.Min(
                 (Target.position-Mover.Transform.position).magnitude,

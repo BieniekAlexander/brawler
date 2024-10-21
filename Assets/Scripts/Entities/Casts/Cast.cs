@@ -56,8 +56,9 @@ public static class CastUtils {
         }
     }
 
-    public static Transform GetTransformDeepCopy(Transform transform, string name) {
+    public static Transform GetTransformDeepCopy(Transform transform, string name, Transform parentTransform) {
         GameObject go = new(name);
+        go.transform.parent = parentTransform;
         go.transform.position = transform.position;
         go.transform.rotation = transform.rotation;
         return go.transform;
@@ -77,8 +78,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     public string Data { get { return DataExpression.Value; } }
 
     [HideInInspector] public ICasts Caster;
-    private Transform _about = null; // TODO hacking this in - Trigger starts in scene without an About - how to handle?
-    [HideInInspector] public Transform About {get {return _about==null?transform:_about; } set {_about = value;}}
+    [HideInInspector] protected Transform About;
     [HideInInspector] public Transform Target;
     [HideInInspector] public bool Mirrored = false;
     [HideInInspector] public bool Indefinite = false;
@@ -112,11 +112,11 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
 
         // TODO clean these configs up
         if (Positioning == AboutResolution.HardCopyTarget) {
-            About = CastUtils.GetTransformDeepCopy(target, "Cast About");
+            About = CastUtils.GetTransformDeepCopy(target, "Cast About", null);
         }
 
         if (TargetResolution == TargetResolution.HardCopy) {
-            Target = CastUtils.GetTransformDeepCopy(target, "Projectile About");
+            Target = CastUtils.GetTransformDeepCopy(target, "Projectile About", null);
         }
 
         OnInitialize();
@@ -128,9 +128,11 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
 
         if (Positioning == AboutResolution.HardCopyAbout) {
             transform.position = About.position + transform.rotation*Vector3.forward*Range;
+            About = transform;
         } else if (Positioning == AboutResolution.HardCopyTarget) {
             float CastDistance = (Target.position - About.position).magnitude;
             transform.position = About.position + Mathf.Min(Range, CastDistance)*(transform.rotation * Vector3.forward);
+            About = transform;
         } 
     }
 
@@ -142,16 +144,11 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// <param name="mirrored"></param>
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
     public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
-        if (CastablePrefab.AppliesTo(about.gameObject)) {
-            // TODO this check is used for effects - the effect is applied to the About, but maybe factor
-            Cast Castable = Instantiate(CastablePrefab);
-            Castable.Parent = parent;
-            parent._children.Add(Castable);
-            Castable.Initialize(caster, about, target, mirrored);
-            return Castable;
-        } else {
-            return null;
-        }
+        Cast Castable = Instantiate(CastablePrefab);
+        Castable.Parent = parent;
+        parent._children.Add(Castable);
+        Castable.Initialize(caster, about, target, mirrored);
+        return Castable;
     }
 
     /// <summary>
@@ -197,11 +194,6 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
                     Mirrored,
                     this
                 );
-
-                if (newCast is CommandMovement) {
-                    // TODO should this be the caster or the Castable?
-                    About.GetComponent<IMoves>().CommandMovement = (CommandMovement)newCast;
-                }
             }
 
             return true;
@@ -220,7 +212,6 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     public bool IsRotatingClockwise() => !Mirrored;
     public Transform GetOriginTransform() => transform;
     public Transform GetTargetTransform() => Target; // TODO this will probably depend on the cast, and I think this is a good default?
-    public virtual bool AppliesTo(GameObject go) => true;
 
     protected virtual void Tick() { }
 
@@ -239,8 +230,30 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     protected virtual void OnDestruction() {
     }
 
-    protected virtual void OnCollision() {
-        _castConditionalCastables(CastableCondition.OnCollision);
+    protected virtual void OnCollision(ICollidable collidable) {
+        Cast[] casts = ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)
+            ? ConditionCastablesMap[CastableCondition.OnCollision]
+            : null;
+        if (casts==null || casts.Count() == 0) {
+            return;
+        } else {
+            foreach (Cast Castable in casts) {
+                if (Castable is Effect effect && !effect.AppliesTo(collidable.Transform.gameObject)) {
+                    continue;
+                }
+
+                Cast newCast = Initiate(
+                    Castable,
+                    Caster,
+                    (Castable is Effect)?collidable.Transform:About,
+                    Target,
+                    Mirrored,
+                    this
+                );
+            }
+
+            
+        }
 
         if (DestroyOnCollision) {
             Destroy(gameObject);

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RingOutEffect : Cast
+public class RingOutEffect : Effect
 {
     [SerializeField] public int RingOutDamage = 250;
     private Character Effected;
@@ -27,5 +27,5 @@ public class RingOutEffect : Cast
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.CompareTag("Character");
+    override public bool AppliesTo(GameObject go) => go.CompareTag("Character");
 }

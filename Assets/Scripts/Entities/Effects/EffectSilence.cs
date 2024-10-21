@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectSilence: Cast {
+public class EffectSilence: Effect {
     private ICasts Effected;
 
     protected override void OnInitialize() {
@@ -14,5 +14,5 @@ public class EffectSilence: Cast {
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.GetComponent<ICasts>() != null;
+    override public bool AppliesTo(GameObject go) => go.GetComponent<ICasts>() != null;
 }

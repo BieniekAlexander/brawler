@@ -79,7 +79,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
             other is Character Character
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
-            OnCollision();
+            OnCollision(other);
         }
     }
 
@@ -123,10 +123,6 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     public void TakeArmor(Armor armor) { ; }
-
-    public override bool AppliesTo(GameObject go) {
-        return true;
-    }
 
     override protected void OnDestruction() {
         base.OnDestruction();

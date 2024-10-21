@@ -1,17 +1,16 @@
 using UnityEngine;
 
 public class CommandMovementLock : CommandMovement {
-    private IMoves Effected;
     private IMoves Lock;
 
     protected override void OnInitialize() {
-        Effected = About.GetComponent<IMoves>();
+        base.OnInitialize();
         Lock = Target.GetComponent<IMoves>();
     }
 
     protected override void Tick() {
-        if (Effected != null && Lock != null) {
-            Effected.Velocity = Lock.Velocity;
+        if (Mover != null && Lock != null) {
+            Mover.Velocity = Lock.Velocity;
         }
     }
 

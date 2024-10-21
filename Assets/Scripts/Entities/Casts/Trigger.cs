@@ -106,7 +106,11 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
         return $"PolarPosition: {PolarPosition}\nDimension: {Dimension}\nRotation: {Rotation}\nAxis: {axis}";
     }
 
-    public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
+    public TransformCoordinates ToTransformCoordinates(
+        Vector3 position,
+        Quaternion rotation,
+        bool mirror
+    ) {
         axis = Vector3.up;
         Quaternion rot = mirror ? MirrorQuaternion(Rotation, axis) : Rotation;
 
@@ -116,9 +120,25 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
         );
 
         return new(
-            origin.position+origin.rotation*orientation*Vector3.forward*PolarPosition.y,
-            origin.rotation*orientation*rot,
+            position + rotation*orientation*Vector3.forward*PolarPosition.y,
+            rotation*orientation*rot,
             Dimension
+        );
+    }
+
+    public TransformCoordinates ToTransformCoordinates(TransformCoordinates origin, bool mirror) {
+        return ToTransformCoordinates(
+            origin.Position,
+            origin.Rotation,
+            mirror
+        );
+    }
+
+    public TransformCoordinates ToTransformCoordinates(Transform origin, bool mirror) {
+        return ToTransformCoordinates(
+            origin.position,
+            origin.rotation,
+            mirror
         );
     }
 
@@ -196,15 +216,7 @@ public class TriggerTransformation : IEquatable<TriggerTransformation> {
 public class Trigger : Cast, ICollidable, ICasts {
     /* Transform */
     [SerializeField] public List<TriggerTransformation> TriggerTransformations;
-
-    /* ICollidable */
-    [SerializeField] public bool RedundantCollisions = false;
-    [SerializeField] public bool DissapearOnTrigger = false;
-    [SerializeField] public bool HitsEnemies = true;
-    [SerializeField] public bool HitsFriendlies = false;
-    private HashSet<ICollidable> CollisionLog = new();
-    public Transform Transform { get { return transform; } }
-    public int ImmaterialStack { get { return 0; } set {; } }
+    private TransformCoordinates _staticCoordinates = null;
 
     /* Utility Functions */
     public static GameObject GetClosestGameObject(GameObject reference, params GameObject[] others) {
@@ -228,8 +240,15 @@ public class Trigger : Cast, ICollidable, ICasts {
         base.Awake();
     }
 
+    override protected void OnInitialize() {
+        base.OnInitialize();
+        transform.position = About.position;
+        transform.rotation = About.rotation;
+    }
+
     public void Start() {
         // Evaluate the position of the Trigger before it's accounted for in game logic
+        _staticCoordinates = new TransformCoordinates(transform.position, transform.rotation, transform.localScale);
         UpdateTransform(0);
     }
 
@@ -237,11 +256,6 @@ public class Trigger : Cast, ICollidable, ICasts {
         // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they 
         UpdateTransform(Frame);
         HandleCollisions();
-    }
-
-    public override bool AppliesTo(GameObject go) {
-        // TODO check
-        return true;
     }
 
     /* IMoves Methods */
@@ -263,12 +277,11 @@ public class Trigger : Cast, ICollidable, ICasts {
          */
         // maybe by convention, X will be major axis? and then the magnitude of minor axes must be smaller
         // I'm considering enforcing this with an assertion, and additionally maybe specifying different parameter types
-        if (About==null) {
-            return; // If the origin disappears, stop moving
-        }
-
         int index = Math.Min(_frame, TriggerTransformations.Count-1);
-        TransformCoordinates tc = TriggerTransformations[index].ToTransformCoordinates(About, Mirrored);
+        TransformCoordinates tc = (About==null)
+            ? TriggerTransformations[index].ToTransformCoordinates(_staticCoordinates, Mirrored)
+            : TriggerTransformations[index].ToTransformCoordinates(About, Mirrored);
+
         tc.Apply(transform);
     }
 
@@ -277,7 +290,14 @@ public class Trigger : Cast, ICollidable, ICasts {
     /// </summary>
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f; }
 
-    /* ICollidable Methods */
+    /* ICollidable */
+    [SerializeField] public bool RedundantCollisions = false;
+    [SerializeField] public bool DissapearOnTrigger = false;
+    [SerializeField] public bool HitsEnemies = true;
+    [SerializeField] public bool HitsFriendlies = false;
+    private HashSet<ICollidable> CollisionLog = new();
+    public Transform Transform { get { return transform; } }
+    public int ImmaterialStack { get { return 0; } set {; } }
     private Collider _collider;
     public Collider Collider { get { return _collider; } } // TODO cache collider
 
@@ -292,10 +312,9 @@ public class Trigger : Cast, ICollidable, ICasts {
         ) {
             return;
         } else {
-            if (other is MonoBehaviour mono && mono.enabled) {
-                if (ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)) {
-                    OnCollision();
-                }
+            if (other.Transform.gameObject.activeSelf) {
+                // TODO why did I check this? when will a collision happen with something inactive?
+                OnCollision(other);
             }
         }
     }
@@ -307,4 +326,6 @@ public class Trigger : Cast, ICollidable, ICasts {
             // TODO hardcoding mirrored=false - I'm worried that the Caster is getting rotated in the CastablePlayer edit process
         }
     }
+
+    override protected void OnDestruction() {}
 }

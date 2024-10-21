@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EffectSlow: Cast {
+public class EffectSlow: Effect {
     [SerializeField] public float slowFactor = .7f;
 
     protected override void OnInitialize() {
@@ -14,5 +14,5 @@ public class EffectSlow: Cast {
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.GetComponent<IMoves>() != null;
+    override public bool AppliesTo(GameObject go) => go.GetComponent<IMoves>() != null;
 }

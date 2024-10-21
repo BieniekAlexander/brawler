@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Positioning: 0
-  TargetingMethod: 0
+  TargetResolution: 0
   Duration: -1
   EncumberTime: 0
   Range: 0

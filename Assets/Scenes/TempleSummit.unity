@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Positioning: 0
-  TargetingMethod: 0
+  TargetResolution: 0
   Duration: 360000
   EncumberTime: 0
   Range: 0
@@ -198,7 +198,7 @@ MonoBehaviour:
     - data:
       - {fileID: -4402768598185200423, guid: 479dd243ee57cb44389cc5b3b2a627d7, type: 3}
   TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0}
+  - PolarPosition: {x: 0, y: -5}
     Dimension: {x: 100, y: 0, z: 100}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   RedundantCollisions: 1

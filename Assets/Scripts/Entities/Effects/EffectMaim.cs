@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EffectMaim: Cast {
+public class EffectMaim: Effect {
     protected override void OnInitialize() {
         About.GetComponent<ICasts>().MaimStack++;
     }
@@ -11,5 +11,5 @@ public class EffectMaim: Cast {
         }
     }
 
-    public override bool AppliesTo(GameObject go) => go.GetComponent<ICasts>() != null;
+    override public bool AppliesTo(GameObject go) => go.GetComponent<ICasts>() != null;
 }

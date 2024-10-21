@@ -47,8 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 2
-  TargetingMethod: 0
+  Positioning: 0
+  TargetResolution: 0
   Duration: 5
   EncumberTime: 0
   Range: 0
@@ -64,10 +64,12 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 
-    m_values: []
+    m_keys: 01000000
+    m_values:
+    - data:
+      - {fileID: 909248990716021204, guid: 7739a35de192a78409181f0b01633001, type: 3}
   TriggerTransformations:
-  - PolarPosition: {x: 0, y: 0.25}
+  - PolarPosition: {x: 0, y: -0.4}
     Dimension: {x: 5, y: 5, z: 5}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   RedundantCollisions: 0

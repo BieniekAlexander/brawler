@@ -29,7 +29,7 @@ public class CanvasController : MonoBehaviour {
         }
     }
 
-    void Update() {
+    void FixedUpdate() {
         HealthBars.RemoveAll(bar => bar==null);
 
         for (int i = 0; i < HealthBars.Count; i++) {

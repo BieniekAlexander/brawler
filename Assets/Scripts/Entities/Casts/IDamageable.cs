@@ -19,7 +19,7 @@ public interface IDamageable
     /// <param name="damage">The amount of damage to take. Should be positive.</param>
     /// <param name="contactPoint">The contact point at which damage should be applied. Applicable for shield blocks, backstabs, etc.</param>
     /// <returns>The actual amount of damage taken</returns>
-    int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier);
+    int TakeDamage(Vector3 contactPoint, in int damage, HitTier hitTier);
 
     /// <summary>
     /// Take <paramref name="damage"/> damage and do some related behaviors, if applicable.
@@ -47,10 +47,13 @@ public interface IDamageable
     /// </summary>
     void OnDeath();
 
-    public List<Armor> Armors { get; }
     int HP { get; }
+    public List<Armor> Armors { get; }
+    public int AP { get; }
     int ParryWindow { get; set; } // if hit during the window, reflect projectiles, ignore damage, and maybe hitstun?
 
     // Status effects
     int InvulnerableStack { get; set; } // can't be damaged
+
+    public static int GetTakenDamage(in int damage, in int maxDamage) => damage + Math.Min(0, maxDamage-damage);
 }

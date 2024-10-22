@@ -34,6 +34,8 @@ public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> 
     private ScriptContext scriptContext;
 
     public class CastableLispAccessors : ScriptMethods {
+        public int HP(IDamageable d) => d.HP;
+        public int AP(IDamageable d) => d.AP;
         public float Speed(ICasts c) => (c is IMoves moves) ? moves.Velocity.magnitude : 0f;
         public ICasts Caster(Cast c) => c.Caster;
         public string Data(Cast c) => c.Data;

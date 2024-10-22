@@ -51,7 +51,6 @@ public class SceneController : MonoBehaviour
 
         // set up UI, if a canvas is provided
         if (FindAnyObjectByType(typeof(CanvasController)) is CanvasController canvas) {
-            Debug.Log("is this here?");
             canvas.InitializeStatBars(Characters);
 
             if (HazardHandlerPrefab != null) {

@@ -756,9 +756,9 @@ MonoBehaviour:
   - name: Ability2
     castablePrefab: {fileID: 0}
     costs:
-      charges: 0
+      charges: 1
       energy: 0
-    cooldown: -1
+    cooldown: 60
     defaultChargeCount: 1
   - name: Ability3
     castablePrefab: {fileID: 0}
@@ -795,6 +795,14 @@ MonoBehaviour:
       charges: 0
       energy: 0
     cooldown: -1
+    defaultChargeCount: 1
+  - name: Dash
+    castablePrefab: {fileID: 6926152612496824558, guid: 4344a703eb0e0984e811405d722120a1,
+      type: 3}
+    costs:
+      charges: 1
+      energy: 0
+    cooldown: 300
     defaultChargeCount: 1
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}

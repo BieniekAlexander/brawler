@@ -48,8 +48,6 @@ public class CharacterStateIdle : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash && Character.Charges>=1) {
-            return Factory.Dashing();
         } else if (!Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
             return Factory.Walking();
         } else {
@@ -108,8 +106,6 @@ public class CharacterStateWalking : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash && Character.Charges>=1) {
-            return Factory.Dashing();
         } else if (Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
             return Factory.Idle();
         } else if (MovementUtils.inXZ(Character.Velocity).magnitude>Character.BaseSpeed+.1f) {
@@ -185,8 +181,6 @@ public class CharacterStateRunning : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Character.InputDash && Character.Charges>=1) {
-            return Factory.Dashing();
         } else if (MovementUtils.inXZ(Character.Velocity).magnitude<=7.51f) {
             return Factory.Walking();
         } else {
@@ -247,80 +241,6 @@ public class CharacterStateRunning : CharacterState {
             Vector3 mirror = info.Normal;
             Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
             Character.Velocity = MovementUtils.setXZ(Character.Velocity, bounceDirection*Character.Velocity.magnitude);
-        }
-    }
-}
-
-public class CharacterStateDashing : CharacterState {
-    private int _boostTimer;
-    private int _boostMaxDuration = 20;
-    private float _boostSpeedBump = 2.5f;
-    private float boostDecay;
-    private float _boostSpeedEnd;
-
-    public CharacterStateDashing(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
-
-    public override CharacterState CheckGetNewState() {
-        if (Character.CommandMovement != null) { // do I want this to be possible while dashing? probably, at least for getting grabbed
-            return Factory.CommandMovement();
-        } else if (_boostTimer == 0) {
-            return Factory.Running();
-        } else {
-            return null;
-        }
-    }
-
-    public override void EnterState() {
-        // TODO should I have a boost cooldown? I'm not sure
-        // chargeCooldown = chargeCooldownMax;
-        base.EnterState();
-        _boostTimer = _boostMaxDuration;
-        Character.Charges--;
-
-        _boostSpeedEnd = Mathf.Max(MovementUtils.inXZ(Character.Velocity).magnitude, Character.BaseSpeed)+_boostSpeedBump;
-        float boostSpeedStart = _boostSpeedEnd + 2*_boostSpeedBump;
-        boostDecay = (_boostSpeedEnd-boostSpeedStart)/_boostMaxDuration;
-
-        Vector3 v = Character.InputAimDirection;
-        Character.Velocity = new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
-        // TODO I think I'm losing the vertical velocity implementation here
-
-    }
-
-    public override void ExitState() {
-        Character.Velocity = Character.Velocity.normalized * _boostSpeedEnd;
-    }
-
-    public override void FixedUpdateState() {
-        // write stuff that happens during each frame of game logic in this state
-        Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
-        Character.Velocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
-        _boostTimer--;
-    }
-
-    public override void InitializeSubState() {
-        SetSubState(Factory.Ready());
-    }
-
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is Character otherCharacter) { // TODO 
-            if (MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
-                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
-                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
-                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
-                Vector3 dvNormal = Vector3.Project(MovementUtils.inXZ(Character.Velocity)-MovementUtils.inXZ(otherCharacter.Velocity), info.Normal)*(-(5f/20))*Time.deltaTime*30;
-                dvNormal.y = 0f;
-                Character.Velocity-=dvNormal;
-                otherCharacter.Velocity=MovementUtils.inXZ(Character.Velocity)+dvNormal;
-            }
-        } else if (collidable is StageTerrain terrain) {
-            // TODO sometimes this collision is breaking because info is null?
-            Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
-            Character.Velocity = MovementUtils.inY(Character.Velocity) + MovementUtils.inXZ(bounceDirection*Character.Velocity.magnitude);
         }
     }
 }

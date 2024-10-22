@@ -88,18 +88,20 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     /* IDamageable */
     [SerializeField] private int _hp;
     public int HP { get { return _hp; } }
+    public int AP { get { return 0; } }
     public List<Armor> Armors { get { return null; } set {; } }
     public int ParryWindow { get { return 0; } set {; } }
     public int InvulnerableStack { get { return 0; } set {; } }
     public int EncumberedTimer { get { return 0; } set {; } }
 
-    public int TakeDamage(Vector3 contactPoint, int damage, HitTier hitTier) {
+    public int TakeDamage(Vector3 contactPoint, in int damage, HitTier hitTier) {
+        int remainingDamage = damage;
         _hp -= damage;
 
         if (_hp <= 0)
             OnDeath();
 
-        return damage;
+        return damage-remainingDamage;
     }
 
     public int TakeHeal(int damage) {

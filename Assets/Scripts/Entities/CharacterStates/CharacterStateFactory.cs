@@ -14,7 +14,6 @@ public class CharacterStateFactory {
         _stateDict["Idle"] = new CharacterStateIdle(_character, this);
         _stateDict["Walking"] = new CharacterStateWalking(_character, this);
         _stateDict["Running"] = new CharacterStateRunning(_character, this);
-        _stateDict["Dashing"] = new CharacterStateDashing(_character, this);
         _stateDict["CommandMovement"] = new CharacterStateCommandMovement(_character, this);
         // Action
         _stateDict["Ready"] = new CharacterStateReady(_character, this);
@@ -39,7 +38,6 @@ public class CharacterStateFactory {
     public CharacterState Idle() { return _stateDict["Idle"]; }
     public CharacterState Walking() { return _stateDict["Walking"]; }
     public CharacterState Running() { return _stateDict["Running"]; }
-    public CharacterState Dashing() { return _stateDict["Dashing"]; }
     public CharacterState CommandMovement() { return _stateDict["CommandMovement"]; }
 
     // action

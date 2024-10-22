@@ -12,7 +12,7 @@ public class EffectImmaterial: Effect {
         // the current implementation logically errs if mutliple immaterials are applied
     }
 
-    protected void OnDestroy() {
+    override protected void OnDestruction() {
         if (About != null){
             About.gameObject.layer = originalLayer;
             About.GetComponent<ICollidable>().ImmaterialStack--;

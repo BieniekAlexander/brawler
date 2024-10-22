@@ -51,26 +51,27 @@ public class CastContainer {
 }
 
 public enum CastId {
-    Light1 = 0,
-    Light2 = 1,
-    LightS = 2,
-    Medium1 = 3,
-    Medium2 = 4,
-    MediumS = 5,
-    Heavy1 = 6,
-    Heavy2 = 7,
-    HeavyS = 8,
-    DashAttack = 9,
-    Throw1 = 10,
-    Throw2 = 11,
-    ThrowS = 12,
-    Ability1 = 13,
-    Ability2 = 14,
-    Ability3 = 15,
-    Ability4 = 16,
-    Special1 = 17,
-    Special2 = 18,
-    Ultimate = 19
+    Light1,
+    Light2,
+    LightS,
+    Medium1,
+    Medium2,
+    MediumS,
+    Heavy1,
+    Heavy2,
+    HeavyS,
+    DashAttack,
+    Throw1,
+    Throw2,
+    ThrowS,
+    Ability1,
+    Ability2,
+    Ability3,
+    Ability4,
+    Special1,
+    Special2,
+    Ultimate,
+    Dash
 }
 
 [Serializable]
@@ -90,7 +91,6 @@ public class CharacterFrameInput {
         Blocking = blocking;
         Shielding = shielding;
         Running = running;
-        Dash = dash;
         CastId = castId;
     }
 
@@ -101,7 +101,6 @@ public class CharacterFrameInput {
     public bool Blocking = false;
     public bool Shielding = false;
     public bool Running = false;
-    public bool Dash = false;
     public int CastId = -1;
 }
 
@@ -242,7 +241,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void OnDash(InputAction.CallbackContext context) {
-        InputDash=context.ReadValueAsButton();
+        if (context.ReadValueAsButton()) {
+            InputCastId = (int)CastId.Dash;
+        }
     }
 
     // attacks
@@ -767,22 +768,28 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public static int HPMax = 1000;
     private int healMax; private int healMaxOffset = 100;
     public List<Armor> Armors { get; } = new List<Armor>();
+    public int AP {get { return Enumerable.Sum(from Armor armor in Armors select armor.AP ); } }
     public int ParryWindow { get; set; } = 0;
     public int InvulnerableStack { get; set; } = 0;
 
-    public int TakeDamage(Vector3 _contactPoint, int damage, HitTier hitTier) {
-        // TODO add some sort of implementation to ignore shield
-        // TODO add taking damage from armor before HP
+    public int TakeDamage(Vector3 _contactPoint, in int damage, HitTier hitTier) {
+        // TODO add a better implementation to ignore shield
         if ((hitTier!=HitTier.Pure) && (InvulnerableStack>0 || HitsShield(_contactPoint))) return 0;
+        int remainingDamage = damage;
 
-        HP -= damage;
+        for (int i = Armors.Count-1; i>=0; i--) {
+            remainingDamage = Armors[i].TakeDamage(remainingDamage);
+        }
+
+        int takenDamage = IDamageable.GetTakenDamage(remainingDamage, HP);
+        HP -= takenDamage;
         healMax = Mathf.Min(healMax, HP+healMaxOffset);
 
         if (HP<=0) {
             OnDeath();
         }
 
-        return damage-Math.Min(HP, 0);
+        return remainingDamage-takenDamage;
     }
 
     public int TakeHeal(int damage) {
@@ -864,7 +871,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public void LoadCharacterFrameInput(CharacterFrameInput input) {
         InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
         InputAimDirection = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
-        InputDash = input.Dash;
         InputRunning = input.Running;
         InputCastId = input.CastId;
         InputBlocking = input.Blocking;

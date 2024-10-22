@@ -44,8 +44,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ced22230589ddd439f9089b85ffe5cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positioning: 0
+  TargetResolution: 0
   Duration: 15
-  About: {fileID: 0}
+  EncumberTime: 0
+  Range: 0
+  DestroyOnRecast: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
   Mirrored: 0
   Indefinite: 0
@@ -55,6 +63,7 @@ MonoBehaviour:
     - data:
       - {fileID: 1916127504584190134, guid: aef35f10af9dc3b4c998289da0c6ef33, type: 3}
       - {fileID: -8206380172614511167, guid: 3ae41647f5d1df741be0e0ed56e69266, type: 3}
+      - {fileID: 377234719705160766, guid: b23fb15eba976a44894bdf164e79bc29, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []

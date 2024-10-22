@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Armor : Effect {
+public class Armor : Effect { // TODO maybe IDamageable?
     [SerializeField] public int AP;
 
     override public bool AppliesTo(GameObject go) => go.GetComponent<Character>()!=null;

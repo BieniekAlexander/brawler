@@ -708,28 +708,31 @@ MonoBehaviour:
     costs:
       charges: 0
       energy: 0
-    cooldown: 180
+    cooldown: 480
     defaultChargeCount: 1
   - name: Special1
-    castablePrefab: {fileID: 0}
+    castablePrefab: {fileID: 5910319733208110140, guid: 64a4052fd17840448b22a3436d2433ab,
+      type: 3}
     costs:
       charges: 0
-      energy: 0
-    cooldown: -1
+      energy: 50
+    cooldown: 300
     defaultChargeCount: 1
   - name: Special2
-    castablePrefab: {fileID: 0}
+    castablePrefab: {fileID: 6244843261149292953, guid: ab37a100ef51dfe44901abfbe55118f8,
+      type: 3}
     costs:
       charges: 0
-      energy: 0
+      energy: 50
     cooldown: -1
     defaultChargeCount: 1
   - name: Ultimate
-    castablePrefab: {fileID: 0}
+    castablePrefab: {fileID: 8415808389734030167, guid: ab4f757c686100349a9259478c0e8b61,
+      type: 3}
     costs:
       charges: 0
-      energy: 0
-    cooldown: -1
+      energy: 100
+    cooldown: 1800
     defaultChargeCount: 1
   - name: Dash
     castablePrefab: {fileID: 6926152612496824558, guid: 47b9e5e42bcccc14d90386c0888fcf52,

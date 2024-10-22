@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 1893018920000934706}
+  - component: {fileID: 5910319733208110140}
   m_Layer: 9
-  m_Name: gatCastSpecial1
+  m_Name: gatpecial1
   m_TagString: Untagged
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1893018920000934706
+--- !u!114 &5910319733208110140
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,20 +41,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 3059344016903470191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
+  m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPefabs: []
-  commandMovementPrefab: {fileID: 0}
+  Positioning: 0
+  TargetResolution: 0
+  Duration: 15
+  EncumberTime: 15
+  Range: 0
+  DestroyOnRecast: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 60
+  Target: {fileID: 0}
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
-    m_keys: 
-    m_values: []
+    m_keys: 0e000000
+    m_values:
+    - data:
+      - {fileID: 2445238925043839964, guid: 15b4f54ddf1cf784aa1db1f440c1f092, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  Frame: 0
-  startupTime: 0
-  Encumbering: 0
-  duration: 30
-  Origin: {fileID: 0}
-  statusEffects: []

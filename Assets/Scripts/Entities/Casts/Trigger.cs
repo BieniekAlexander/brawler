@@ -248,12 +248,22 @@ public class Trigger : Cast, ICollidable, ICasts {
 
     public void Start() {
         // Evaluate the position of the Trigger before it's accounted for in game logic
+        if (RetriggerDuration>0) {
+            CollisionLog = new();
+        }
+
         _staticCoordinates = new TransformCoordinates(transform.position, transform.rotation, transform.localScale);
         UpdateTransform(0);
     }
 
     protected override void Tick() {
         // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they 
+        if (CollisionLog != null) {
+            foreach (ICollidable c in CollisionLog.Keys.ToList()) {
+                CollisionLog[c]--;
+            }
+        }
+
         UpdateTransform(Frame);
         HandleCollisions();
     }
@@ -291,18 +301,18 @@ public class Trigger : Cast, ICollidable, ICasts {
     public float TakeKnockBack(Vector3 contactPoint, int hitLagDuration, Vector3 knockBackVector, int hitStunDuration, int hitTier) { return 0f; }
 
     /* ICollidable */
-    [SerializeField] public bool RedundantCollisions = false;
+    [SerializeField] public int RetriggerDuration = 60;
     [SerializeField] public bool DissapearOnTrigger = false;
     [SerializeField] public bool HitsEnemies = true;
     [SerializeField] public bool HitsFriendlies = false;
-    private HashSet<ICollidable> CollisionLog = new();
+    private Dictionary<ICollidable, int> CollisionLog = null;
     public Transform Transform { get { return transform; } }
     public int ImmaterialStack { get { return 0; } set {; } }
     private Collider _collider;
     public Collider Collider { get { return _collider; } } // TODO cache collider
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this, RedundantCollisions ? null : CollisionLog);
+        CollisionUtils.HandleCollisions(this, (RetriggerDuration==0) ? null : CollisionLog, RetriggerDuration);
     }
 
     public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {

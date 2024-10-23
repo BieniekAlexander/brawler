@@ -85,12 +85,12 @@ public static class CollisionUtils {
     /// <param name="CollisionLog"></param>
     /// <param name="ICollidable"></param>
     /// <returns></returns>
-    public static bool CollisionLogPushUpdated(HashSet<ICollidable> CollisionLog, ICollidable ICollidable) {
+    public static bool CollisionLogPushUpdated(Dictionary<ICollidable, int> CollisionLog, ICollidable ICollidable, int retriggerDuration) {
         // TODO maybe this should go to Castable? 
-        if (CollisionLog.Contains(ICollidable)) {
+        if (CollisionLog.ContainsKey(ICollidable) && CollisionLog[ICollidable]>0) {
             return false;
         } else {
-            CollisionLog.Add(ICollidable);
+            CollisionLog[ICollidable]=retriggerDuration;
             return true;
         }
     }
@@ -135,11 +135,11 @@ public static class CollisionUtils {
     /// </summary>
     /// <param name="ThisCollidable"></param>
     /// <param name="CollisionLog"></param>
-    public static void HandleCollisions(ICollidable ThisCollidable, HashSet<ICollidable> CollisionLog) {
+    public static void HandleCollisions(ICollidable ThisCollidable, Dictionary<ICollidable, int> CollisionLog, int retriggerDuration) {
         if (ThisCollidable.Collider != null) {
             foreach (Collider otherCollider in GetOverlappingColliders(ThisCollidable.Collider)) {
                 if (otherCollider.GetComponent<ICollidable>() is ICollidable OtherCollidable) {
-                    if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable)) {
+                    if (CollisionLog==null || CollisionLogPushUpdated(CollisionLog, OtherCollidable, retriggerDuration)) {
                         Vector3 normal = GetDecollisionVector(ThisCollidable, OtherCollidable).normalized;
                         CollisionInfo info = new CollisionInfo(normal); // TOOD is this an effective way to find the normal?
                         ThisCollidable.OnCollideWith(OtherCollidable, info);
@@ -150,7 +150,7 @@ public static class CollisionUtils {
     }
 
     public static void HandleCollisions(ICollidable thisCollidable) {
-        HandleCollisions(thisCollidable, null);
+        HandleCollisions(thisCollidable, null, 0);
     }
     
     public static Vector3 GetDecollisionVector(ICollidable thisCollidable, ICollidable otherCollidable) {

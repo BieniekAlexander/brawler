@@ -201,7 +201,7 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: -5}
     Dimension: {x: 100, y: 0, z: 100}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  RedundantCollisions: 1
+  RetriggerDuration: 0
   DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0

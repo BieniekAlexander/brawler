@@ -71,7 +71,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     public int ImmaterialStack { get { return 0; } set {; } }
 
     public void HandleCollisions() {
-        CollisionUtils.HandleCollisions(this, null); // TODO I don't konw if it makes sense for this to have a collision log
+        CollisionUtils.HandleCollisions(this, null, 0); // TODO I don't konw if it makes sense for this to have a collision log
     }
 
     public void OnCollideWith(ICollidable other, CollisionInfo info) {

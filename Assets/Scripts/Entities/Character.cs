@@ -428,7 +428,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             );
 
             castContainer.charges--;
-            Debug.Log($"now has {castContainer.charges} charges");
             castContainer.timer = castContainer.cooldown;
             BusyTimer = castContainer.castablePrefab.Duration;
             EncumberedTimer = castContainer.castablePrefab.EncumberTime;

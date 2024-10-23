@@ -47,15 +47,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 7
+  Positioning: 0
+  TargetResolution: 0
+  Duration: 600
   EncumberTime: 0
   Range: 0
-  TargetingMethod: 0
   DestroyOnRecast: 0
+  DestroyOnCollision: 0
   DestroyWithParent: 1
   DataExpression:
     expression: 0
-  About: {fileID: 0}
   Target: {fileID: 0}
   Mirrored: 0
   Indefinite: 0
@@ -81,7 +82,7 @@ MonoBehaviour:
   - PolarPosition: {x: -5.3343225, y: 1.0756584}
     Dimension: {x: 0.3, y: 0.3, z: 0.3}
     Rotation: {x: 0.52407324, y: 0.52137405, z: 0.47741923, w: 0.4749603}
-  RedundantCollisions: 0
+  RetriggerDuration: 60
   DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0

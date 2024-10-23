@@ -257,6 +257,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 644e42b65e393b84ebda2b56949eda7e,
+        type: 3}
+      propertyPath: m_TagString
+      value: Character
+      objectReference: {fileID: 0}
     - target: {fileID: 1082271958561512970, guid: 644e42b65e393b84ebda2b56949eda7e,
         type: 3}
       propertyPath: m_Layer
@@ -696,11 +701,12 @@ MonoBehaviour:
     cooldown: 300
     defaultChargeCount: 1
   - name: Ability3
-    castablePrefab: {fileID: 0}
+    castablePrefab: {fileID: 6882466414408210628, guid: 2a303c578e901304e8c19b01081c4993,
+      type: 3}
     costs:
       charges: 0
       energy: 0
-    cooldown: -1
+    cooldown: 1200
     defaultChargeCount: 1
   - name: Ability4
     castablePrefab: {fileID: 3442410745517630681, guid: caab8487e143fc84d993b0c69bfcff39,

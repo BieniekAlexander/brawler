@@ -107,6 +107,7 @@ public class CharacterFrameInput {
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
+    public int TeamBit = 1;
 
     /* State WIP */
     CharacterState _state;
@@ -407,11 +408,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             Transform castOrigin = transform;
 
-            if (castContainer.castablePrefab.TargetResolution == TargetResolution.HardCopy) {
-                Character t = CastUtils.GetSnapTarget(CursorTransform.position, true, false, castContainer.castablePrefab.Range);
+            if (castContainer.castablePrefab.TargetResolution == TargetResolution.SnapTarget) {
+                Character t = CastUtils.GetSnapTarget(CursorTransform.position, TeamBit, castContainer.castablePrefab.Range);
 
                 if (t==null) {
-                    return false;
+                    // TODO if there's no target snap, the buffer will cause the code to retry `buffer` times,
+                    // which I don't want, but I don't want to return true because nothing was casted
+                    return false; 
                 } else {
                     castOrigin = t.transform;
                 }

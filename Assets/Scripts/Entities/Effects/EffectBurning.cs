@@ -13,7 +13,6 @@ public class EffectBurning : Effect {
 
     override protected void Tick() {
         if (Frame % TickRate == 0 && Damageable != null) {
-            Debug.Log($"burning {(Damageable as Character).name}");
             Damageable.TakeDamage(Target.transform.position, Damage, HitTier.Pure);
         }
     }

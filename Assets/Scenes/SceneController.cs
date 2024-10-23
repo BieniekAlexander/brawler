@@ -41,7 +41,9 @@ public class SceneController : MonoBehaviour
 
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
+            Char.TeamBit = (1<<i);
             Characters.Add(Char);
+
             if (i == _meId) {
                 Char.gameObject.name = "Player";
                 Char.SetMe();

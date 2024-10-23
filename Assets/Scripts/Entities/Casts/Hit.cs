@@ -102,4 +102,3 @@ public class Hit : Trigger, ICollidable {
         }
     }
 }
-

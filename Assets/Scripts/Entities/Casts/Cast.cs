@@ -34,7 +34,7 @@ public class CastableCosts {
 }
 
 public static class CastUtils {
-    public static Character GetSnapTarget(Vector3 worldPosition, bool hitsFriendlies, bool hitsEnemies, float maxDistance) {
+    public static Character GetSnapTarget(Vector3 worldPosition, int teamMask, float maxDistance) {
         List<Character> characters = (from go in GameObject.FindGameObjectsWithTag("Character") select go.GetComponent<Character>()).ToList();
         List<float> characterDists = (from ch in characters select (worldPosition-ch.transform.position).magnitude).ToList();
 
@@ -42,11 +42,13 @@ public static class CastUtils {
         int minIndex = -1;
 
         for (int i = 0; i < characterDists.Count; i++) {
-            float dist = characterDists[i];
-            if (dist < minDist && dist<maxDistance) {
-                minDist = dist;
-                minIndex = i;
-            }
+            if ((characters[i].TeamBit & teamMask)>0) {
+                float dist = characterDists[i];
+                if (dist < minDist && dist<maxDistance) {
+                    minDist = dist;
+                    minIndex = i;
+                }
+            }        
         }
 
         if (minIndex>=0) {

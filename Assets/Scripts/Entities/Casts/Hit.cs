@@ -1,6 +1,11 @@
 using System;
 using UnityEngine;
 
+public enum KnockbackReference {
+    About,
+    Caster
+};
+
 /// <summary>
 /// Object that represents a Hitbox, which collides with entities in the game to heal, damage, afflict, etc.
 /// NOTE: I can't get the collider properties to comport with its visualization for the life of me when 
@@ -18,7 +23,7 @@ public class Hit : Trigger, ICollidable {
     }
 
     /* Knockback */
-    [SerializeField] private CoordinateSystem KnockbackCoordinateSystem;
+    [SerializeField] private KnockbackReference KnockbackReference = KnockbackReference.About;
     [SerializeField] private Vector3 BaseKnockbackVector;
     [SerializeField] public HitTier HitTier;
 
@@ -27,15 +32,20 @@ public class Hit : Trigger, ICollidable {
 
     /* Getters */
     private Vector3 GetKnockBackVector(Vector3 targetPosition) {
-        if (KnockbackCoordinateSystem==CoordinateSystem.Cartesian) {
-            // TODO knockback is behaving very oddly with this setting, particularly with the throw hitbox I was working on - why?
-            Vector3 knockBackDirection = About.transform.rotation * BaseKnockbackVector;
-            if (Mirrored) knockBackDirection.x *= -1; // TODO is this mirror redundant? I'm adding this because cartesian KB vectors go the wrong way before this change
-            return knockBackDirection;
-        } else { // polar
-            Vector3 hitboxToTargetNormalized = Vector3.Scale(targetPosition - transform.position, new Vector3(1, 0, 1)).normalized;
-            Vector3 knockBackDirection = Quaternion.Euler(0, BaseKnockbackVector.x, 0) * hitboxToTargetNormalized * BaseKnockbackVector.z;
-            return knockBackDirection;
+        switch (KnockbackReference) {
+            case KnockbackReference.About:
+                return Quaternion.FromToRotation(
+                    Vector3.forward,
+                    MovementUtils.inXZ(targetPosition - transform.position).normalized
+                ) * BaseKnockbackVector;
+            case KnockbackReference.Caster:
+                return Caster.GetOriginTransform().rotation * new Vector3(
+                    Mirrored?BaseKnockbackVector.x:-BaseKnockbackVector.x,
+                    BaseKnockbackVector.y,
+                    BaseKnockbackVector.z
+                );
+            default:
+                throw new Exception($"Unhandled KnockbackReference type: {KnockbackReference}");
         }
     }
 

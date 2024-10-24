@@ -5,7 +5,8 @@ public class CommandMovementLock : CommandMovement {
 
     protected override void OnInitialize() {
         base.OnInitialize();
-        Lock = Target.GetComponent<IMoves>();
+        Lock = Caster.GetOriginTransform().GetComponent<IMoves>();
+        Mover.Transform.position = Lock.Transform.position + Lock.Transform.rotation*Vector3.forward*Range;
     }
 
     protected override void Tick() {

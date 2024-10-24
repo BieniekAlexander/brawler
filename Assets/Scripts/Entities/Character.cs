@@ -11,28 +11,26 @@ using System.Runtime.Serialization.Formatters.Binary;
 [Serializable]
 public class CastSlot {
     public CastSlot(string _name) {
-        name = _name;
-        castablePrefab = null;
-        cooldown = -1;
-        defaultChargeCount = 1;
+        Name = _name;
+        CastPrefab = null;
+        Cooldown = -1;
+        DefaultChargeCount = 1;
     }
 
-    public string name;
-    public Cast castablePrefab;
-    public CastableCosts costs;
-    public int cooldown;
-    public int defaultChargeCount;
+    public string Name;
+    public Cast CastPrefab;
+    public CastableCosts Costs;
+    public int Cooldown;
+    public int DefaultChargeCount;
 }
 
 public class CastContainer {
     static GameObject RootCastablePrefab = Resources.Load<GameObject>("RootCastable");
 
     public CastContainer(CastSlot castSlot, Character character, string name) {
-        castablePrefab = castSlot.castablePrefab;
-        cooldown = castSlot.cooldown;
+        CastSlot = castSlot;
         timer = 0;
-        charges = castSlot.defaultChargeCount;
-        Costs = castSlot.costs;
+        charges = castSlot.DefaultChargeCount;
 
         RootCastable = GameObject.Instantiate(
             RootCastablePrefab,
@@ -42,10 +40,8 @@ public class CastContainer {
         RootCastable.name = $"{name}Root";
     }
 
-    public Cast castablePrefab;
+    public CastSlot CastSlot;
     public Cast RootCastable { get; private set; }
-    public CastableCosts Costs;
-    public int cooldown;
     public int timer;
     public int charges;
 }
@@ -138,7 +134,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this
-            return (EncumberedTimer>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
+            return (EncumberedTimer>0 || StunStack>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
         }
     }
 
@@ -156,7 +152,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             // setting rotation
             var direction = value.normalized;
-            Quaternion newRotation = Quaternion.FromToRotation(Vector3.forward, direction);
+            Quaternion newRotation = (_rotationCap>=175f)
+                ? Quaternion.FromToRotation(Vector3.forward, direction)
+                : Quaternion.RotateTowards(transform.rotation, Quaternion.FromToRotation(Vector3.forward, direction), _rotationCap);
 
             float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
             if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
@@ -167,10 +165,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
+    private float _rotationCap = 180f;
+
     public bool InputDash { get; set; } = false;
     public bool InputRunning { get; set; } = false;
+    public bool Running { get { return InputRunning && StunStack==0; } }
     public bool InputBlocking { get; set; } = false;
     public bool InputShielding { get; set; } = false;
+
 
     /* Abilities */
     private int maxCharges = 5;
@@ -390,10 +392,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (castContainer.charges == 0) {
             // we're updating another cast - allowed
             return castContainer.RootCastable.OnRecastCastables(CursorTransform);
-        } else if (castContainer.castablePrefab == null) {
+        } else if (castContainer.CastSlot.CastPrefab == null) {
             Debug.Log("No cast supplied for cast"+(int)castId);
             return true;
-        } else if (_hasResourcesForCast(castContainer.Costs)) {
+        } else if (_hasResourcesForCast(castContainer.CastSlot.Costs)) {
             if (boostedIds.Contains(castId)) {
                 Charges--;
             } else if (specialIds.Contains(castId)) {
@@ -408,8 +410,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             Transform castOrigin = transform;
 
-            if (castContainer.castablePrefab.TargetResolution == TargetResolution.SnapTarget) {
-                Character t = CastUtils.GetSnapTarget(CursorTransform.position, TeamBit, castContainer.castablePrefab.Range);
+            if (castContainer.CastSlot.CastPrefab.TargetResolution == TargetResolution.SnapTarget) {
+                Character t = CastUtils.GetSnapTarget(CursorTransform.position, TeamBit, castContainer.CastSlot.CastPrefab.Range);
 
                 if (t==null) {
                     // TODO if there's no target snap, the buffer will cause the code to retry `buffer` times,
@@ -421,7 +423,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
 
             _activeCastable = Cast.Initiate(
-                castContainer.castablePrefab,
+                castContainer.CastSlot.CastPrefab,
                 this,
                 castOrigin,
                 CursorTransform,
@@ -431,9 +433,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             );
 
             castContainer.charges--;
-            castContainer.timer = castContainer.cooldown;
-            BusyTimer = castContainer.castablePrefab.Duration;
-            EncumberedTimer = castContainer.castablePrefab.EncumberTime;
+            castContainer.timer = castContainer.CastSlot.Cooldown;
+            BusyTimer = castContainer.CastSlot.CastPrefab.Duration;
+            EncumberedTimer = castContainer.CastSlot.CastPrefab.EncumberTime;
+            _rotationCap = castContainer.CastSlot.CastPrefab.RotationCap;
             return true;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
@@ -451,12 +454,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         // resolve cooldowns and cast expirations
         for (int i = 0; i<CastContainers.Length; i++) {
-            if (CastContainers[i].charges < castSlots[i].defaultChargeCount) {
+            if (CastContainers[i].charges < castSlots[i].DefaultChargeCount) {
                 if (--CastContainers[i].timer<=0) {
                     CastContainers[i].charges++;
-                    CastContainers[i].timer = castSlots[i].cooldown;
+                    CastContainers[i].timer = castSlots[i].Cooldown;
                 }
             }
+        }
+
+        if (BusyTimer<=0) {
+            _rotationCap = 180f;
         }
     }
 
@@ -517,7 +524,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         tr = GetComponent<TrailRenderer>();
 
         for (int i = 0; i<castSlots.Length; i++) {
-            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].name);
+            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].Name);
         }
     }
 

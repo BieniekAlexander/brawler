@@ -44,8 +44,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5bb9061d11ec654c86dd32e19199503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tickRate: 0
-  _duration: 300
+  AboutResolution: 2
+  TargetResolution: 0
+  Duration: 0
+  EncumberTime: 0
+  RotationCap: 180
+  Range: 0
+  DestroyOnRecast: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
+  Mirrored: 0
+  Indefinite: 0
+  FrameCastablesMap:
+    m_keys: 
+    m_values: []
+  ConditionCastablesMap:
+    m_keys: 
+    m_values: []
   RingOutDamage: 250
-  RingOutDuration: 300

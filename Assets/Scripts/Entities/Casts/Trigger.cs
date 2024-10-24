@@ -15,8 +15,6 @@ public class VectorLabelsAttribute : PropertyAttribute {
     }
 }
 
-public enum CoordinateSystem { Polar, Cartesian };
-
 [Serializable]
 public class TransformCoordinates : IEquatable<TransformCoordinates> {
     public Vector3 Position;

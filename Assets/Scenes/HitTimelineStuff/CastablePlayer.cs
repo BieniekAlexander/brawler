@@ -108,7 +108,7 @@ public class CastPlayer : MonoBehaviour {
     private void InitializeCast(int castId) {
         DeleteInstantiatedCasts();
 
-        CastablePrefab = Caster.CastContainers[(int)castIds[castId]].castablePrefab;
+        CastablePrefab = Caster.CastContainers[(int)castIds[castId]].CastSlot.CastPrefab;
         duration = CastablePrefab.Duration;
         ActiveCastables = new();
 

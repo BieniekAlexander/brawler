@@ -564,6 +564,39 @@
                 },
                 {
                     "name": "One Modifier",
+                    "id": "d03e8a99-416f-4603-8357-a7c3849608d8",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "boostedThrow",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "5565e472-3685-46d6-82a1-0ceb5e3d672f",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "boostedThrow",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "1ec74604-0ae2-47d5-89b0-8503dbd1002d",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "boostedThrow",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "One Modifier",
                     "id": "2f28835d-e488-4c39-b977-046ce0baafe1",
                     "path": "OneModifier",
                     "interactions": "",

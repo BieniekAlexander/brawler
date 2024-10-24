@@ -196,7 +196,7 @@ public class CharacterStateShielding : CharacterState {
         float acceleration = _maxAcceleration*directionDot*Time.deltaTime;
         Vector3 direction = Vector3.RotateTowards(Character.Velocity, -shieldDirection, 90f*Mathf.Deg2Rad*directionDot, 0);
 
-        if (Character.InputRunning) {
+        if (Character.Running) {
             Character.Velocity = Vector3.RotateTowards(
                 MovementUtils.inXZ(Character.Velocity),
                 direction,

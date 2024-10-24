@@ -133,7 +133,7 @@ public class CharacterStateWalking : CharacterState {
         Vector3 newVelocity = Vector3.ClampMagnitude(
             horizontalVelocity + dSpeed*(
                 (Character.MoveDirection == Vector3.zero)
-                ? (Character.InputRunning ? Vector3.zero : (-horizontalVelocity.normalized))
+                ? (Character.Running ? Vector3.zero : (-horizontalVelocity.normalized))
                 : Character.MoveDirection
             ),
             Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude)
@@ -197,7 +197,7 @@ public class CharacterStateRunning : CharacterState {
 
     public override void FixedUpdateState() {
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
-        float speed = (Character.InputRunning)
+        float speed = (Character.Running)
             ? horizontalVelocity.magnitude
             : horizontalVelocity.magnitude - _acceleration*Time.deltaTime;
 

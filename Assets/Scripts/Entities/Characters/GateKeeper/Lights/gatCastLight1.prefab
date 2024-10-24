@@ -48,6 +48,7 @@ MonoBehaviour:
   TargetResolution: 0
   Duration: 15
   EncumberTime: 0
+  RotationCap: 5
   Range: 0
   DestroyOnRecast: 1
   DestroyOnCollision: 0

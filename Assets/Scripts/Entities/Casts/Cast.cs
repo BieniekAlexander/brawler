@@ -6,8 +6,10 @@ using UnityEngine;
 [Serializable]
 public enum AboutResolution {
     ShallowCopyAbout,
+    ShallowCopyCaster,
     ShallowCopyTarget,
     HardCopyAbout,
+    HardCopyCaster,
     HardCopyTarget
 }
 
@@ -68,10 +70,11 @@ public static class CastUtils {
 }
 
 public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
-    [SerializeField] public AboutResolution Positioning = AboutResolution.ShallowCopyAbout;
+    [SerializeField] public AboutResolution AboutResolution = AboutResolution.ShallowCopyAbout;
     [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
     [SerializeField] public int EncumberTime;
+    [SerializeField] public float RotationCap = 180f;
     [SerializeField] public float Range = 0;
     [SerializeField] public bool DestroyOnRecast = false;
     [SerializeField] public bool DestroyOnCollision = false;
@@ -113,7 +116,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         Mirrored = mirrored;
 
         // TODO clean these configs up
-        if (Positioning == AboutResolution.HardCopyTarget) {
+        if (AboutResolution == AboutResolution.HardCopyTarget) {
             About = CastUtils.GetTransformDeepCopy(target, "Cast About", null);
         }
 
@@ -128,10 +131,10 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
         transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
 
-        if (Positioning == AboutResolution.HardCopyAbout) {
+        if (AboutResolution == AboutResolution.HardCopyAbout) {
             transform.position = About.position + transform.rotation*Vector3.forward*Range;
             About = transform;
-        } else if (Positioning == AboutResolution.HardCopyTarget) {
+        } else if (AboutResolution == AboutResolution.HardCopyTarget) {
             float CastDistance = (Target.position - About.position).magnitude;
             transform.position = About.position + Mathf.Min(Range, CastDistance)*(transform.rotation * Vector3.forward);
             About = transform;
@@ -232,6 +235,11 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     protected virtual void OnDestruction() {
     }
 
+    private int f(int x) {
+        Debug.Log($"hello {x}");
+        return x;
+    }
+
     protected virtual void OnCollision(ICollidable collidable) {
         Cast[] casts = ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)
             ? ConditionCastablesMap[CastableCondition.OnCollision]
@@ -240,21 +248,33 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
             return;
         } else {
             foreach (Cast Castable in casts) {
-                if (Castable is Effect effect && !effect.AppliesTo(collidable.Transform.gameObject)) {
-                    continue;
+                Transform castableAbout = null;
+                
+                switch (Castable.AboutResolution) {
+                    case AboutResolution.ShallowCopyCaster:
+                        castableAbout = Caster.GetOriginTransform();
+                        break;
+                    case AboutResolution.ShallowCopyAbout:
+                        castableAbout = About;
+                        break;
+                    case AboutResolution.ShallowCopyTarget:
+                        castableAbout = collidable.Transform;
+                        break;
+                    default:
+                        throw new Exception($"unhandled Effect About evaluation for {Castable.AboutResolution}");
                 }
 
-                Cast newCast = Initiate(
-                    Castable,
-                    Caster,
-                    (Castable is Effect)?collidable.Transform:About,
-                    Target,
-                    Mirrored,
-                    this
-                );
-            }
-
-            
+                if (!(Castable is Effect effect) || effect.AppliesTo(castableAbout.gameObject)) {
+                    Cast newCast = Initiate(
+                        Castable,
+                        Caster,
+                        castableAbout,
+                        Target,
+                        Mirrored,
+                        this
+                    );
+                }
+            }            
         }
 
         if (DestroyOnCollision) {

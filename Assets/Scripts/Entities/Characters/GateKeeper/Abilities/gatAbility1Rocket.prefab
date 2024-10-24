@@ -121,10 +121,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 2
+  AboutResolution: 3
   TargetResolution: 0
   Duration: 180
   EncumberTime: 0
+  RotationCap: 180
   Range: 1
   DestroyOnRecast: 1
   DestroyOnCollision: 1

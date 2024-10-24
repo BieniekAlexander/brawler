@@ -23,14 +23,17 @@ public enum TargetResolution {
 
 [Serializable]
 public enum CastableCondition {
+    OnAttack,
     OnRecast,
     OnCollision,
     OnDestruction,
+    OnRecastDestruction,
+    OnAttackDestruction,
     OnDeath
 }
 
 [Serializable]
-public class CastableCosts {
+public class CastCosts {
     [Range(0, 1)] public int charges = 0;
     [Range(0, 100)] public int energy = 0;
 }
@@ -73,10 +76,14 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     [SerializeField] public AboutResolution AboutResolution = AboutResolution.ShallowCopyAbout;
     [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
-    [SerializeField] public int EncumberTime;
+    [SerializeField] public int BusyTimer;
     [SerializeField] public float RotationCap = 180f;
     [SerializeField] public float Range = 0;
+    [SerializeField] public bool Encumbering;
+    [SerializeField] public float RecastCooldown = 0; // TODO make use of implementation
+    [SerializeField] public float AttackCooldown = 0; // TODO make use of implementation
     [SerializeField] public bool DestroyOnRecast = false;
+    [SerializeField] public bool DestroyOnAttack = false;
     [SerializeField] public bool DestroyOnCollision = false;
     [SerializeField] public bool DestroyWithParent = false;
     [SerializeField] private FieldExpression<Cast, string> DataExpression = new("0");
@@ -155,6 +162,38 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         Castable.Initialize(caster, about, target, mirrored);
         return Castable;
     }
+    
+    /// <summary>
+    /// Cast an attack, based on the active castable's behavior
+    /// </summary>
+    /// <remarks>E.g. dash attack</remarks>
+    /// <param name="target"></param>
+    /// <returns>cast busying time</returns>
+    protected virtual int OnAttack(Transform target) => -1;
+
+    public int OnAttackCastables(Transform target) {
+        int ret = -1;
+
+        foreach (Cast child in _children) {
+            ret = Math.Max(ret, child.OnAttackCastables(target));
+        }
+
+        ret = Math.Max(ret, OnAttack(target));
+        ret = Math.Max(
+            ret,
+            _castConditionalCastables(
+                DestroyOnAttack
+                ? CastableCondition.OnAttackDestruction
+                : CastableCondition.OnAttack   
+            )
+        );
+
+        if (DestroyOnAttack) {
+            Destroy(gameObject);
+        }
+
+        return ret;
+    }
 
     /// <summary>
     /// Update the Castable's behavior, according to some strategy decided by the Castable.
@@ -163,20 +202,23 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="target"></param>
-    protected virtual bool OnRecast(Transform target) => false;
+    protected virtual int OnRecast(Transform target) => -1;
 
-    public bool OnRecastCastables(Transform target) {
-        bool ret = false;
+    public int OnRecastCastables(Transform target) {
+        int ret = -1;
 
         foreach (Cast child in _children) {
-            ret |= child.OnRecastCastables(target);
+            ret = Math.Max(ret, child.OnRecastCastables(target));
         }
 
-        ret |= OnRecast(target);
-        ret |= _castConditionalCastables( // sinister bug here - if set to destroy on recast, both will happen, but I only want one
-            DestroyOnRecast
-            ? CastableCondition.OnDestruction
-            : CastableCondition.OnRecast
+        ret = Math.Max(ret, OnRecast(target));
+        ret = Math.Max(
+            ret,
+            _castConditionalCastables(
+                DestroyOnRecast
+                ? CastableCondition.OnRecastDestruction
+                : CastableCondition.OnRecast
+            )
         );
 
         if (DestroyOnRecast) {
@@ -186,10 +228,12 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         return ret;
     }
 
-    private bool _castCastables(Cast[] casts) {
+    private int _castCastables(Cast[] casts) {
         if (casts==null && casts.Count() == 0) {
-                return false;
+                return -1;
         } else {
+            int ret = 0;
+
             foreach (Cast Castable in casts) {
                 Cast newCast = Initiate(
                     Castable,
@@ -199,17 +243,19 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
                     Mirrored,
                     this
                 );
+
+                ret = Math.Max(ret, newCast.BusyTimer);
             }
 
-            return true;
+            return ret;
         }
     }
 
-    private bool _castConditionalCastables(CastableCondition castableCondition) {
+    private int _castConditionalCastables(CastableCondition castableCondition) {
         if (ConditionCastablesMap.ContainsKey(castableCondition)) {
             return _castCastables(ConditionCastablesMap[castableCondition]);
         } else {
-            return false;
+            return -1;
         }
     }
 

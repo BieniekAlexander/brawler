@@ -313,16 +313,16 @@ public class Trigger : Cast, ICollidable, ICasts {
         CollisionUtils.HandleCollisions(this, (RetriggerDuration==0) ? null : CollisionLog, RetriggerDuration);
     }
 
-    public virtual void OnCollideWith(ICollidable other, CollisionInfo info) {
+    public virtual void OnCollideWith(ICollidable collided, CollisionInfo info) {
         if (
-            (Caster==other && !HitsFriendlies)
-            || (Caster!=other && !HitsEnemies)
+            (Caster==collided && !HitsFriendlies)
+            || (Caster!=collided && !HitsEnemies)
         ) {
             return;
         } else {
-            if (other.Transform.gameObject.activeSelf) {
+            if (collided.Transform.gameObject.activeSelf) {
                 // TODO why did I check this? when will a collision happen with something inactive?
-                OnCollision(other);
+                OnCollision(collided);
             }
         }
     }

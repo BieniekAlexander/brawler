@@ -23,13 +23,13 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
         HandleCollisions();
     }
 
-    protected override bool OnRecast(Transform target) {
+    protected override int OnRecast(Transform target) {
         if (!Mathf.Approximately(RotationalControl, 0)) {
             Target.position = target.position;
-            return true;
+            return 0;
         } else {
             // nothing to recast
-            return false;
+            return -1;
         }
     }
 

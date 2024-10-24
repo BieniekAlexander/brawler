@@ -19,7 +19,7 @@ public class CastSlot {
 
     public string Name;
     public Cast CastPrefab;
-    public CastableCosts Costs;
+    public CastCosts Costs;
     public int Cooldown;
     public int DefaultChargeCount;
 }
@@ -187,7 +187,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     public int CastBufferTimer { get; private set; } = 0;
-    private bool _hasResourcesForCast(CastableCosts costs) => energy >= costs.energy && Charges >= costs.charges;
     private Cast _activeCastable = null;
     private int _nextCastId;
     public int InputCastId {
@@ -382,11 +381,23 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         characterControls.Disable();
     }
 
+    private static HashSet<int> attackCastIdSet = new(){(int) CastId.Light1, (int) CastId.Light2, (int) CastId.LightS, (int) CastId.Medium1, (int) CastId.Medium2, (int) CastId.MediumS, (int) CastId.Heavy1, (int) CastId.Heavy2, (int) CastId.HeavyS};
+
+    private bool _hasResourcesForCast(CastCosts costs) => energy >= costs.energy && Charges >= costs.charges;
+    private void useCastResources(CastCosts costs) {
+        energy -= costs.energy;
+        Charges -= costs.charges;
+    }
+
     /* Casts */
     /// <summary/>
     /// <param name="castId"></param>
-    /// <returns>Whether the cast was initiated or not</returns>
-    private bool StartCast(int castId) {
+    /// <returns>the busy timer of the cast</returns>
+    private int StartCast(int castId) {
+        if (attackCastIdSet.Contains(castId) && _activeCastable!=null) {
+            return _activeCastable.OnAttackCastables(CursorTransform);
+        }
+
         ref CastContainer castContainer = ref CastContainers[castId];
 
         if (castContainer.charges == 0) {
@@ -394,15 +405,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             return castContainer.RootCastable.OnRecastCastables(CursorTransform);
         } else if (castContainer.CastSlot.CastPrefab == null) {
             Debug.Log("No cast supplied for cast"+(int)castId);
-            return true;
+            return 0;
         } else if (_hasResourcesForCast(castContainer.CastSlot.Costs)) {
-            if (boostedIds.Contains(castId)) {
-                Charges--;
-            } else if (specialIds.Contains(castId)) {
-                energy -= 50;
-            } else if (castId == (int)CastId.Ultimate) {
-                energy -= 100;
-            }
+            if (BusyTimer>0) return -1;
+
+            useCastResources(castContainer.CastSlot.Costs);
 
             if (_activeCastable!=null && _activeCastable.DestroyOnRecast) {
                 Destroy(_activeCastable);
@@ -416,14 +423,15 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 if (t==null) {
                     // TODO if there's no target snap, the buffer will cause the code to retry `buffer` times,
                     // which I don't want, but I don't want to return true because nothing was casted
-                    return false; 
+                    return -1; 
                 } else {
                     castOrigin = t.transform;
                 }
             }
 
+            Cast castPrefab = castContainer.CastSlot.CastPrefab;
             _activeCastable = Cast.Initiate(
-                castContainer.CastSlot.CastPrefab,
+                castPrefab,
                 this,
                 castOrigin,
                 CursorTransform,
@@ -434,14 +442,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             castContainer.charges--;
             castContainer.timer = castContainer.CastSlot.Cooldown;
-            BusyTimer = castContainer.CastSlot.CastPrefab.Duration;
-            EncumberedTimer = castContainer.CastSlot.CastPrefab.EncumberTime;
-            _rotationCap = castContainer.CastSlot.CastPrefab.RotationCap;
-            return true;
+            _rotationCap = castPrefab.RotationCap;
+            EncumberedTimer = castPrefab.Encumbering?castPrefab.BusyTimer:0;
+            BusyTimer = castPrefab.BusyTimer;
+            return BusyTimer;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
             // I think I need to change this
-            return false;
+            return -1;
         }
     }
 
@@ -450,8 +458,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// </summary>
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
-        EncumberedTimer--;
-
         // resolve cooldowns and cast expirations
         for (int i = 0; i<CastContainers.Length; i++) {
             if (CastContainers[i].charges < castSlots[i].DefaultChargeCount) {
@@ -462,7 +468,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
-        if (BusyTimer<=0) {
+
+        if (BusyTimer==0) {
+            EncumberedTimer = 0;
             _rotationCap = 180f;
         }
     }
@@ -632,7 +640,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (--CastBufferTimer == 0) {
             InputCastId = -1;
         } else if (InputCastId >= 0) {
-            if (StartCast(InputCastId)) {
+            if (StartCast(InputCastId)>-1) {
                 InputCastId = -1;
             }
         }

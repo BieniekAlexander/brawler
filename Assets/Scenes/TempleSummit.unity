@@ -182,6 +182,7 @@ MonoBehaviour:
   EncumberTime: 0
   RotationCap: 180
   Range: 0
+  RecastCooldown: 0
   DestroyOnRecast: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0

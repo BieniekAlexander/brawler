@@ -23,9 +23,5 @@ public class CommandMovementDash: CommandMovement {
         Mover.Velocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
     }
 
-    protected override void OnDestruction() {
-        Mover.Velocity = Mover.Velocity.normalized * _boostSpeedEnd;
-    }
-
     override public bool AppliesTo(GameObject go) => go.GetComponent<Character>() != null;
 }

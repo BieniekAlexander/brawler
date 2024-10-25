@@ -188,7 +188,7 @@ public static class CollisionUtils {
 /// An interface that defines how a given GameObject should behave when it collides with another GameObject
 /// </summary>
 public interface ICollidable {
-    public void OnCollideWith(ICollidable other, CollisionInfo info);
+    public bool OnCollideWith(ICollidable other, CollisionInfo info);
 
     public void HandleCollisions();
 

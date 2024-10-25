@@ -47,10 +47,15 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 45
-  EncumberTime: 0
+  Busies: 1
+  Encumbers: 0
+  Stuns: 0
   RotationCap: 0
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 1
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
@@ -59,10 +64,10 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 05000000
+    m_keys: 0a000000
     m_values:
     - data:
-      - {fileID: 4653230242521064225, guid: a61497687454f8348ab248013cd1bd76, type: 3}
+      - {fileID: 4653230242521064225, guid: f304604c91456fb4f980448dae25902f, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []

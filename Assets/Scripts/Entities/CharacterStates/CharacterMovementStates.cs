@@ -35,6 +35,17 @@ public static class MovementUtils {
         else if (sm < (double)min * (double)min) return v.normalized * min;
         return v;
     }
+
+    public static Vector3 GetBounce(Vector3 velocity, Vector3 normal) {
+            Vector3 bounceDirection = (velocity-2*Vector3.Project(velocity, normal)).normalized;
+            return MovementUtils.setXZ(velocity, bounceDirection*velocity.magnitude);
+    }
+
+    public static void Push(IMoves pushing, IMoves pushed, Vector3 normal) {
+            Vector3 dvNormal = normal*Mathf.Max(pushing.BaseSpeed, pushed.BaseSpeed)*Time.deltaTime;
+            pushing.Velocity += dvNormal;
+            pushed.Velocity = pushing.Velocity-dvNormal;
+    }
 }
 
 public class CharacterStateIdle : CharacterState {
@@ -83,14 +94,16 @@ public class CharacterStateIdle : CharacterState {
     /// </summary>
     /// <param name="collidable"></param>
     /// <param name="info"></param>
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is Character otherCharacter) {
             Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
             Character.Transform.position += MovementUtils.inXZ(decollisionVector);
+            return true;
         } else if (collidable is StageTerrain terrain) {
-            Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
-            Character.Velocity = MovementUtils.setXZ(Character.Velocity, bounceDirection*Character.Velocity.magnitude);
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -156,14 +169,12 @@ public class CharacterStateWalking : CharacterState {
         }
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain && info!=null) {
-            Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
-            Character.Velocity = MovementUtils.setXZ(
-                Character.Velocity,
-                MovementUtils.inXZ(bounceDirection*Character.Velocity.magnitude)
-            );
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -192,8 +203,7 @@ public class CharacterStateRunning : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() {
-    }
+    public override void ExitState() {}
 
     public override void FixedUpdateState() {
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
@@ -225,22 +235,19 @@ public class CharacterStateRunning : CharacterState {
         }
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is Character otherCharacter) {
             if (info!=null && MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
-                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
-                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
-                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
-                Vector3 dvNormal = Vector3.Project(MovementUtils.inXZ(Character.Velocity)-MovementUtils.inXZ(otherCharacter.Velocity), info.Normal)*(-(5f/20))*Time.deltaTime*30;
-                dvNormal.y = 0f;
-                Character.Velocity-=dvNormal;
-                otherCharacter.Velocity=MovementUtils.inXZ(Character.Velocity)+dvNormal;
+                MovementUtils.Push(Character, otherCharacter, info.Normal);
+                return true;
+            } else {
+                return false;
             }
         } else if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
-            Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
-            Character.Velocity = MovementUtils.setXZ(Character.Velocity, bounceDirection*Character.Velocity.magnitude);
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -271,22 +278,7 @@ public class CharacterStateCommandMovement : CharacterState {
         SetSubState(Factory.Ready());
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is Character otherCharacter) {
-            if (MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
-                // TODO I haven't tested this on moving targets yet, so I haven't tested the second term
-                // TODO figure out this implementation and calibrate the deceleration more - the behavior is very confusing right now
-                // TODO hardcoding the 5f/20 because that used to be some stupid calculationfrom dash decay, which was constant
-                Vector3 dvNormal = Vector3.Project(MovementUtils.inXZ(Character.Velocity)-MovementUtils.inXZ(otherCharacter.Velocity), info.Normal)*(-(5f/20))*Time.deltaTime*30;
-                dvNormal.y = 0f;
-                Character.Velocity-=dvNormal;
-                otherCharacter.Velocity=MovementUtils.inXZ(Character.Velocity)+dvNormal;
-            }
-        } else if (collidable is StageTerrain terrain) {
-            //Vector3 mirror = new Vector3(info.Normal.x, 0, info.Normal.z); // TODO maybe restore?
-            Vector3 mirror = info.Normal;
-            Vector3 bounceDirection = (Character.Velocity-2*Vector3.Project(Character.Velocity, mirror)).normalized;
-            Character.Velocity = MovementUtils.inY(Character.Velocity) + MovementUtils.inXZ(bounceDirection*Character.Velocity.magnitude);
-        }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        return Character.CommandMovement.OnCollideWith(collidable, info);
     }
 }

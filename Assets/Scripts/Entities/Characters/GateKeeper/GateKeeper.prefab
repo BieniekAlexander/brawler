@@ -599,63 +599,71 @@ MonoBehaviour:
     Costs:
       charges: 0
       energy: 0
-    Cooldown: 15
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: Light2
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 4209523939935771002, guid: 7585e0cd12bbe0742b81275f5baac19c,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 12
     DefaultChargeCount: 1
   - Name: LightS
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 585766600846117122, guid: 31915890dbae8b2418757e8099c90292,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 14
     DefaultChargeCount: 1
   - Name: Medium1
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 4207541412499467509, guid: 7943d1cff1211374280e2ce7ac9b5f48,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: Medium2
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 4976466725045762006, guid: 56a86ee0cbbe519498cec7613c6f0326,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: MediumS
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 799165592850238794, guid: 521bbdf56313d1842875469ae25827cb,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: Heavy1
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 4732197686106141231, guid: 2e3a6645b87a9334e8cd02234d177d48,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: Heavy2
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 6826065171707727716, guid: f21133612c22cdf40b33e99e86f32a8e,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: HeavyS
-    CastPrefab: {fileID: 0}
+    CastPrefab: {fileID: 8598508159451603624, guid: 795b9e2be3f95f146af44074bb6013a3,
+      type: 3}
     Costs:
       charges: 0
       energy: 0
-    Cooldown: -1
+    Cooldown: 0
     DefaultChargeCount: 1
   - Name: DashAttack
     CastPrefab: {fileID: 0}

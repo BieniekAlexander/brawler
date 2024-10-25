@@ -50,10 +50,15 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 3
-  EncumberTime: 0
+  Busies: 0
+  Encumbers: 0
+  Stuns: 0
   RotationCap: 180
   Range: 1.2
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 1
   DestroyWithParent: 0
   DataExpression:
@@ -65,17 +70,15 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 01000000
+    m_keys: 02000000
     m_values:
     - data:
       - {fileID: -341771808515748932, guid: 854a4de69ab3aed438c16edc9021f39a, type: 3}
-      - {fileID: -6027088007599127969, guid: d8eb33d2a3f313c49a671b7722b5a28a, type: 3}
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 1}
     Dimension: {x: 0.8, y: 0.8, z: 0.8}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   RetriggerDuration: 60
-  DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0
 --- !u!135 &-4144442226832302667

@@ -23,5 +23,18 @@ public class CommandMovementDash: CommandMovement {
         Mover.Velocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
     }
 
+    override protected void OnDestruction() {
+        Mover.Velocity = Mover.Velocity.normalized * _boostSpeedEnd;
+    }
+
+    override public bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (base.OnCollideWith(collidable, info)) {
+            Destroy(gameObject);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     override public bool AppliesTo(GameObject go) => go.GetComponent<Character>() != null;
 }

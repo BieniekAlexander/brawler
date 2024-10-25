@@ -39,7 +39,7 @@ public class CharacterStateReady : CharacterState {
 
     public override void ExitState(){}
     public override void InitializeSubState(){}
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
 
 public class CharacterStateBusy : CharacterState {
@@ -75,7 +75,7 @@ public class CharacterStateBusy : CharacterState {
     }
 
     public override void InitializeSubState() { }
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }
 
 public class CharacterStateBlocking : CharacterState {
@@ -140,7 +140,7 @@ public class CharacterStateBlocking : CharacterState {
     }
 
     public override void InitializeSubState(){}
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
 
 
@@ -210,5 +210,5 @@ public class CharacterStateShielding : CharacterState {
     }
 
     public override void InitializeSubState(){}
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }

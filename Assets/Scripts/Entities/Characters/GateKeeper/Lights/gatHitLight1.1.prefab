@@ -47,12 +47,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 0
+  AboutResolution: 0
   TargetResolution: 0
   Duration: 7
-  EncumberTime: 0
+  Busies: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 1
   DataExpression:
@@ -83,12 +89,11 @@ MonoBehaviour:
     Dimension: {x: 0.3, y: 0.3, z: 0.3}
     Rotation: {x: 0.52407324, y: 0.52137405, z: 0.47741923, w: 0.4749603}
   RetriggerDuration: 60
-  DissapearOnTrigger: 0
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
     expression: 50
-  KnockbackCoordinateSystem: 0
+  KnockbackReference: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 8}
   HitTier: 1
 --- !u!23 &-3587656788900788176

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1635544872617382815}
-  - component: {fileID: 5634063031192742342}
+  - component: {fileID: 585766600846117122}
   m_Layer: 9
   m_Name: gatCastLightS
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5634063031192742342
+--- !u!114 &585766600846117122
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,22 +41,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 3059344016903470191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
+  m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPefabs: []
-  commandMovementPrefab: {fileID: 0}
+  AboutResolution: 0
+  TargetResolution: 0
+  Duration: 30
+  Busies: 1
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
+  Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 1
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
+  Target: {fileID: 0}
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
-    m_keys: 05000000
+    m_keys: 07000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: d35f49dcc54ba594c906bcc3b1569c2d, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  Frame: 0
-  startupTime: 0
-  Encumbering: 0
-  duration: 12
-  Origin: {fileID: 0}
-  statusEffects: []

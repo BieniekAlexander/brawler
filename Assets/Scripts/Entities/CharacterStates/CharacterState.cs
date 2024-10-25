@@ -62,7 +62,7 @@ public abstract class CharacterState {
         newSubState.SetSuperState(this);
     }
 
-    public abstract void OnCollideWith(ICollidable collidable, CollisionInfo info);
+    public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);
 
     public virtual bool StateInHierarchy(Type stateType) {
         if (this.GetType()==stateType) {
@@ -74,11 +74,15 @@ public abstract class CharacterState {
         }
     }
 
-    public virtual void HandleCollisionWithStates(ICollidable collidable, CollisionInfo info) {
-        OnCollideWith(collidable, info);
+    public virtual bool HandleCollisionWithStates(ICollidable collidable, CollisionInfo info) {
+        bool ret = false;
+
+        ret |= OnCollideWith(collidable, info);
 
         if (_subState != null) {
-            _subState.HandleCollisionWithStates(collidable, info);
+           ret |= _subState.HandleCollisionWithStates(collidable, info);
         }
+
+        return ret;
     }
 }

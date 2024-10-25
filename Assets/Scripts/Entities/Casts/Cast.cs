@@ -5,31 +5,31 @@ using UnityEngine;
 
 [Serializable]
 public enum AboutResolution {
-    ShallowCopyAbout,
-    ShallowCopyCaster,
-    ShallowCopyTarget,
-    HardCopyAbout,
-    HardCopyCaster,
-    HardCopyTarget
+    ShallowCopyAbout = 0,
+    ShallowCopyCaster = 1,
+    ShallowCopyTarget = 2,
+    HardCopyAbout = 3,
+    HardCopyCaster = 4,
+    HardCopyTarget = 5
 }
 
 [Serializable]
 public enum TargetResolution {
-    ShallowCopy,
-    HardCopy,
-    SnapTarget,
-    SelfTarget
+    ShallowCopy = 0,
+    HardCopy = 1,
+    SnapTarget = 2,
+    SelfTarget = 3
 }
 
 [Serializable]
 public enum CastableCondition {
-    OnAttack,
-    OnRecast,
-    OnCollision,
-    OnDestruction,
-    OnRecastDestruction,
-    OnAttackDestruction,
-    OnDeath
+    OnAttack = 0,
+    OnRecast = 1,
+    OnCollision = 2,
+    OnDestruction = 3,
+    OnRecastDestruction = 4,
+    OnAttackDestruction = 5,
+    OnDeath = 6
 }
 
 [Serializable]
@@ -39,7 +39,7 @@ public class CastCosts {
 }
 
 public static class CastUtils {
-    public static Character GetSnapTarget(Vector3 worldPosition, int teamMask, float maxDistance) {
+    public static Character GetSnapTarget(Vector3 worldPosition, int teamBitMask, float maxDistance) {
         List<Character> characters = (from go in GameObject.FindGameObjectsWithTag("Character") select go.GetComponent<Character>()).ToList();
         List<float> characterDists = (from ch in characters select (worldPosition-ch.transform.position).magnitude).ToList();
 
@@ -47,7 +47,7 @@ public static class CastUtils {
         int minIndex = -1;
 
         for (int i = 0; i < characterDists.Count; i++) {
-            if ((characters[i].TeamBit & teamMask)>0) {
+            if ((teamBitMask & characters[i].TeamBitMask)>0) {
                 float dist = characterDists[i];
                 if (dist < minDist && dist<maxDistance) {
                     minDist = dist;
@@ -72,7 +72,7 @@ public static class CastUtils {
     }
 }
 
-public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
+public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     [SerializeField] public AboutResolution AboutResolution = AboutResolution.ShallowCopyAbout;
     [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
@@ -108,7 +108,10 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         as ConditionCastablesDictionary
     );
 
-    public void Awake() => Indefinite = (Duration<0);
+    public void Awake() {
+        _collider = GetComponent<Collider>();
+        Indefinite = (Duration<0);
+    }
 
     /// <summary>
     /// To be run right when the Castable is casted by a caster.
@@ -140,13 +143,13 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
 
         if (AboutResolution == AboutResolution.HardCopyAbout) {
-            transform.position = About.position + transform.rotation*Vector3.forward*Range;
+            transform.position = About.position + About.rotation*Vector3.forward*Range;
             About = transform;
         } else if (AboutResolution == AboutResolution.HardCopyTarget) {
             float CastDistance = (Target.position - About.position).magnitude;
             transform.position = About.position + Mathf.Min(Range, CastDistance)*(transform.rotation * Vector3.forward);
             About = transform;
-        } 
+        }
     }
 
     /// <summary/>
@@ -256,6 +259,7 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     }
 
     /* ICasts Methods */
+    public int TeamBitMask {get {return (Caster!=null)?Caster.TeamBitMask:0;}}
     public bool IsRotatingClockwise() => !Mirrored;
     public Transform GetOriginTransform() => transform;
     public Transform GetTargetTransform() => Target; // TODO this will probably depend on the cast, and I think this is a good default?
@@ -277,13 +281,18 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     protected virtual void OnDestruction() {
     }
 
-    protected virtual void OnCollision(ICollidable collidable) {
-        Cast[] casts = ConditionCastablesMap.ContainsKey(CastableCondition.OnCollision)
-            ? ConditionCastablesMap[CastableCondition.OnCollision]
-            : null;
-        if (casts==null || casts.Count() == 0) {
-            return;
-        } else {
+    /* ICollidable Methods */
+    protected Collider _collider;
+    public Collider Collider { get { return _collider; } }
+    public Transform Transform { get { return transform; } }
+    public int ImmaterialStack { get { return 0; } set {; } }
+
+    virtual public void HandleCollisions() {
+        CollisionUtils.HandleCollisions(this, null, 0);
+    }
+
+    virtual public bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (ConditionCastablesMap.TryGetValue(CastableCondition.OnCollision, out Cast[] casts) && casts!=null) {
             foreach (Cast Castable in casts) {
                 Transform castableAbout = null;
                 
@@ -317,6 +326,8 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         if (DestroyOnCollision) {
             Destroy(gameObject);
         }
+
+        return true;
     }
 
     private void OnDestroy() {
@@ -324,13 +335,13 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
             Destroy(Target.gameObject);
         }
 
-        if (Busies && Caster is Character character) {
-            character.BusyMutex.Reset();
-        }
-        
         _castConditionalCastables(CastableCondition.OnDestruction);
         OnDestruction();
         PropagateChildren();
+
+        if (Busies && Caster is Character character) {
+            character.BusyMutex.Reset();
+        }
     }
 
     /* IHealingTree Methods */

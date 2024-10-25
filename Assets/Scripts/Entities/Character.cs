@@ -162,7 +162,7 @@ public class BusyMutex {
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
-    public int TeamBit = 1;
+    public int TeamBitMask {get; set; } = 1;
 
     /* State WIP */
     CharacterState _state;
@@ -235,7 +235,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int Charges { get; set; } = 4;
     private int rechargeRate = 300;
     private int rechargeTimer = 0;
-    private int energy = 100;
+    private int energy = 10000; // TODO lower
     // private int maxEnergy = 100;
 
     [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
@@ -472,7 +472,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Transform castOrigin = transform;
 
             if (castContainer.CastSlot.CastPrefab.TargetResolution == TargetResolution.SnapTarget) {
-                Character t = CastUtils.GetSnapTarget(CursorTransform.position, TeamBit, castContainer.CastSlot.CastPrefab.Range);
+                Character t = CastUtils.GetSnapTarget(CursorTransform.position, TeamBitMask, castContainer.CastSlot.CastPrefab.Range);
 
                 if (t==null) {
                     // TODO if there's no target snap, the buffer will cause the code to retry `buffer` times,
@@ -884,26 +884,26 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private Collider _collider;
     public int ImmaterialStack { get; set; } = 0;
 
-    void OnControllerColliderHit(ControllerColliderHit hit) {
+    bool OnControllerColliderHit(ControllerColliderHit hit) {
         GameObject collisionObject = hit.collider.gameObject;
 
         if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
-            State.HandleCollisionWithStates(collidable, new CollisionInfo(hit.normal));
+            return State.HandleCollisionWithStates(collidable, new CollisionInfo(hit.normal));
         } else {
             throw new Exception("Unhandled collision type");
         }
     }
 
-    public void OnCollideWith(ICollidable other, CollisionInfo info) {
+    public bool OnCollideWith(ICollidable other, CollisionInfo info) {
         if (other is Character otherCharacter
             && (
                 ImmaterialStack > 0
                 || otherCharacter.ImmaterialStack > 0
             )
         ) {
-            return;
+            return false;
         } else {
-            _state.HandleCollisionWithStates(other, info);
+            return _state.HandleCollisionWithStates(other, info);
         }
     }
 

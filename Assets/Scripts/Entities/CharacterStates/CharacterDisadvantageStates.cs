@@ -53,7 +53,7 @@ public class CharacterStateHitStopped : CharacterState {
         _subState = Factory.Busy();
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 
     public override void FixedUpdateState() {
         Character.HitStopTimer--;
@@ -111,7 +111,7 @@ public class CharacterStatePushedBack : CharacterState {
         _subState = Factory.Busy();
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }
 
 public class CharacterStateKnockedBack : CharacterState {
@@ -165,7 +165,14 @@ public class CharacterStateKnockedBack : CharacterState {
     }
 
     public override void ExitState() { }
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (collidable is StageTerrain terrain) {
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 public class CharacterStateBlownBack : CharacterState {
@@ -218,5 +225,5 @@ public class CharacterStateBlownBack : CharacterState {
     }
 
     public override void ExitState() { }
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }

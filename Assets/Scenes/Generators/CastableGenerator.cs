@@ -8,6 +8,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
     [SerializeField] public int ReloadTime = 300;
     [Tooltip("A number of frames for which the cast reload time can jiggle")]
     [SerializeField] public int TimeJiggle = 50;
+    public int TeamBitMask {get { return 0;} }
     private int Timer;
 
     /* Targeting */

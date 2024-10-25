@@ -46,11 +46,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 2
   TargetResolution: 0
-  Duration: 0
-  EncumberTime: 0
+  Duration: 60
+  Busies: 0
+  Encumbers: 0
+  Stuns: 0
   RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7159542288348881807}
   - component: {fileID: 8826511796677745375}
   m_Layer: 8
-  m_Name: gatHitMedium1.1
+  m_Name: gatHitMedium2.1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,8 +47,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Duration: 30
-  About: {fileID: 0}
+  AboutResolution: 0
+  TargetResolution: 0
+  Duration: 12
+  Busies: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
+  Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
   Mirrored: 0
   Indefinite: 0
@@ -59,43 +73,49 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -11.0648575, y: 0.68778557}
+  - PolarPosition: {x: -40, y: 1}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.7719845, z: 0, w: 0.63564134}
-  - PolarPosition: {x: -9.702838, y: 0.78320366}
+    Rotation: {x: 0, y: 0.7071068, z: 0, w: 0.70710677}
+  - PolarPosition: {x: -40.01567, y: 1.0824311}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.76437503, z: 0, w: 0.6447719}
-  - PolarPosition: {x: -8.646928, y: 0.87797946}
+    Rotation: {x: 0, y: 0.70720345, z: 0, w: 0.7070101}
+  - PolarPosition: {x: -31.51147, y: 1.0943825}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.75840145, z: 0, w: 0.6517878}
-  - PolarPosition: {x: -8.646928, y: 0.87797946}
+    Rotation: {x: 0, y: 0.6996331, z: 0, w: 0.7145022}
+  - PolarPosition: {x: -23.076565, y: 1.1098045}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.7911222, z: 0, w: 0.6116582}
-  - PolarPosition: {x: -7.5906525, y: 0.9462923}
+    Rotation: {x: 0, y: 0.6760205, z: 0, w: 0.73688287}
+  - PolarPosition: {x: -15.570159, y: 1.132562}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.80249786, z: 0, w: 0.59665495}
-  - PolarPosition: {x: -6.560168, y: 1.0065907}
+    Rotation: {x: -0.01325966, y: 0.62619466, z: -0.016503343, w: 0.7793792}
+  - PolarPosition: {x: -7.664418, y: 1.1472492}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.81067586, z: 0, w: 0.58549535}
-  - PolarPosition: {x: -4.954008, y: 1.1001095}
+    Rotation: {x: -0.010354281, y: 0.6476233, z: -0.018465316, w: 0.7616666}
+  - PolarPosition: {x: -2.3677766, y: 1.1619921}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.8217386, z: 0, w: 0.56986463}
-  - PolarPosition: {x: -3.9793625, y: 1.1527792}
+    Rotation: {x: -0.007495287, y: 0.6897554, z: -0.01979898, w: 0.723733}
+  - PolarPosition: {x: 6.544426, y: 1.1847199}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.81686205, z: 0, w: 0.5768331}
-  - PolarPosition: {x: -3.9793625, y: 1.1527792}
+    Rotation: {x: -0.0040833047, y: 0.69857126, z: -0.020772714, w: 0.71522737}
+  - PolarPosition: {x: 15.572717, y: 1.1325763}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.81686205, z: 0, w: 0.5768331}
-  - PolarPosition: {x: -3.9793625, y: 1.1527792}
+    Rotation: {x: -0.0009885486, y: 0.69124717, z: -0.021147145, w: 0.72230834}
+  - PolarPosition: {x: 22.40531, y: 1.1465523}
     Dimension: {x: 0.7, y: 0.3, z: 0.3}
-    Rotation: {x: 0, y: 0.81686205, z: 0, w: 0.5768331}
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
+    Rotation: {x: 0.0010230342, y: 0.6735695, z: -0.021145502, w: 0.7388207}
+  - PolarPosition: {x: 33.156612, y: 1.1885157}
+    Dimension: {x: 0.7, y: 0.3, z: 0.3}
+    Rotation: {x: 0.004730623, y: 0.66567826, z: -0.020634923, w: 0.7459386}
+  - PolarPosition: {x: 39.035854, y: 1.1908562}
+    Dimension: {x: 0.7, y: 0.3, z: 0.3}
+    Rotation: {x: 0.0067763194, y: 0.66407317, z: -0.020056427, w: 0.7473678}
+  RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0
-  damage: 1
-  KnockbackCoordinateSystem: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 7}
+  damageExpression:
+    expression: 0
+  KnockbackReference: 1
+  BaseKnockbackVector: {x: 3, y: 0, z: 10.5}
   HitTier: 2
 --- !u!23 &-3587656788900788176
 MeshRenderer:

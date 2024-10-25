@@ -47,10 +47,15 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 15
-  EncumberTime: 15
+  Busies: 1
+  Encumbers: 0
+  Stuns: 0
   RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:

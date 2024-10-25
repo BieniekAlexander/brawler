@@ -20,4 +20,7 @@ public interface ICasts {
     // status effects
     public int MaimStack { get; set; } // can't use attacks
     public int SilenceStack { get; set; } // can't cast spells
+
+    // Ownership Evaluation
+    public int TeamBitMask {get; }
 }

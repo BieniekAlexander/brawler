@@ -47,10 +47,11 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 20
-  BusyTimer: 20
+  Busies: 1
+  Encumbers: 0
+  Stuns: 0
   RotationCap: 180
   Range: 0
-  Encumbering: 0
   RecastCooldown: 0
   AttackCooldown: 0
   DestroyOnRecast: 0

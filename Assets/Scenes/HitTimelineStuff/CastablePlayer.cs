@@ -5,13 +5,13 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 public enum CastEditorControls {
-    StepBackward,
-    StepForward,
-    CopyOnStep,
-    Mirror,
-    NextCast,
-    PreviousCast,
-    Save
+    StepBackward = 0,
+    StepForward = 1,
+    CopyOnStep = 2,
+    Mirror = 3,
+    NextCast = 4,
+    PreviousCast = 5,
+    Save = 6
 }
 
 public class CastPlayer : MonoBehaviour {

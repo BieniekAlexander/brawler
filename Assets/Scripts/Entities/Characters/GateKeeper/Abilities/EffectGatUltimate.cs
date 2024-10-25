@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EffectGatUltimate : Effect {
    override protected void OnInitialize() {
+        base.OnInitialize();
         Character character = About.gameObject.GetComponent<Character>();
         character.CastContainers[(int)CastId.Ability4].charges += 4;
     }
@@ -15,5 +16,5 @@ public class EffectGatUltimate : Effect {
         }
     }
 
-    public virtual bool AppliesTo(GameObject go) => go.GetComponent<Character>();
+    override public bool AppliesTo(GameObject go) => go.GetComponent<Character>();
 }

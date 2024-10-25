@@ -9,11 +9,12 @@ public class RingOutEffect : Effect
         Effected = About.GetComponent<Character>();
         Effected.TakeDamage(Effected.transform.position, RingOutDamage, HitTier.Pure);
         Effected.Velocity = Vector3.zero;
+        // TODO this is currently damaging shields - probably strip all effects from the character first (Armor is an effect)
 
         if (Effected == null) {
             Destroy(gameObject);
         } else {
-            Effected.enabled = false;
+            Effected.gameObject.SetActive(false);
         }
     }
 
@@ -23,7 +24,7 @@ public class RingOutEffect : Effect
             GameObject[] spawns = SceneController.GetSceneSpawns();
             GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
             c.transform.position = randomSpawn.transform.position;
-            c.enabled = true;
+            Effected.gameObject.SetActive(true);
         }
     }
 

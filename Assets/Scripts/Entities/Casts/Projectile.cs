@@ -15,7 +15,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     override protected void OnInitialize() {
         base.OnInitialize();
         FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
-        Velocity = transform.rotation*Vector3.forward*BaseSpeed;
+        Velocity = Caster.GetOriginTransform().rotation*Vector3.forward*BaseSpeed;
     }
 
     protected override void Tick() {
@@ -67,23 +67,23 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     }
 
     /* ICollidable Methods */
-    private Collider _collider;
-    public int ImmaterialStack { get { return 0; } set {; } }
-
     public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this, null, 0); // TODO I don't konw if it makes sense for this to have a collision log
     }
 
-    public void OnCollideWith(ICollidable other, CollisionInfo info) {
+    override public bool OnCollideWith(ICollidable other, CollisionInfo info) {
         if (
             other is Character Character
             || (other is Projectile Projectile && Vector3.Dot(Velocity, Projectile.Velocity)<=0) // if the rockets are relatively antiparallel, make them collide
         ) {
-            OnCollision(other);
+            return base.OnCollideWith(other, info);
+        } else if (other is StageTerrain terrain) {
+            Velocity = MovementUtils.GetBounce(Velocity, info.Normal);
+            return true;
+        } else {
+            return false;
         }
     }
-
-    public Collider Collider { get { return _collider; } }
 
     /* IDamageable */
     [SerializeField] private int _hp;

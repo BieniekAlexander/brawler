@@ -228,8 +228,6 @@ public class Trigger : Cast, ICollidable, ICasts {
 
     /* State Handling */
     new public void Awake() {
-        _collider = GetComponent<Collider>();
-
         if (_collider is CapsuleCollider cc) {
             // https://discussions.unity.com/t/capsule-collider-how-direction-change-to-z-axis-c/225672/2
             Assert.IsTrue(cc.direction==0);
@@ -300,29 +298,28 @@ public class Trigger : Cast, ICollidable, ICasts {
 
     /* ICollidable */
     [SerializeField] public int RetriggerDuration = 60;
-    [SerializeField] public bool DissapearOnTrigger = false;
     [SerializeField] public bool HitsEnemies = true;
     [SerializeField] public bool HitsFriendlies = false;
     private Dictionary<ICollidable, int> CollisionLog = null;
-    public Transform Transform { get { return transform; } }
-    public int ImmaterialStack { get { return 0; } set {; } }
-    private Collider _collider;
-    public Collider Collider { get { return _collider; } } // TODO cache collider
+    
 
-    public void HandleCollisions() {
+    override public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this, (RetriggerDuration==0) ? null : CollisionLog, RetriggerDuration);
     }
 
-    public virtual void OnCollideWith(ICollidable collided, CollisionInfo info) {
+    public virtual bool OnCollideWith(ICollidable collided, CollisionInfo info) {
         if (
-            (Caster==collided && !HitsFriendlies)
+            (collided is not IDamageable)
+            || (Caster==collided && !HitsFriendlies)
             || (Caster!=collided && !HitsEnemies)
         ) {
-            return;
+            return false;
         } else {
             if (collided.Transform.gameObject.activeSelf) {
                 // TODO why did I check this? when will a collision happen with something inactive?
-                OnCollision(collided);
+                return base.OnCollideWith(collided, info);
+            } else {
+                return false;
             }
         }
     }

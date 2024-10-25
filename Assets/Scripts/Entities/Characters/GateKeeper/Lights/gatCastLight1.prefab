@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 10
+  Duration: 14
   Busies: 1
   Encumbers: 0
   Stuns: 0
@@ -64,7 +64,7 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 04000000
+    m_keys: 05000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 337d2536371e3364bbedebe5a0eaf009, type: 3}

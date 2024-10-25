@@ -27,7 +27,7 @@ public class CharacterStateKnockedDown : CharacterState {
         SetSubState(Factory.Busy());
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
 
 public class CharacterStateTumbling : CharacterState {
@@ -66,10 +66,13 @@ public class CharacterStateTumbling : CharacterState {
         ) + MovementUtils.inY(Character.Velocity);
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
             // TODO improve interaction of tumbling into wall
             Character.Velocity = new();
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -110,10 +113,13 @@ public class CharacterStateRolling : CharacterState {
         SetSubState(Factory.Busy());
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
             // TODO improve interaction of tumbling into wall
             Character.Velocity = new();
+            return true;
+        } else {
+            return false;
         }
     }
 }
@@ -153,7 +159,7 @@ public class CharacterStateGettingUp : CharacterState {
         SetSubState(Factory.Busy());
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info){}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
 
 
@@ -192,5 +198,5 @@ public class CharacterStateGetUpAttacking : CharacterState {
         SetSubState(Factory.Busy());
     }
 
-    public override void OnCollideWith(ICollidable collidable, CollisionInfo info) { }
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }

@@ -50,7 +50,8 @@ public class Hit : Trigger, ICollidable {
     }
 
     /* ICollidable Methods */
-    public override void OnCollideWith(ICollidable Other, CollisionInfo info) {
+    public override bool OnCollideWith(ICollidable Other, CollisionInfo info) {
+        bool ret = false;
         base.OnCollideWith(Other, info);
 
         Physics.Raycast(
@@ -65,7 +66,7 @@ public class Hit : Trigger, ICollidable {
             if ((Caster==OtherDamagable && !HitsFriendlies)
                 || (Caster!=OtherDamagable && !HitsEnemies)
             ) {
-                return;
+                ;
             } else {
                 int damageTaken = OtherDamagable.TakeDamage(
                     hitInfo.point,
@@ -76,6 +77,8 @@ public class Hit : Trigger, ICollidable {
                 if (Caster is Character c) { // Throwing this in for RL agent - TODO clean this up
                     c.DamageDealt = damageTaken;
                 }
+
+                ret = true;
             }
         }
 
@@ -84,7 +87,7 @@ public class Hit : Trigger, ICollidable {
                 || (Caster!=OtherMover && !HitsEnemies)
                 || BaseKnockbackVector == Vector3.zero // if the attack has no knockback - TODO is this the best way to enforce this?
             ) {
-                return;
+                ;
             } else {
                 Vector3 knockBackVector = GetKnockBackVector(OtherMover.Transform.position);
                 int hitStunDuration = KnockBackUtils.getHitStun(knockBackVector);
@@ -108,7 +111,11 @@ public class Hit : Trigger, ICollidable {
                         HitTier
                     );
                 }
+
+                ret = true;
             }
         }
+        
+        return ret;
     }
 }

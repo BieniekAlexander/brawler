@@ -100,6 +100,65 @@ public class CharacterFrameInput {
     public int CastId = -1;
 }
 
+/// <summary>
+/// Object that manages whether the character is available to perform another action
+/// </summary>
+public class BusyMutex {
+    public BusyMutex(Character character) {
+        _character = character;
+        _busyTimer = 0;
+    }
+
+    private Character _character;
+    private int _busyTimer; // can't recast
+    private bool _encumbered; // can't redirect
+    private bool _stunned; // can't move
+    private float _rotationCap; // can't turn
+
+    public bool Busy {get { return _busyTimer>0; }}
+
+    public void Lock(int busyTimer, bool encumbered, bool stunned, float rotationCap) {
+        if (_busyTimer>0) throw new Exception("Can't grab mutex, because it's already taken");
+
+        busyTimer = _busyTimer;
+        if (encumbered) {
+            _encumbered = true;
+            _character.EncumberedStack++;
+        }
+
+        if (stunned) {
+            _stunned = true;
+            _character.StunStack++;
+        }
+
+        if (rotationCap < 175) {
+            _rotationCap = rotationCap;
+            _character.RotationCap = rotationCap;
+        }
+    }
+
+    public void Reset() {
+        _busyTimer = 0;
+        _character.RotationCap = 180f;
+
+        if (_encumbered) {
+            _character.EncumberedStack--;
+            _encumbered = false;
+        }
+        
+        if (_stunned) {
+            _character.StunStack--;
+            _stunned = false;
+        }
+    }
+
+    public void Tick() {
+        if (_busyTimer>0 && --_busyTimer==0) {
+            Reset();
+        }        
+    }
+}
+
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
@@ -114,8 +173,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     CharacterStateFactory StateFactory;
-
-    public int BusyTimer { get; set; } = 0;
     public bool Parried = false;
 
     /* Visuals */
@@ -134,7 +191,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this
-            return (EncumberedTimer>0 || StunStack>0) ? Vector3.zero : new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
+            return (EncumberedStack>0 || StunStack>0)
+            ? Vector3.zero :
+            new Vector3(InputMoveDirection.x, 0f, InputMoveDirection.y);
         }
     }
 
@@ -152,9 +211,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             // setting rotation
             var direction = value.normalized;
-            Quaternion newRotation = (_rotationCap>=175f)
+            Quaternion newRotation = (RotationCap>=175f)
                 ? Quaternion.FromToRotation(Vector3.forward, direction)
-                : Quaternion.RotateTowards(transform.rotation, Quaternion.FromToRotation(Vector3.forward, direction), _rotationCap);
+                : Quaternion.RotateTowards(transform.rotation, Quaternion.FromToRotation(Vector3.forward, direction), RotationCap);
 
             float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
             if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
@@ -165,14 +224,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    private float _rotationCap = 180f;
-
     public bool InputDash { get; set; } = false;
     public bool InputRunning { get; set; } = false;
     public bool Running { get { return InputRunning && StunStack==0; } }
     public bool InputBlocking { get; set; } = false;
     public bool InputShielding { get; set; } = false;
-
 
     /* Abilities */
     private int maxCharges = 5;
@@ -392,8 +448,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* Casts */
     /// <summary/>
     /// <param name="castId"></param>
-    /// <returns>the busy timer of the cast</returns>
-    private int StartCast(int castId) {
+    /// <returns>whether a cast/recast was initiated</returns>
+    private bool StartCast(int castId) {
         if (attackCastIdSet.Contains(castId) && _activeCastable!=null) {
             return _activeCastable.OnAttackCastables(CursorTransform);
         }
@@ -405,10 +461,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             return castContainer.RootCastable.OnRecastCastables(CursorTransform);
         } else if (castContainer.CastSlot.CastPrefab == null) {
             Debug.Log("No cast supplied for cast"+(int)castId);
-            return 0;
-        } else if (_hasResourcesForCast(castContainer.CastSlot.Costs)) {
-            if (BusyTimer>0) return -1;
-
+            return false;
+        } else if (!BusyMutex.Busy && _hasResourcesForCast(castContainer.CastSlot.Costs)) {
             useCastResources(castContainer.CastSlot.Costs);
 
             if (_activeCastable!=null && _activeCastable.DestroyOnRecast) {
@@ -423,7 +477,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 if (t==null) {
                     // TODO if there's no target snap, the buffer will cause the code to retry `buffer` times,
                     // which I don't want, but I don't want to return true because nothing was casted
-                    return -1; 
+                    return false;
                 } else {
                     castOrigin = t.transform;
                 }
@@ -442,14 +496,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             castContainer.charges--;
             castContainer.timer = castContainer.CastSlot.Cooldown;
-            _rotationCap = castPrefab.RotationCap;
-            EncumberedTimer = castPrefab.Encumbering?castPrefab.BusyTimer:0;
-            BusyTimer = castPrefab.BusyTimer;
-            return BusyTimer;
+            return true;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer
             // I think I need to change this
-            return -1;
+            return false;
         }
     }
 
@@ -466,12 +517,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     CastContainers[i].timer = castSlots[i].Cooldown;
                 }
             }
-        }
-
-
-        if (BusyTimer==0) {
-            EncumberedTimer = 0;
-            _rotationCap = 180f;
         }
     }
 
@@ -516,10 +561,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         InputCastId = -1;
 
         // State WIP
+        BusyMutex = new(this);
         StateFactory = new(this);
         SwitchState(StateFactory.Idle());
 
-        cc =GetComponent<CharacterController>();
+        cc = GetComponent<CharacterController>();
         standingY = transform.position.y + standingOffset;
         healMax = HP;
 
@@ -623,6 +669,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
 
         // Handle Casts
+        BusyMutex.Tick();
         State.FixedUpdateStates();
 
         if (HitStopTimer==0) {
@@ -640,7 +687,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         if (--CastBufferTimer == 0) {
             InputCastId = -1;
         } else if (InputCastId >= 0) {
-            if (StartCast(InputCastId)>-1) {
+            if (StartCast(InputCastId)) {
                 InputCastId = -1;
             }
         }
@@ -678,8 +725,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
     public Vector3 Velocity { get; set; } = Vector3.zero;
-    public int EncumberedTimer { get; set; } = 0;
-    public int StunStack { get; set; } // stuns
+    public BusyMutex BusyMutex;
+    public int EncumberedStack { get; set; } = 0;
+    public int StunStack { get; set; } = 0;
+    public float RotationCap {get; set; } = 180f;
     public Transform ForceMoveDestination { get; set; } = null; // taunts, fears, etc.
     public CommandMovement CommandMovement { get; set; } = null;
     private float gravity = -.5f;
@@ -755,9 +804,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 Destroy(CommandMovement);
                 CommandMovement = null;
                 KnockBack = knockBackFactor*knockBackVector;
-                HitStunTimer = hitStunDuration;
-                EncumberedTimer = 0;
-                BusyTimer = 0;
+                BusyMutex.Reset();
 
                 if (hitStopDuration > 0) {
                     HitStopTimer = hitStopDuration;

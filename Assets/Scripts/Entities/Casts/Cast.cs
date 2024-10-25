@@ -76,10 +76,11 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     [SerializeField] public AboutResolution AboutResolution = AboutResolution.ShallowCopyAbout;
     [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
-    [SerializeField] public int BusyTimer;
+    [SerializeField] public bool Busies;
+    [SerializeField] public bool Encumbers;
+    [SerializeField] public bool Stuns;
     [SerializeField] public float RotationCap = 180f;
     [SerializeField] public float Range = 0;
-    [SerializeField] public bool Encumbering;
     [SerializeField] public float RecastCooldown = 0; // TODO make use of implementation
     [SerializeField] public float AttackCooldown = 0; // TODO make use of implementation
     [SerializeField] public bool DestroyOnRecast = false;
@@ -156,11 +157,16 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// <param name="mirrored"></param>
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
     public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
-        Cast Castable = Instantiate(CastablePrefab);
-        Castable.Parent = parent;
-        parent._children.Add(Castable);
-        Castable.Initialize(caster, about, target, mirrored);
-        return Castable;
+        Cast cast = Instantiate(CastablePrefab);
+        cast.Parent = parent;
+        parent._children.Add(cast);
+        cast.Initialize(caster, about, target, mirrored);
+        
+        if (cast.Busies && caster is Character character) {
+            character.BusyMutex.Lock(cast.Duration, cast.Encumbers, cast.Stuns, cast.RotationCap);
+        }
+
+        return cast;
     }
     
     /// <summary>
@@ -168,24 +174,21 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// </summary>
     /// <remarks>E.g. dash attack</remarks>
     /// <param name="target"></param>
-    /// <returns>cast busying time</returns>
-    protected virtual int OnAttack(Transform target) => -1;
+    /// <returns>whether some sort of behavior was activated</returns>
+    protected virtual bool OnAttack(Transform target) => false;
 
-    public int OnAttackCastables(Transform target) {
-        int ret = -1;
+    public bool OnAttackCastables(Transform target) {
+        bool ret = false;
 
         foreach (Cast child in _children) {
-            ret = Math.Max(ret, child.OnAttackCastables(target));
+            ret |=  child.OnAttackCastables(target);
         }
 
-        ret = Math.Max(ret, OnAttack(target));
-        ret = Math.Max(
-            ret,
-            _castConditionalCastables(
-                DestroyOnAttack
-                ? CastableCondition.OnAttackDestruction
-                : CastableCondition.OnAttack   
-            )
+        ret |= OnAttack(target);
+        ret |= _castConditionalCastables(
+            DestroyOnAttack
+            ? CastableCondition.OnAttackDestruction
+            : CastableCondition.OnAttack   
         );
 
         if (DestroyOnAttack) {
@@ -202,23 +205,20 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     /// E.g. if the castable is a rocket, cast updating might involve reassigning the rocket's target destination.
     /// </remarks>
     /// <param name="target"></param>
-    protected virtual int OnRecast(Transform target) => -1;
+    protected virtual bool OnRecast(Transform target) => false;
 
-    public int OnRecastCastables(Transform target) {
-        int ret = -1;
+    public bool OnRecastCastables(Transform target) {
+        bool ret = false;
 
         foreach (Cast child in _children) {
-            ret = Math.Max(ret, child.OnRecastCastables(target));
+            ret |= child.OnRecastCastables(target);
         }
 
-        ret = Math.Max(ret, OnRecast(target));
-        ret = Math.Max(
-            ret,
-            _castConditionalCastables(
-                DestroyOnRecast
-                ? CastableCondition.OnRecastDestruction
-                : CastableCondition.OnRecast
-            )
+        ret |= OnRecast(target);
+        ret |= _castConditionalCastables(
+            DestroyOnRecast
+            ? CastableCondition.OnRecastDestruction
+            : CastableCondition.OnRecast
         );
 
         if (DestroyOnRecast) {
@@ -228,12 +228,10 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
         return ret;
     }
 
-    private int _castCastables(Cast[] casts) {
+    private bool _castCastables(Cast[] casts) {
         if (casts==null && casts.Count() == 0) {
-                return -1;
+                return false;
         } else {
-            int ret = 0;
-
             foreach (Cast Castable in casts) {
                 Cast newCast = Initiate(
                     Castable,
@@ -243,19 +241,17 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
                     Mirrored,
                     this
                 );
-
-                ret = Math.Max(ret, newCast.BusyTimer);
             }
 
-            return ret;
+            return true;
         }
     }
 
-    private int _castConditionalCastables(CastableCondition castableCondition) {
+    private bool _castConditionalCastables(CastableCondition castableCondition) {
         if (ConditionCastablesMap.ContainsKey(castableCondition)) {
             return _castCastables(ConditionCastablesMap[castableCondition]);
         } else {
-            return -1;
+            return false;
         }
     }
 
@@ -279,11 +275,6 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     }
 
     protected virtual void OnDestruction() {
-    }
-
-    private int f(int x) {
-        Debug.Log($"hello {x}");
-        return x;
     }
 
     protected virtual void OnCollision(ICollidable collidable) {
@@ -331,6 +322,10 @@ public class Cast : MonoBehaviour, ICasts, IHealingTree<Cast> {
     private void OnDestroy() {
         if (TargetResolution == TargetResolution.HardCopy) {
             Destroy(Target.gameObject);
+        }
+
+        if (Busies && Caster is Character character) {
+            character.BusyMutex.Reset();
         }
         
         _castConditionalCastables(CastableCondition.OnDestruction);

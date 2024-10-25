@@ -67,7 +67,7 @@ public class CharacterStateIdle : CharacterState {
     }
 
     public override void InitializeSubState() {
-        if (Character.BusyTimer>0) {
+        if (Character.BusyMutex.Busy) {
             SetSubState(Factory.Busy());
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());
@@ -145,7 +145,7 @@ public class CharacterStateWalking : CharacterState {
     }
 
     public override void InitializeSubState() {
-        if (Character.BusyTimer>0) {
+        if (Character.BusyMutex.Busy) {
             SetSubState(Factory.Busy());
         } else if (Character.InputShielding) {
             SetSubState(Factory.Shielding());
@@ -214,7 +214,7 @@ public class CharacterStateRunning : CharacterState {
     }
 
     public override void InitializeSubState() {
-        if (Character.BusyTimer>0) {
+        if (Character.BusyMutex.Busy) {
             SetSubState(Factory.Busy());
         } else if (Character.InputBlocking) {
             SetSubState(Factory.Blocking());

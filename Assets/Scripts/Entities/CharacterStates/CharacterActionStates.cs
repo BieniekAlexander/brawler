@@ -13,7 +13,7 @@ public class CharacterStateReady : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO make sure that you can't shield if you're dashing, in disadvantage, etc.
-        if (Character.BusyTimer > 0) {
+        if (Character.BusyMutex.Busy) {
             return Factory.Busy();
         } else if (Character.InputShielding && !Character.Parried) {
             return Factory.Shielding();
@@ -26,7 +26,7 @@ public class CharacterStateReady : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
-        Character.BusyTimer = 0;
+        Character.BusyMutex.Reset();
         Character.Shield.gameObject.SetActive(false);
     }
 
@@ -57,7 +57,7 @@ public class CharacterStateBusy : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO make sure that you can't shield if you're dashing, in disadvantage, etc.
-        if (Character.BusyTimer<=0 && _validExitParentStates.Contains(_superState)) {
+        if (Character.BusyMutex.Busy && _validExitParentStates.Contains(_superState)) {
             return Factory.Ready();
         } else {
             return null;
@@ -69,11 +69,9 @@ public class CharacterStateBusy : CharacterState {
     }
     
     public override void FixedUpdateState() {
-        Character.BusyTimer--;
     }
 
     public override void ExitState() {
-        Character.BusyTimer = 0;
     }
 
     public override void InitializeSubState() { }
@@ -98,7 +96,7 @@ public class CharacterStateBlocking : CharacterState {
         } else if (Character.InputBlocking) {
             return null;
         } else {
-            Character.BusyTimer = _exposedDuration;
+            Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
             return Factory.Busy();
         }
     }
@@ -111,7 +109,7 @@ public class CharacterStateBlocking : CharacterState {
 
     public override void ExitState() {
         if (!Character.Parried){
-            Character.BusyTimer = _exposedDuration;
+            Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
         }
 
         Character.Shield.gameObject.SetActive(false);
@@ -165,7 +163,7 @@ public class CharacterStateShielding : CharacterState {
         } else if (Character.InputBlocking) {
             return Factory.Blocking();
         } else {
-            Character.BusyTimer = _exposedDuration;
+            Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
             return Factory.Busy();
         }
     }
@@ -178,7 +176,7 @@ public class CharacterStateShielding : CharacterState {
 
     public override void ExitState() {
         if (!Character.Parried){
-            Character.BusyTimer = _exposedDuration;
+            Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
         }
 
         Character.Shield.gameObject.SetActive(false);

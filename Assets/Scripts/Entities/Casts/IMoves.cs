@@ -32,7 +32,7 @@ public interface IMoves {
     // TODO I hope I don't accidentally have two knockback events infinitely recurse :) I should make the implementation more explicit about that
 
     // Status effects
-    public int EncumberedTimer { get; set; } // can't issue move command, but can run
+    public int EncumberedStack { get; set; } // can't issue move command, but can run
     public int StunStack { get; set; } // stuns
     public Transform ForceMoveDestination { get; set; } // taunts, fears, etc.
 }

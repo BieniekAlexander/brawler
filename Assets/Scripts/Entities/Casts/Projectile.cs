@@ -23,13 +23,13 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
         HandleCollisions();
     }
 
-    protected override int OnRecast(Transform target) {
+    protected override bool OnRecast(Transform target) {
         if (!Mathf.Approximately(RotationalControl, 0)) {
             Target.position = target.position;
-            return 0;
+            return true;
         } else {
             // nothing to recast
-            return -1;
+            return false;
         }
     }
 
@@ -92,7 +92,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     public List<Armor> Armors { get { return null; } set {; } }
     public int ParryWindow { get { return 0; } set {; } }
     public int InvulnerableStack { get { return 0; } set {; } }
-    public int EncumberedTimer { get { return 0; } set {; } }
+    public int EncumberedStack { get { return 0; } set {; } }
 
     public int TakeDamage(Vector3 contactPoint, in int damage, HitTier hitTier) {
         int remainingDamage = damage;

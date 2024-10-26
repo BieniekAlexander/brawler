@@ -73,21 +73,27 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -8.439315, y: 0.68137807}
+  - PolarPosition: {x: -6.361528, y: 0.90255755}
     Dimension: {x: 0.3, y: 0.2, z: 0.2}
-    Rotation: {x: 0.53681546, y: 0.53405064, z: 0.46304536, w: 0.46066052}
-  - PolarPosition: {x: -7.0122404, y: 0.819127}
-    Dimension: {x: 0.3, y: 0.3, z: 0.3}
-    Rotation: {x: 0.5310074, y: 0.52827257, z: 0.46969455, w: 0.46727547}
-  - PolarPosition: {x: -6.4903884, y: 0.88467}
-    Dimension: {x: 0.3, y: 0.3, z: 0.3}
-    Rotation: {x: 0.52886295, y: 0.5261391, z: 0.47210786, w: 0.46967632}
-  - PolarPosition: {x: -5.880033, y: 0.9761358}
-    Dimension: {x: 0.3, y: 0.3, z: 0.3}
-    Rotation: {x: 0.52634084, y: 0.52362996, z: 0.47491807, w: 0.47247204}
-  - PolarPosition: {x: -5.3343225, y: 1.0756584}
-    Dimension: {x: 0.3, y: 0.3, z: 0.3}
-    Rotation: {x: 0.52407324, y: 0.52137405, z: 0.47741923, w: 0.4749603}
+    Rotation: {x: 0.52833176, y: 0.52561057, z: 0.4727023, w: 0.47026777}
+  - PolarPosition: {x: -5.750878, y: 0.998023}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.5258052, y: 0.5230971, z: 0.47551095, w: 0.473062}
+  - PolarPosition: {x: -5.534951, y: 1.0368342}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.52490824, y: 0.5222048, z: 0.4765009, w: 0.47404686}
+  - PolarPosition: {x: -5.466513, y: 1.0497743}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.5246235, y: 0.5219216, z: 0.47681433, w: 0.47435862}
+  - PolarPosition: {x: -5.3099117, y: 1.0806373}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.52397144, y: 0.52127284, z: 0.47753087, w: 0.47507146}
+  - PolarPosition: {x: -5.3099117, y: 1.0806373}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.52397144, y: 0.52127284, z: 0.47753087, w: 0.47507146}
+  - PolarPosition: {x: -5.3099117, y: 1.0806373}
+    Dimension: {x: 0.3, y: 0.2, z: 0.2}
+    Rotation: {x: 0.52397144, y: 0.52127284, z: 0.47753087, w: 0.47507146}
   RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0

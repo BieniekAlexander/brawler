@@ -19,7 +19,7 @@ public class CastPlayer : MonoBehaviour {
     // https://discussions.unity.com/t/prefabutility-check-if-changes-have-been-made-to-prefab/167857
     [SerializeField] Character Caster;
     [SerializeField] Transform Target;
-    private Cast CastablePrefab;
+    private Cast CastPrefab;
     private Dictionary<int, List<Cast>> StartFrameCastablesMap = null;
     private Dictionary<int, List<Cast>> ExpireFrameCastablesMap = null;
     private List<Cast> ActiveCastables = null;
@@ -36,7 +36,7 @@ public class CastPlayer : MonoBehaviour {
         (int) CastId.Medium1,
         (int) CastId.Medium2,
         (int) CastId.MediumS,
-        (int)CastId.Heavy1,
+        (int) CastId.Heavy1,
         (int) CastId.Heavy2,
         (int) CastId.HeavyS
     };
@@ -68,19 +68,27 @@ public class CastPlayer : MonoBehaviour {
         InitializeCast(castId);
     }
 
-    private void GetActiveFrameCastablesMap(
+    // returns duration, because hitboxes might last longer than the base Castable
+    private int GetActiveFrameCastablesMap(
         Cast prefab,
         out Dictionary<int, List<Cast>> startFrameCastablesMap,
         out Dictionary<int, List<Cast>> expireFrameCastablesMap
     ) {
+        int finalDuration = prefab.Duration;
+
+        foreach (int frame in prefab.FrameCastablesMap.Keys) {
+            Cast[] casts = prefab.FrameCastablesMap[frame];
+            foreach (Cast cast in casts) {
+                finalDuration = Math.Max(finalDuration, frame+cast.Duration);
+            }
+        }
+
         // TODO recursive
-        startFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Cast>());
-        expireFrameCastablesMap = Enumerable.Range(0, duration).ToDictionary(i => i, i => new List<Cast>());
+        startFrameCastablesMap = Enumerable.Range(0, finalDuration).ToDictionary(i => i, i => new List<Cast>());
+        expireFrameCastablesMap = Enumerable.Range(0, finalDuration).ToDictionary(i => i, i => new List<Cast>());
 
-        for (int f = 0; f < prefab.Duration; f++) {
+        for (int f = 0; f < finalDuration; f++) {
             // inefficient, but nice if I want to create new castables
-            startFrameCastablesMap[f] = new();
-
             if (prefab.FrameCastablesMap.ContainsKey(f)) {
                 for (int i = 0; i <  prefab.FrameCastablesMap[f].Length; i++) {
                     Cast newCastable = Cast.Initiate(
@@ -95,25 +103,24 @@ public class CastPlayer : MonoBehaviour {
                     newCastable.gameObject.SetActive(false);
                     startFrameCastablesMap[f].Add(newCastable);
 
-                    if (f+newCastable.Duration < duration){
+                    if (f+newCastable.Duration < finalDuration) {
                         expireFrameCastablesMap[f+newCastable.Duration].Add(newCastable);
-                    } else if (f+newCastable.Duration > duration) {
-                        Debug.LogWarning($"Hitbox extends past cast duration\nstart frame: {f}\ncastable duration: {newCastable.Duration}\ncast duration: {duration}");
-                    } // NOTE: it's okay if the Castable lasts as long as the Cast, I think!
+                    }
                 }
             }
         }
+
+        return finalDuration;
     }
 
     private void InitializeCast(int castId) {
         DeleteInstantiatedCasts();
 
-        CastablePrefab = Caster.CastContainers[(int)castIds[castId]].CastSlot.CastPrefab;
-        duration = CastablePrefab.Duration;
+        CastPrefab = Caster.CastContainers[(int)castIds[castId]].CastSlot.CastPrefab;
         ActiveCastables = new();
 
-        GetActiveFrameCastablesMap(
-            CastablePrefab,
+        duration = GetActiveFrameCastablesMap(
+            CastPrefab,
             out Dictionary<int, List<Cast>> starts,
             out Dictionary<int, List<Cast>> expirations
         );
@@ -231,12 +238,12 @@ public class CastPlayer : MonoBehaviour {
         UpdateCastableTransformations();
 
         for (int i = 0; i < duration; i++) {
-            if (!CastablePrefab.FrameCastablesMap.ContainsKey(i))
+            if (!CastPrefab.FrameCastablesMap.ContainsKey(i))
                 continue;
 
             // https://discussions.unity.com/t/test-if-prefab-is-an-instance/716592/3
             List<Cast> startFrameCastables = StartFrameCastablesMap[i];
-            Cast[] prefabMap = CastablePrefab.FrameCastablesMap[i];
+            Cast[] prefabMap = CastPrefab.FrameCastablesMap[i];
 
             for (int j = 0; j < prefabMap.Length; j++) {
                 Cast toCopy = startFrameCastables[j];
@@ -256,7 +263,7 @@ public class CastPlayer : MonoBehaviour {
 
     private void DeleteInstantiatedCasts() {
         for (int i = 0; i < duration; i++) {
-            if (!CastablePrefab.FrameCastablesMap.ContainsKey(i))
+            if (!CastPrefab.FrameCastablesMap.ContainsKey(i))
                 continue;
 
             List<Cast> startFrameCastables = StartFrameCastablesMap[i];

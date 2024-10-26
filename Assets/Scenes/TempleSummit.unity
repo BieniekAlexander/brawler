@@ -312,7 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterPrefabs:
   - {fileID: 1452099186333517590, guid: fc346559b2a566b449090787913262e6, type: 3}
-  - {fileID: 6377833502345791155, guid: e3c01419408d2f44495f94aee4c6713b, type: 3}
+  - {fileID: 1452099186333517590, guid: fc346559b2a566b449090787913262e6, type: 3}
   HazardHandlerPrefab: {fileID: 0}
 --- !u!4 &101345385
 Transform:

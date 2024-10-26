@@ -120,11 +120,16 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     /// <param name="about">The Transform about which the castable originates.</param>
     /// <param name="target">The Transform towards which the castable is directed.</param>
     /// <param name="_rotatingClockwise">Whether the castable's trajcetory needs to be mirrored.</param>
-    private void Initialize(ICasts caster, Transform about, Transform target, bool mirrored) {
+    private void Initialize(ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
         Caster = caster;
         About = about;
         Target = target;
         Mirrored = mirrored;
+
+        if (parent!=null) {
+            Parent = parent;
+            parent._children.Add(this);
+        }
 
         // TODO clean these configs up
         if (AboutResolution == AboutResolution.HardCopyTarget) {
@@ -161,10 +166,8 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     /// <returns>An instance of the <typeparamref name="Castable"/>, instantiated and initialized</returns>
     public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
         Cast cast = Instantiate(CastablePrefab);
-        cast.Parent = parent;
-        parent._children.Add(cast);
-        cast.Initialize(caster, about, target, mirrored);
-        
+        cast.Initialize(caster, about, target, mirrored, parent);
+
         if (cast.Busies && caster is Character character) {
             character.BusyMutex.Lock(cast.Encumbers, cast.Stuns, cast.RotationCap);
         }

@@ -11,18 +11,21 @@ public class AnimationStateController : MonoBehaviour
     // TODO maybe some jumping stuff
 
     // disadvantage
+    int _hitStunnedHash;
+    int _pushedBackHash;
     int _knockedBackHash;
     int _blownBackHash;
 
     // recovery
+    int _tumblingHash;
     int _rollingHash;
     int _gettingUpHash;
-    int _getUpAttackingHash;
+    int _knockedDownHash;
 
     // action
-    int _attackingHash;
-    int _grabbingHash;
-    int _castingHash;
+    int _readyHash;
+    int _shieldingHash;
+    int _busyHash;
 
 
     // Start is called before the first frame update
@@ -31,23 +34,54 @@ public class AnimationStateController : MonoBehaviour
         _animator = GetComponent<Animator>();
         _character = GetComponent<Character>();
 
-        _runningHash = Animator.StringToHash("Running");
-        _sprintingHash = Animator.StringToHash("Sprinting");
-        _knockedBackHash = Animator.StringToHash("KnockedBack");
-        _blownBackHash = Animator.StringToHash("BlownBack");
-        _rollingHash = Animator.StringToHash("Rolling");
-        _gettingUpHash = Animator.StringToHash("GettingUp");
-        _getUpAttackingHash = Animator.StringToHash("GetUpAttacking");
-        _attackingHash = Animator.StringToHash("Attacking");
-        _grabbingHash = Animator.StringToHash("Grabbing");
-        _castingHash = Animator.StringToHash("Casting");
+        // movement
+        _runningHash = Animator.StringToHash("MovementRunning");
+        _sprintingHash = Animator.StringToHash("MovementSprinting");
+
+        // disadvantage
+        _hitStunnedHash = Animator.StringToHash("DisadvantageHitStunned");
+        _pushedBackHash = Animator.StringToHash("DisadvantagePushedBack");
+        _knockedBackHash = Animator.StringToHash("DisadvantageKnockedBack");
+        _blownBackHash = Animator.StringToHash("DisadvantageBlownBack");
+
+        // recovery
+        _tumblingHash = Animator.StringToHash("RecoveryTumbling");
+        _rollingHash = Animator.StringToHash("RecoveryRolling");
+        _gettingUpHash = Animator.StringToHash("RecoveryGettingUp");
+        _knockedDownHash = Animator.StringToHash("RecoveryKnockedDown");
+
+        // action
+        _readyHash = Animator.StringToHash("ActionReady");
+        _shieldingHash = Animator.StringToHash("ActionShielding");
+        _busyHash = Animator.StringToHash("ActionBusy");
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        // movement
         _animator.SetBool(_runningHash, _character.Velocity.sqrMagnitude > 1);
         _animator.SetBool(_sprintingHash, _character.Velocity.sqrMagnitude > Mathf.Pow(_character.BaseSpeed+.5f, 2));
+
+        // disadvantage
+        _animator.SetBool(_hitStunnedHash, _character.StateIsActive(typeof(CharacterStateHitStopped)));
+        _animator.SetBool(_pushedBackHash, _character.StateIsActive(typeof(CharacterStatePushedBack)));
+        _animator.SetBool(_knockedBackHash, _character.StateIsActive(typeof(CharacterStateKnockedBack)));
+        _animator.SetBool(_blownBackHash, _character.StateIsActive(typeof(CharacterStateBlownBack)));
+
+        // recovery
+        _animator.SetBool(_tumblingHash, _character.StateIsActive(typeof(CharacterStateTumbling)));
+        _animator.SetBool(_rollingHash, _character.StateIsActive(typeof(CharacterStateRolling)));
+        _animator.SetBool(_gettingUpHash, _character.StateIsActive(typeof(CharacterStateGettingUp)));
+        _animator.SetBool(_knockedDownHash, _character.StateIsActive(typeof(CharacterStateKnockedDown)));
+
+        // action
+        _animator.SetBool(_readyHash, _character.StateIsActive(typeof(CharacterStateReady)));
+        _animator.SetBool(_busyHash, _character.StateIsActive(typeof(CharacterStateBusy)));
+        _animator.SetBool(_shieldingHash,
+            _character.StateIsActive(typeof(CharacterStateBlocking))
+            || _character.StateIsActive(typeof(CharacterStateShielding))
+        );
     }
 }

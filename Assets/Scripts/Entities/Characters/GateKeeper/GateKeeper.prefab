@@ -590,7 +590,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
-  TeamBit: 1
   Parried: 0
   castSlots:
   - Name: Light1
@@ -735,7 +734,7 @@ MonoBehaviour:
       charges: 0
       energy: 50
     Cooldown: 300
-    DefaultChargeCount: 1
+    DefaultChargeCount: -4
   - Name: Special2
     CastPrefab: {fileID: 6244843261149292953, guid: ab37a100ef51dfe44901abfbe55118f8,
       type: 3}

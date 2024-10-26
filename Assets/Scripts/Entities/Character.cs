@@ -47,27 +47,27 @@ public class CastContainer {
 }
 
 public enum CastId {
-    Light1,
-    Light2,
-    LightS,
-    Medium1,
-    Medium2,
-    MediumS,
-    Heavy1,
-    Heavy2,
-    HeavyS,
-    DashAttack,
-    Throw1,
-    Throw2,
-    ThrowS,
-    Ability1,
-    Ability2,
-    Ability3,
-    Ability4,
-    Special1,
-    Special2,
-    Ultimate,
-    Dash
+    Light1 = 0,
+    Light2 = 1,
+    LightS = 2,
+    Medium1 = 3,
+    Medium2 = 4,
+    MediumS = 5,
+    Heavy1 = 6,
+    Heavy2 = 7,
+    HeavyS = 8,
+    DashAttack = 9,
+    Throw1 = 10,
+    Throw2 = 11,
+    ThrowS = 12,
+    Ability1 = 13,
+    Ability2 = 14,
+    Ability3 = 15,
+    Ability4 = 16,
+    Special1 = 17,
+    Special2 = 18,
+    Ultimate = 19,
+    Dash = 20
 }
 
 [Serializable]
@@ -469,9 +469,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             return _activeCastable.OnAttackCastables(CursorTransform);
         }
 
-        ref CastContainer castContainer = ref CastContainers[castId];
+        // charges are shared if defaultChargeCount<0 - index is indicated by the negated index
+        CastContainer castContainer = CastContainers[castId];
+        CastContainer cdContainer = (castSlots[castId].DefaultChargeCount>=0)
+             ? castContainer
+             : CastContainers[castId+castSlots[castId].DefaultChargeCount];
 
-        if (castContainer.charges == 0) {
+        if (cdContainer.charges == 0) {
             // we're updating another cast - allowed
             return castContainer.RootCastable.OnRecastCastables(CursorTransform);
         } else if (castContainer.CastSlot.CastPrefab == null) {
@@ -504,13 +508,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 this,
                 castOrigin,
                 CursorTransform,
-                RotatingClockwise,
+                !RotatingClockwise,
                 castContainer.RootCastable
                 // TODO might be cleaner to write if I have the parent collect the castable ref
             );
 
-            castContainer.charges--;
-            castContainer.timer = castContainer.CastSlot.Cooldown;
+            cdContainer.charges--;
+            cdContainer.timer = cdContainer.CastSlot.Cooldown;
             return true;
         } else {
             // TODO I think it goes here if you can't afford the cast, meaning it will stay in buffer

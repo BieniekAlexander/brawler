@@ -113,14 +113,30 @@ public class BusyMutex {
     private int _busyTimer; // can't recast
     private bool _encumbered; // can't redirect
     private bool _stunned; // can't move
-    private float _rotationCap; // can't turn
 
-    public bool Busy {get { return _busyTimer>0; }}
+    public bool Busy {get { return _busyTimer!=0; }}
 
-    public void Lock(int busyTimer, bool encumbered, bool stunned, float rotationCap) {
+    /// <summary>
+    /// Locks the Mutex indefinitely
+    /// </summary>
+    /// <param name="encumbered"></param>
+    /// <param name="stunned"></param>
+    /// <param name="rotationCap"></param>
+    public void Lock(bool encumbered, bool stunned, float rotationCap) {
+        Lock(-1, encumbered, stunned, rotationCap);
+    }
+
+    /// <summary>
+    /// Locks the Mutex for the specified duration
+    /// </summary>
+    /// /// <param name="newBusyTimer"></param>
+    /// <param name="encumbered"></param>
+    /// <param name="stunned"></param>
+    /// <param name="rotationCap"></param>
+    public void Lock(int newBusyTimer, bool encumbered, bool stunned, float rotationCap) {
         if (_busyTimer>0) throw new Exception("Can't grab mutex, because it's already taken");
 
-        busyTimer = _busyTimer;
+        _busyTimer = newBusyTimer;
         if (encumbered) {
             _encumbered = true;
             _character.EncumberedStack++;
@@ -132,12 +148,11 @@ public class BusyMutex {
         }
 
         if (rotationCap < 175) {
-            _rotationCap = rotationCap;
             _character.RotationCap = rotationCap;
         }
     }
 
-    public void Reset() {
+    public void Unlock() {
         _busyTimer = 0;
         _character.RotationCap = 180f;
 
@@ -154,7 +169,7 @@ public class BusyMutex {
 
     public void Tick() {
         if (_busyTimer>0 && --_busyTimer==0) {
-            Reset();
+            Unlock();
         }        
     }
 }
@@ -804,7 +819,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 Destroy(CommandMovement);
                 CommandMovement = null;
                 KnockBack = knockBackFactor*knockBackVector;
-                BusyMutex.Reset();
+                BusyMutex.Unlock();
 
                 if (hitStopDuration > 0) {
                     HitStopTimer = hitStopDuration;

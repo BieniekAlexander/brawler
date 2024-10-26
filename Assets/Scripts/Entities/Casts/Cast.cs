@@ -166,7 +166,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         cast.Initialize(caster, about, target, mirrored);
         
         if (cast.Busies && caster is Character character) {
-            character.BusyMutex.Lock(cast.Duration, cast.Encumbers, cast.Stuns, cast.RotationCap);
+            character.BusyMutex.Lock(cast.Encumbers, cast.Stuns, cast.RotationCap);
         }
 
         return cast;
@@ -340,7 +340,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         PropagateChildren();
 
         if (Busies && Caster is Character character) {
-            character.BusyMutex.Reset();
+            character.BusyMutex.Unlock();
         }
     }
 

@@ -50,7 +50,7 @@ MonoBehaviour:
   Busies: 1
   Encumbers: 1
   Stuns: 0
-  RotationCap: 180
+  RotationCap: 1
   Range: 0
   RecastCooldown: 0
   AttackCooldown: 0

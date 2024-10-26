@@ -62,26 +62,22 @@ public class CharacterAI : Agent
     }
 
     public override void OnActionReceived(ActionBuffers actions) {
-        /* Set inputs of Character behavior */
-        // movement
-        character.InputMoveDirection = new UnityEngine.Vector2(
-            actions.DiscreteActions[0]-1,   // [0,2] -> [-1,1]
-            actions.DiscreteActions[1]-1    // [0,2] -> [-1,1]
-        ).normalized;
-
-        // cast
-        character.InputCastId = actions.DiscreteActions[2]-1;
-        character.InputBlocking = actions.DiscreteActions[3]==1;
-        character.InputShielding = actions.DiscreteActions[4]==1;
-        character.InputDash = actions.DiscreteActions[5]==1;
-        character.InputRunning = actions.DiscreteActions[6]==1;
-
-        // aim
         UnityEngine.Vector3 aim = new UnityEngine.Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);
-        if (aim == UnityEngine.Vector3.zero) {
-            aim = UnityEngine.Vector3.right;
-        }
-        character.InputAimDirection = aim.normalized;
+        aim = (aim == UnityEngine.Vector3.zero) ? UnityEngine.Vector3.forward : aim;
+
+        CharacterFrameInput i = new(
+            aim, // TODO the aim will need to have some range because casts can lock to world position
+            new UnityEngine.Vector2(
+                actions.DiscreteActions[0]-1,   // [0,2] -> [-1,1]
+                actions.DiscreteActions[1]-1    // [0,2] -> [-1,1]
+            ).normalized,
+            actions.DiscreteActions[2]==1, // blocking
+            actions.DiscreteActions[3]==1, // shielding
+            actions.DiscreteActions[4]==1, // running
+            actions.DiscreteActions[5]-1 // CastId TODO expand set of values
+        );
+        
+        character.LoadCharacterFrameInput(i);
     }
 
     private void FixedUpdate() {

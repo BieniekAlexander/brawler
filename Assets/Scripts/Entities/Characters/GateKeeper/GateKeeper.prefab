@@ -592,6 +592,14 @@ MonoBehaviour:
   me: 0
   Parried: 0
   castSlots:
+  - Name: Dash
+    CastPrefab: {fileID: 6926152612496824558, guid: 47b9e5e42bcccc14d90386c0888fcf52,
+      type: 3}
+    Costs:
+      charges: 1
+      energy: 0
+    Cooldown: 60
+    DefaultChargeCount: 1
   - Name: Light1
     CastPrefab: {fileID: 6447237145091032774, guid: dde3ed861901527448a1de30d9005c81,
       type: 3}
@@ -663,13 +671,6 @@ MonoBehaviour:
       charges: 0
       energy: 0
     Cooldown: 0
-    DefaultChargeCount: 1
-  - Name: DashAttack
-    CastPrefab: {fileID: 0}
-    Costs:
-      charges: 0
-      energy: 0
-    Cooldown: -1
     DefaultChargeCount: 1
   - Name: Throw1
     CastPrefab: {fileID: 3464759251752078316, guid: 6e3e1d948562c8e4b979fbbc5a46f799,
@@ -750,14 +751,6 @@ MonoBehaviour:
       charges: 0
       energy: 100
     Cooldown: 1800
-    DefaultChargeCount: 1
-  - Name: Dash
-    CastPrefab: {fileID: 6926152612496824558, guid: 47b9e5e42bcccc14d90386c0888fcf52,
-      type: 3}
-    Costs:
-      charges: 1
-      energy: 0
-    Cooldown: 60
     DefaultChargeCount: 1
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}

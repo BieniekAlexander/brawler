@@ -11,7 +11,7 @@ public class CharacterStateKnockedDown : CharacterState {
             return Factory.HitStopped();
         } else if (Character.MoveDirection != Vector3.zero) {
             return Factory.GettingUp();
-        } else if (Character.InputDash) {
+        } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
         } else {
             return null;
@@ -45,7 +45,7 @@ public class CharacterStateTumbling : CharacterState {
             return Factory.HitStopped();
         } else if (Character.MoveDirection!=Vector3.zero) {
             return Factory.GettingUp();
-        } else if (Character.InputDash) {
+        } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
         } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.KnockedDown();
@@ -82,8 +82,8 @@ public class CharacterStateTumbling : CharacterState {
 }
 
 public class CharacterStateRolling : CharacterState {
-    private float _rollSpeed = 10f;
-    private int _recoveryDuration = 20;
+    private float _rollSpeed = 12.5f;
+    private int _recoveryDuration = 15;
 
     public CharacterStateRolling(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -102,13 +102,17 @@ public class CharacterStateRolling : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
+        // TODO not the prettiest place to do this, but I want this action to consume input
+        // otherwise, I'm having an issue where the roll happens, but the dash input is still buffered
+        Character.InputCastId = -1;
         Character.RecoveryTimer = _recoveryDuration;
-        Character.Velocity = Character.InputAimDirection * _rollSpeed;
-        // add invincibility
+        Character.Velocity = Character.InputAimDirection.normalized * _rollSpeed;
+        Character.InvulnerableStack++;
     }
 
     public override void ExitState(){
-        // undo invincibility
+        Character.InvulnerableStack--;
+        Character.BusyMutex.Unlock();
     }
 
     public override void FixedUpdateState() {
@@ -152,11 +156,12 @@ public class CharacterStateGettingUp : CharacterState {
         base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
-        // TODO invulnerability
+        Character.InvulnerableStack++;
     }
 
     public override void ExitState(){
-        // TODO invulnerability
+        Character.InvulnerableStack--;
+        Character.BusyMutex.Unlock();
     }
 
     public override void FixedUpdateState() {
@@ -192,11 +197,12 @@ public class CharacterStateGetUpAttacking : CharacterState {
         base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
-        // TODO invulnerability
+        Character.InvulnerableStack++;
     }
 
     public override void ExitState() {
-        // TODO invulnerability
+        Character.InvulnerableStack--;
+        Character.BusyMutex.Unlock();
     }
 
     public override void FixedUpdateState() {

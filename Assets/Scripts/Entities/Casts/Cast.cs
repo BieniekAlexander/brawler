@@ -41,7 +41,7 @@ public class CastCosts {
 public static class CastUtils {
     public static Character GetSnapTarget(Vector3 worldPosition, int teamBitMask, float maxDistance) {
         List<Character> characters = (from go in GameObject.FindGameObjectsWithTag("Character") select go.GetComponent<Character>()).ToList();
-        List<float> characterDists = (from ch in characters select (worldPosition-ch.transform.position).magnitude).ToList();
+         List<float> characterDists = (from ch in characters select (worldPosition-ch.transform.position).magnitude).ToList();
 
         float minDist = Mathf.Infinity;
         int minIndex = -1;

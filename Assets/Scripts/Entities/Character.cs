@@ -47,16 +47,16 @@ public class CastContainer {
 }
 
 public enum CastId {
-    Light1 = 0,
-    Light2 = 1,
-    LightS = 2,
-    Medium1 = 3,
-    Medium2 = 4,
-    MediumS = 5,
-    Heavy1 = 6,
-    Heavy2 = 7,
-    HeavyS = 8,
-    DashAttack = 9,
+    Dash = 0,
+    Light1 = 1,
+    Light2 = 2,
+    LightS = 3,
+    Medium1 = 4,
+    Medium2 = 5,
+    MediumS = 6,
+    Heavy1 = 7,
+    Heavy2 = 8,
+    HeavyS = 9,
     Throw1 = 10,
     Throw2 = 11,
     ThrowS = 12,
@@ -66,19 +66,18 @@ public enum CastId {
     Ability4 = 16,
     Special1 = 17,
     Special2 = 18,
-    Ultimate = 19,
-    Dash = 20
+    Ultimate = 19
+    
 }
 
 [Serializable]
 public class CharacterFrameInput {
     public CharacterFrameInput(
-        Vector2 moveDirection,
         Vector3 aimDirection,
+        Vector2 moveDirection,
         bool blocking,
         bool shielding,
         bool running,
-        bool dash,
         int castId) {
         MoveDirectionX = moveDirection.x;
         MoveDirectionZ = moveDirection.y;
@@ -177,7 +176,8 @@ public class BusyMutex {
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
-    public int TeamBitMask {get; set; } = 1;
+    [SerializeField] public int _teamBit = 1; // TODO refactor
+    [SerializeField] public int TeamBitMask {get {return _teamBit; } set {_teamBit = value; }}
 
     /* State WIP */
     CharacterState _state;
@@ -239,7 +239,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    public bool InputDash { get; set; } = false;
     public bool InputRunning { get; set; } = false;
     public bool Running { get { return InputRunning && StunStack==0; } }
     public bool InputBlocking { get; set; } = false;
@@ -430,12 +429,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public CharacterFrameInput GetCharacterFrameInput() {
         return new CharacterFrameInput(
-            MoveDirection,
             InputAimDirection,
+            MoveDirection,
             InputBlocking,
             InputShielding,
             InputRunning,
-            InputDash,
             InputCastId
         );
     }
@@ -823,7 +821,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 Destroy(CommandMovement);
                 CommandMovement = null;
                 KnockBack = knockBackFactor*knockBackVector;
-                BusyMutex.Unlock();
+                BusyMutex.Unlock(); // forcibly grab the busy mutex until the character recovers
+                BusyMutex.Lock(false, false, 0f);
 
                 if (hitStopDuration > 0) {
                     HitStopTimer = hitStopDuration;
@@ -939,12 +938,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private FileStream _recordControlStream = null;
     private void WriteCharacterFrameInput(FileStream outputStream) {
         CharacterFrameInput input = new CharacterFrameInput(
-            InputMoveDirection,
             InputAimDirection,
+            InputMoveDirection,
             InputBlocking,
             InputShielding,
             InputRunning,
-            InputDash,
             InputCastId
         );
 
@@ -953,8 +951,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void LoadCharacterFrameInput(CharacterFrameInput input) {
-        InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
         InputAimDirection = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
+        InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
         InputRunning = input.Running;
         InputCastId = input.CastId;
         InputBlocking = input.Blocking;

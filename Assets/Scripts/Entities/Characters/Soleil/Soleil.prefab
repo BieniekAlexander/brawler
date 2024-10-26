@@ -652,158 +652,146 @@ MonoBehaviour:
   me: 0
   Parried: 0
   castSlots:
-  - name: Light1
-    castablePrefab: {fileID: 1512821878018968643, guid: 05c4c02d28120b84091ab10186852031,
-      type: 3}
-    costs:
+  - Name: Dash
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 20
-    defaultChargeCount: 1
-  - name: Light2
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Light1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 20
-    defaultChargeCount: 1
-  - name: LightS
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Light2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 60
-    defaultChargeCount: 1
-  - name: Medium1
-    castablePrefab: {fileID: 6210110543066929936, guid: c9369341c45b8d7479029a691c40ff0e,
-      type: 3}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: LightS
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 30
-    defaultChargeCount: 1
-  - name: Medium2
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Medium1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 30
-    defaultChargeCount: 1
-  - name: MediumS
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Medium2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 30
-    defaultChargeCount: 1
-  - name: Heavy1
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: MediumS
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 40
-    defaultChargeCount: 1
-  - name: Heavy2
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Heavy1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 45
-    defaultChargeCount: 1
-  - name: HeavyS
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Heavy2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 50
-    defaultChargeCount: 1
-  - name: DashAttack
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: HeavyS
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Throw1
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Throw1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 15
-    defaultChargeCount: 1
-  - name: Throw2
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Throw2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: BoostedThrow
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: ThrowS
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Ability1
-    castablePrefab: {fileID: 7688386882897585539, guid: e543eea69e68de04d922b8bd51adc275,
-      type: 3}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Ability1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: 300
-    defaultChargeCount: 1
-  - name: Ability2
-    castablePrefab: {fileID: 0}
-    costs:
-      charges: 1
-      energy: 0
-    cooldown: 60
-    defaultChargeCount: 1
-  - name: Ability3
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Ability2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Ability4
-    castablePrefab: {fileID: 7688386882897585539, guid: e543eea69e68de04d922b8bd51adc275,
-      type: 3}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Ability3
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Special1
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Ability4
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Special2
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Special1
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Ultimate
-    castablePrefab: {fileID: 0}
-    costs:
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Special2
+    CastPrefab: {fileID: 0}
+    Costs:
       charges: 0
       energy: 0
-    cooldown: -1
-    defaultChargeCount: 1
-  - name: Dash
-    castablePrefab: {fileID: 6926152612496824558, guid: 4344a703eb0e0984e811405d722120a1,
-      type: 3}
-    costs:
-      charges: 1
+    Cooldown: -1
+    DefaultChargeCount: 1
+  - Name: Ultimate
+    CastPrefab: {fileID: 0}
+    Costs:
+      charges: 0
       energy: 0
-    cooldown: 300
-    defaultChargeCount: 1
+    Cooldown: -1
+    DefaultChargeCount: 1
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}
   ParryInvulnerabilityPrefab: {fileID: -868168471956183718, guid: ac1b3db686c9bf647af1e23771ca1023,

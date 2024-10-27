@@ -485,7 +485,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             useCastResources(castContainer.CastSlot.Costs);
 
             if (_activeCastable!=null && _activeCastable.DestroyOnRecast) {
-                Destroy(_activeCastable);
+                Destroy(_activeCastable.gameObject);
             }
 
             Transform castOrigin = transform;

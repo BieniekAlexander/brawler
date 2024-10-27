@@ -54,7 +54,7 @@ MonoBehaviour:
   Range: 0
   RecastCooldown: 0
   AttackCooldown: 0
-  DestroyOnRecast: 0
+  DestroyOnRecast: 1
   DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0

@@ -92,6 +92,7 @@ public class CharacterStateBlocking : CharacterState {
             return null;
         } else {
             if (!Character.Parried){
+                Character.BusyMutex.Unlock();
                 Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
             }
             
@@ -157,6 +158,7 @@ public class CharacterStateShielding : CharacterState {
             return Factory.Blocking();
         } else {
             if (!Character.Parried){
+                Character.BusyMutex.Unlock();
                 Character.BusyMutex.Lock(_exposedDuration, false, false, 180f);
             }
 

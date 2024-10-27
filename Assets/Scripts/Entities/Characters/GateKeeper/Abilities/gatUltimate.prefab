@@ -44,12 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 0
+  AboutResolution: 0
   TargetResolution: 0
-  Duration: 15
-  EncumberTime: 0
+  Duration: 60
+  BusyTimer: 60
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
@@ -58,7 +64,7 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 0e000000
+    m_keys: 3b000000
     m_values:
     - data:
       - {fileID: 4468500920209676378, guid: 4bf53d5d1668b7e48bb240a1b1f0c26b, type: 3}

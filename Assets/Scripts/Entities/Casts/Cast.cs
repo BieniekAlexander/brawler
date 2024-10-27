@@ -337,6 +337,10 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
             Destroy(Target.gameObject);
         }
 
+        if (BusyTimer>0 && Caster is Character c && c.BusyMutex.Busy) {
+            c.BusyMutex.Unlock();
+        }
+
         _castConditionalCastables(CastableCondition.OnDestruction);
         OnDestruction();
         PropagateChildren();

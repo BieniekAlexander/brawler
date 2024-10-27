@@ -47,9 +47,9 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 60
-  Busies: 1
+  BusyTimer: 60
   Encumbers: 0
-  Stuns: 0
+  Stuns: 1
   RotationCap: 1
   Range: 0
   RecastCooldown: 0

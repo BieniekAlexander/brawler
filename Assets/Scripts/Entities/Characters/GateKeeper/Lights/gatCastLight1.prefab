@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 10
-  Busies: 1
+  Duration: 12
+  BusyTimer: 10
   Encumbers: 0
   Stuns: 0
   RotationCap: 2

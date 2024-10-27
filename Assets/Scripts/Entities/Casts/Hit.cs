@@ -68,14 +68,14 @@ public class Hit : Trigger, ICollidable {
             ) {
                 ;
             } else {
-                int damageTaken = OtherDamagable.TakeDamage(
+                int remainingDamage = OtherDamagable.TakeDamage(
                     hitInfo.point,
                     Damage,
                     HitTier
                 );
 
                 if (Caster is Character c) { // Throwing this in for RL agent - TODO clean this up
-                    c.DamageDealt = damageTaken;
+                    c.DamageDealt = Damage-remainingDamage;
                 }
 
                 ret = true;

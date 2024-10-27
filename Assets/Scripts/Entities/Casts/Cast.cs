@@ -76,7 +76,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     [SerializeField] public AboutResolution AboutResolution = AboutResolution.ShallowCopyAbout;
     [SerializeField] public TargetResolution TargetResolution = TargetResolution.ShallowCopy;
     [SerializeField] public int Duration;
-    [SerializeField] public bool Busies;
+    [SerializeField] public int BusyTimer;
     [SerializeField] public bool Encumbers;
     [SerializeField] public bool Stuns;
     [SerializeField] public float RotationCap = 180f;
@@ -147,6 +147,10 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
         transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
 
+        if (BusyTimer>0 && Caster is Character character) {
+            character.BusyMutex.Lock(BusyTimer, Encumbers, Stuns, RotationCap);
+        }
+
         if (AboutResolution == AboutResolution.HardCopyAbout) {
             transform.position = About.position + About.rotation*Vector3.forward*Range;
             About = transform;
@@ -167,11 +171,6 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     public static Cast Initiate(Cast CastablePrefab, ICasts caster, Transform about, Transform target, bool mirrored, Cast parent) {
         Cast cast = Instantiate(CastablePrefab);
         cast.Initialize(caster, about, target, mirrored, parent);
-
-        if (cast.Busies && caster is Character character) {
-            character.BusyMutex.Lock(cast.Encumbers, cast.Stuns, cast.RotationCap);
-        }
-
         return cast;
     }
     
@@ -341,10 +340,6 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         _castConditionalCastables(CastableCondition.OnDestruction);
         OnDestruction();
         PropagateChildren();
-
-        if (Busies && Caster is Character character) {
-            character.BusyMutex.Unlock();
-        }
     }
 
     /* IHealingTree Methods */

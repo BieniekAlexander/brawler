@@ -272,10 +272,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     
 
     /* Signals */
-    // this is probably not a very good way to implement this, but I just want to propagate damage dealt by my RL agent to learning
+    // this is a very bad way to implement this, but I just want to propagate damage dealt by my RL agent to learning
     private int _damageDealt;
     public int DamageDealt {
-        get { int temp = _damageDealt; _damageDealt=0; return temp; } // so, when the value is read, it's set to zero
+        get { int temp = _damageDealt; _damageDealt=0; return temp; } // when the value is read, it's set to zero
         set {
             _damageDealt=value;
         }
@@ -464,7 +464,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <returns>whether a cast/recast was initiated</returns>
     private bool StartCast(int castId) {
         if (attackCastIdSet.Contains(castId) && _activeCastable!=null) {
-            return _activeCastable.OnAttackCastables(CursorTransform);
+            if(_activeCastable.OnAttackCastables(CursorTransform)) {
+                return true;
+            }
         }
 
         // charges are shared if defaultChargeCount<0 - index is indicated by the negated index

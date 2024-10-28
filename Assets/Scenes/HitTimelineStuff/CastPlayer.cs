@@ -25,7 +25,7 @@ public class CastPlayer : MonoBehaviour {
     private List<Cast> ActiveCastables = null;
     private Cast castable;
     private bool _rotatingClockwise = true; // let's assume that all editing assumes a cast direction of clockwise
-    private int castId;
+    private int editorIndex;
     private int frame;
     private int duration;
 
@@ -64,8 +64,8 @@ public class CastPlayer : MonoBehaviour {
     private void Awake() {
         Time.timeScale = 0;
         frame = 0;
-        castId = castIds[0];
-        InitializeCast(castId);
+        editorIndex = 0;
+        InitializeCast(castIds[editorIndex]);
     }
 
     // returns duration, because hitboxes might last longer than the base Castable
@@ -116,8 +116,9 @@ public class CastPlayer : MonoBehaviour {
     private void InitializeCast(int castId) {
         DeleteInstantiatedCasts();
 
-        CastPrefab = Caster.CastContainers[(int)castIds[castId]].CastSlot.CastPrefab;
+        CastPrefab = Caster.CastContainers[castId].CastSlot.CastPrefab;
         ActiveCastables = new();
+        Debug.Log(CastPrefab.name);
 
         duration = GetActiveFrameCastablesMap(
             CastPrefab,
@@ -215,13 +216,13 @@ public class CastPlayer : MonoBehaviour {
             MirrorFrame();
         } else if (CheckControl(CastEditorControls.Save, Input.GetKeyDown)) {
             SaveCurrentCast();
-            InitializeCast(castId);
+            InitializeCast(castIds[editorIndex]);
         } else if (CheckControl(CastEditorControls.NextCast, Input.GetKeyDown)) {
-            castId = MathUtils.mod(castId+1, castIds.Length);
-            InitializeCast(castId);
+            editorIndex = MathUtils.mod(+1, castIds.Length);
+            InitializeCast(castIds[editorIndex]);
         } else if (CheckControl(CastEditorControls.PreviousCast, Input.GetKeyDown)) {
-            castId = MathUtils.mod(castId-1, castIds.Length);
-            InitializeCast(castId);
+            editorIndex = MathUtils.mod(+1, castIds.Length);
+            InitializeCast(castIds[editorIndex]);
         }
     }
 
@@ -277,7 +278,7 @@ public class CastPlayer : MonoBehaviour {
 
     void OnGUI() {
         // TODO remove: here for debugging
-        GUI.Label(new Rect(20, 40, 200, 20), $"Cast: {(CastId) castId}");
+        GUI.Label(new Rect(20, 40, 200, 20), $"Cast: {(CastId) castIds[editorIndex]}");
         GUI.Label(new Rect(20, 70, 200, 20), $"Frame {frame}/{duration-1} (total {duration})");
     }
 }

@@ -50,7 +50,11 @@ public class CharacterStateHitStopped : CharacterState {
 
     public override void ExitState() { }
     public override void InitializeSubState() {
-        _subState = Factory.Busy();
+        if (!Character.Busy){
+            Character.SetBusy(true, true, 0f);
+        }
+
+        SetSubState(Factory.Busy());
     }
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
@@ -70,7 +74,7 @@ public class CharacterStatePushedBack : CharacterState {
     }
 
     public override CharacterState CheckGetNewState() {
-        if (Character.HitStunTimer==0) {
+        if (Character.HitStunTimer<=0) {
             return Factory.Idle();
         } else {
             return null;
@@ -105,11 +109,12 @@ public class CharacterStatePushedBack : CharacterState {
         }
     }
 
-    public override void ExitState() { }
-
-    public override void InitializeSubState() {
-        _subState = Factory.Busy();
+    public override void ExitState() {
+        Character.UnsetBusy();
+        SetSubState(Factory.Ready());
     }
+
+    public override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }
@@ -124,7 +129,7 @@ public class CharacterStateKnockedBack : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         // TODO implement knockdown, teching
-        if (Character.HitStunTimer==0) {
+        if (Character.HitStunTimer<=0) {
             return Factory.Tumbling();
         } else {
             return null;
@@ -150,7 +155,6 @@ public class CharacterStateKnockedBack : CharacterState {
     }
 
     public override void FixedUpdateState() {
-
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
@@ -160,9 +164,7 @@ public class CharacterStateKnockedBack : CharacterState {
         }
     }
 
-    public override void InitializeSubState() {
-        _subState = Factory.Busy();
-    }
+    public override void InitializeSubState() {}
 
     public override void ExitState() { }
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
@@ -220,9 +222,7 @@ public class CharacterStateBlownBack : CharacterState {
         }
     }
 
-    public override void InitializeSubState() {
-        _subState = Factory.Busy();
-    }
+    public override void InitializeSubState() {}
 
     public override void ExitState() { }
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;

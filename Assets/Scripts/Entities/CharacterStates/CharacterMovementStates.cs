@@ -77,17 +77,7 @@ public class CharacterStateIdle : CharacterState {
         Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration*Time.deltaTime));
     }
 
-    public override void InitializeSubState() {
-        if (Character.BusyMutex.Busy) {
-            SetSubState(Factory.Busy());
-        } else if (Character.InputBlocking) {
-            SetSubState(Factory.Blocking());
-        } else if (Character.InputShielding) {
-            SetSubState(Factory.Shielding());
-        } else {
-            SetSubState(Factory.Ready());
-        }
-    }
+    public override void InitializeSubState() {}
 
     /// <summary>
     /// If I'm stationary and inside another character, push myself out
@@ -157,17 +147,7 @@ public class CharacterStateWalking : CharacterState {
         );
     }
 
-    public override void InitializeSubState() {
-        if (Character.BusyMutex.Busy) {
-            SetSubState(Factory.Busy());
-        } else if (Character.InputShielding) {
-            SetSubState(Factory.Shielding());
-        } else if (Character.InputBlocking) {
-            SetSubState(Factory.Blocking());
-        } else {
-            SetSubState(Factory.Ready());
-        }
-    }
+    public override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain && info!=null) {
@@ -223,17 +203,7 @@ public class CharacterStateRunning : CharacterState {
         );
     }
 
-    public override void InitializeSubState() {
-        if (Character.BusyMutex.Busy) {
-            SetSubState(Factory.Busy());
-        } else if (Character.InputBlocking) {
-            SetSubState(Factory.Blocking());
-        } else if (Character.InputShielding) {
-            SetSubState(Factory.Shielding());
-        } else {
-            SetSubState(Factory.Ready());
-        }
-    }
+    public override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is Character otherCharacter) {
@@ -270,13 +240,12 @@ public class CharacterStateCommandMovement : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() { }
-    public override void FixedUpdateState() { }
-
-    public override void InitializeSubState() {
-        // override any sort of inputs - I want this state to generally be locked in
+    public override void ExitState() {
+        Character.UnsetBusy();
         SetSubState(Factory.Ready());
     }
+    public override void FixedUpdateState() { }
+    public override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         return Character.CommandMovement.OnCollideWith(collidable, info);

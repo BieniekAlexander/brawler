@@ -19,6 +19,12 @@ public abstract class CharacterState {
         Factory = _factory;
     }
 
+    public static CharacterState GetSpawnState(CharacterStateFactory factory) {
+        CharacterState root = factory.Idle();
+        root.SetSubState(factory.Ready());
+        return root;
+    }
+
     public virtual void EnterState() {
         InitializeSubState();
     }
@@ -45,9 +51,12 @@ public abstract class CharacterState {
         ExitState();
         newState.EnterState();
 
+        if (_subState!=null){
+            newState.SetSubState(_subState);
+        }
+
         if (_isRootState) {
             Character.State = newState;
-
         } else if (_superState != null) {
             _superState.SetSubState(newState);
         }
@@ -64,7 +73,7 @@ public abstract class CharacterState {
 
     public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);
 
-    public virtual bool StateInHierarchy(Type stateType) {
+    public bool StateInHierarchy(Type stateType) {
         if (this.GetType()==stateType) {
             return true;
         } else if (_subState != null) {
@@ -84,5 +93,14 @@ public abstract class CharacterState {
         }
 
         return ret;
+    }
+
+    override public string ToString() {
+        return GetType().Name.Replace("CharacterState", "");
+    }
+
+    public string getNames() {
+        string subStateNames = (_subState!=null)?_subState.getNames():"";
+        return $"{this}->{subStateNames}";
     }
 }

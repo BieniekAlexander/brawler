@@ -35,28 +35,27 @@ public class CharacterStateFactory {
     }
 
     // movement
-    public CharacterState Idle() { return _stateDict["Idle"]; }
-    public CharacterState Walking() { return _stateDict["Walking"]; }
-    public CharacterState Running() { return _stateDict["Running"]; }
-    public CharacterState CommandMovement() { return _stateDict["CommandMovement"]; }
+    public CharacterState Idle() => _stateDict["Idle"];
+    public CharacterState Walking() => _stateDict["Walking"];
+    public CharacterState Running() => _stateDict["Running"];
+    public CharacterState CommandMovement() => _stateDict["CommandMovement"];
 
     // action
-    public CharacterState Ready() { return _stateDict["Ready"]; }
-    public CharacterState Blocking() { return _stateDict["Blocking"]; }
-    public CharacterState Shielding() { return _stateDict["Shielding"]; }
-    // public CharacterState Casting() { return _stateDict["Casting"]; } TODO
-    public CharacterState Busy() { return _stateDict["Busy"]; }
+    public CharacterState Ready() => _stateDict["Ready"];
+    public CharacterState Blocking() => _stateDict["Blocking"];
+    public CharacterState Shielding() => _stateDict["Shielding"];
+    public CharacterState Busy() => _stateDict["Busy"];
 
     // disadvantage
-    public CharacterState HitStopped() { return _stateDict["HitStopped"]; }
-    public CharacterState PushedBack() { return _stateDict["PushedBack"]; }
-    public CharacterState KnockedBack() { return _stateDict["KnockedBack"]; }
-    public CharacterState BlownBack() { return _stateDict["BlownBack"]; }
+    public CharacterState HitStopped() => _stateDict["HitStopped"];
+    public CharacterState PushedBack() => _stateDict["PushedBack"];
+    public CharacterState KnockedBack() => _stateDict["KnockedBack"];
+    public CharacterState BlownBack() => _stateDict["BlownBack"];
 
     // recovery
-    public CharacterState Tumbling() { return _stateDict["Tumbling"]; }
-    public CharacterState KnockedDown() { return _stateDict["KnockedDown"]; }
-    public CharacterState GettingUp() { return _stateDict["GettingUp"]; }
-    public CharacterState Rolling() { return _stateDict["Rolling"]; }
-    public CharacterState GetUpAttacking() { return _stateDict["GetUpAttacking"]; }
+    public CharacterState Tumbling() => _stateDict["Tumbling"];
+    public CharacterState KnockedDown() => _stateDict["KnockedDown"];
+    public CharacterState GettingUp() => _stateDict["GettingUp"];
+    public CharacterState Rolling() => _stateDict["Rolling"];
+    public CharacterState GetUpAttacking() => _stateDict["GetUpAttacking"];
 }

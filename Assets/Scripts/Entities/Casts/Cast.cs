@@ -147,8 +147,8 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
         transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
 
-        if (BusyTimer>0 && Caster is Character character) {
-            character.BusyMutex.Lock(BusyTimer, Encumbers, Stuns, RotationCap);
+        if (BusyTimer>0 && Caster is Character c) {
+            c.SetBusy(BusyTimer, Encumbers, Stuns, RotationCap);
         }
 
         if (AboutResolution == AboutResolution.HardCopyAbout) {
@@ -337,8 +337,8 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
             Destroy(Target.gameObject);
         }
 
-        if (BusyTimer>0 && Caster is Character c && c.BusyMutex.Busy) {
-            c.BusyMutex.Unlock();
+        if (BusyTimer>0 && Caster is Character c && c.Busy) {
+            c.UnsetBusy();
         }
 
         _castConditionalCastables(CastableCondition.OnDestruction);

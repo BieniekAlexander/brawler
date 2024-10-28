@@ -100,10 +100,7 @@ public class CharacterAI : Agent
         character.HP = Character.HPMax;
         lastFrameHP = Character.HPMax;
 
-        if (character.BusyMutex.Busy){
-            character.BusyMutex.Unlock();
-        }
-
+        character.SwitchState(character.StateFactory.Idle());
         character.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
         enemy.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
     }

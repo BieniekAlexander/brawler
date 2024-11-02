@@ -66,7 +66,6 @@ public class Hit : Trigger, ICollidable {
             if ((Caster==OtherDamagable && !HitsFriendlies)
                 || (Caster!=OtherDamagable && !HitsEnemies)
             ) {
-                ;
             } else {
                 int remainingDamage = OtherDamagable.TakeDamage(
                     hitInfo.point,

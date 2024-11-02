@@ -102,20 +102,7 @@ public class CharacterFrameInput {
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;
-    [SerializeField] public int _teamBit = 1; // TODO refactor
-    [SerializeField] public int TeamBitMask {get {return _teamBit; } set {_teamBit = value; }}
-
-    /* State WIP */
-    public CharacterStateFactory StateFactory;
-    CharacterState _state;
-    public CharacterState State { get { return _state; } set { _state = value; } }
-
-    public bool StateIsActive(Type state) {
-        return State.StateInHierarchy(state);
-    }
-
-    
-    public bool Parried = false;
+    [SerializeField] public int TeamBitMask { get; set; } = 1;
 
     /* Visuals */
     // Bolt Visualization
@@ -171,33 +158,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public bool InputBlocking { get; set; } = false;
     public bool InputShielding { get; set; } = false;
 
-    /* Abilities */
-    private int maxCharges = 5;
-    public int Charges { get; set; } = 4;
-    private int rechargeRate = 300;
-    private int rechargeTimer = 0;
-    private int energy = 10000; // TODO lower
-    // private int maxEnergy = 100;
-
-    [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
-    public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
-    public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
-    public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
-    public int CastBufferTimer { get; private set; } = 0;
-    private Cast _activeCastable = null;
-    private int _nextCastId;
-    public int InputCastId {
-        get { return _nextCastId; }
-        set {
-            _nextCastId = value;
-            if (value>0) {
-                CastBufferTimer = 60;
-            }
-        }
-    }
-
-    
-
     /* Signals */
     // this is a very bad way to implement this, but I just want to propagate damage dealt by my RL agent to learning
     private int _damageDealt;
@@ -213,9 +173,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     [SerializeField] public EffectInvulnerable ParryInvulnerabilityPrefab;
     public Shield Shield { get; private set; }
 
-    /*
-     * CONTROLS
-     */
+    /* Controls */
     //movement
     public void OnAim(InputAction.CallbackContext context) {
         Vector2 InputAimPosition = context.action.ReadValue<Vector2>();
@@ -390,8 +348,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <param name="castId"></param>
     /// <returns>whether a cast/recast was initiated</returns>
     private bool StartCast(int castId) {
-        if (attackCastIdSet.Contains(castId) && _activeCastable!=null) {
-            if(_activeCastable.OnAttackCastables(CursorTransform)) {
+        if (!Busy && attackCastIdSet.Contains(castId) && _activeCastable!=null) {
+            if (_activeCastable.OnAttackCastables(CursorTransform)) {
                 return true;
             }
         }
@@ -464,10 +422,39 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 }
             }
         }
+    }    
+
+    private void HandleCharges() {
+        rechargeTimer=(Charges>=maxCharges) ? rechargeRate : rechargeTimer-1;
+        if (rechargeTimer<=0) {
+            Charges+=1;
+            rechargeTimer=rechargeRate;
+        }
     }
 
-    /* ICasts Methods */
-    // TODO bake these into getters
+    /* ICasts */
+    [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
+    public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
+    public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
+    public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
+    public int CastBufferTimer { get; private set; } = 0;
+    private Cast _activeCastable = null;
+    private int _nextCastId;
+    public int InputCastId {
+        get { return _nextCastId; }
+        set {
+            _nextCastId = value;
+            if (value>0) {
+                CastBufferTimer = 60;
+            }
+        }
+    }
+
+    private int maxCharges = 5;
+    public int Charges { get; set; } = 4;
+    private int rechargeRate = 300;
+    private int rechargeTimer = 0;
+    private int energy = 10000; // TODO lower
     public int SilenceStack { get; set; } = 0;
     public int MaimStack { get; set; } = 0;
 
@@ -490,18 +477,26 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* State Machine */
+    public CharacterStateFactory StateFactory;
+    public CharacterState State { get; set ; }
+
+    public bool StateIsActive(Type state) {
+        return State.StateInHierarchy(state);
+    }
+
     public void SwitchState(CharacterState state) {
         State = state;
         State.EnterState();
     }
 
+    public bool Parried = false;
     private int _busyTimer;
     private bool _busyEncumbered;
     private bool _busyStunned;
     public bool Busy {get {return _busyTimer != 0; }}
+
     public void SetBusy(bool encumbered, bool stunned, float rotationCap) {SetBusy(-1, encumbered, stunned, RotationCap);}
     public void SetBusy(int newBusyTimer, bool encumbered, bool stunned, float rotationCap) {
-        if (Busy) throw new Exception("trying to set busy, but Character is already busy");
         _busyTimer = newBusyTimer;
 
         if (encumbered) {
@@ -535,36 +530,47 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* MonoBehavior */
+    public void OnRespawn() {
+        // position
+        standingY = transform.position.y + standingOffset;
+        
+        // resources
+        healMax = HPMax;
+        HP = HPMax;
+
+        // state
+        _busyTimer = 0;
+        SwitchState(CharacterState.GetSpawnState(StateFactory));
+        InputCastId = -1;
+    }
+    
     private void Awake() {
         // Controls
         if (me) SetMe(); // TODO lazy way to set up controls
-        _collider = GetComponent<Collider>();
+        RespawnDelayEffectPrefab = Resources.Load<GameObject>("RespawnDelayEffect"); // TODO put this in a scriptable object
+        aimPlane = new Plane(Vector3.up, transform.position);
         GameObject cursorGameObject = new GameObject("Player Cursor Object");
         cursorGameObject.transform.parent = transform;
         CursorTransform = cursorGameObject.transform;
-        aimPlane = new Plane(Vector3.up, transform.position);
-        InputCastId = -1;
 
-        // State WIP
-        _busyTimer = 0;
-        StateFactory = new(this);
-        SwitchState(CharacterState.GetSpawnState(StateFactory));
-
+        // components
+        _collider = GetComponent<Collider>();
         cc = GetComponent<CharacterController>();
-        standingY = transform.position.y + standingOffset;
-        healMax = HP;
-
-        // Children
         Shield = Instantiate(ShieldPrefab, transform);
         Shield.gameObject.SetActive(false);
+
+        // initialize casts
+        for (int i = 0; i<castSlots.Length; i++) {
+            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].Name);
+        }
 
         // Visuals
         Material = GetComponent<Renderer>().material;
         tr = GetComponent<TrailRenderer>();
 
-        for (int i = 0; i<castSlots.Length; i++) {
-            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].Name);
-        }
+        // State
+        StateFactory = new(this);
+        OnRespawn();
     }
 
     private void HandleVisuals() {
@@ -576,15 +582,15 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             Material.color = new Color(255, 255, 255);
         else if (HitStopTimer>0)
             Material.color = new Color(0, 0, 0);
-        else if (_state is CharacterStateBlownBack // disadvantage
-            || _state is CharacterStateKnockedBack
-            || _state is CharacterStatePushedBack)
+        else if (State is CharacterStateBlownBack // disadvantage
+            || State is CharacterStateKnockedBack
+            || State is CharacterStatePushedBack)
             Material.color = new Color(255, 0, 0);
-        else if (_state is CharacterStateTumbling // vulnerable
-            || _state is CharacterStateKnockedDown)
+        else if (State is CharacterStateTumbling // vulnerable
+            || State is CharacterStateKnockedDown)
             Material.color = new Color(125, 125, 0);
-        else if (_state is CharacterStateRolling // recovering
-            || _state is CharacterStateGettingUp)
+        else if (State is CharacterStateRolling // recovering
+            || State is CharacterStateGettingUp)
             Material.color = new Color(255, 255, 0);
         else if (InputCastId >= 0)
             Material.color=Color.magenta;
@@ -638,14 +644,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    private void HandleCharges() {
-        rechargeTimer=(Charges>=maxCharges) ? rechargeRate : rechargeTimer-1;
-        if (rechargeTimer<=0) {
-            Charges+=1;
-            rechargeTimer=rechargeRate;
-        }
-    }
-
     void FixedUpdate() {
         if (_recordingControls) {
             WriteCharacterFrameInput(_recordControlStream);
@@ -693,8 +691,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             return false;
         } else {
             // TODO ugly implementation for now - checking if grounded, updating if true, returning false if not
-            int excludeAllButTerrainLayer = 1<<LayerMask.NameToLayer("Terrain");
-            Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, excludeAllButTerrainLayer);
+            Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, cc.radius+standingOffset+.01f, 1<<LayerMask.NameToLayer("Terrain"));
             if (hitInfo.transform) {
                 standingY = hitInfo.point.y + cc.radius + standingOffset;
                 return true;
@@ -818,7 +815,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     /* IDamageable Methods */
-    public int HP { get; set; } = HPMax;
+    public int LifeCount = -1; // 
+    private static GameObject RespawnDelayEffectPrefab;
+    public int HP {get; private set;} = 1000;
     public static int HPMax = 1000;
     private int healMax; private int healMaxOffset = 100;
     public List<Armor> Armors { get; } = new List<Armor>();
@@ -856,7 +855,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void OnDeath() {
-        // Destroy(gameObject); // TODO disabling for RL
+        if (LifeCount > 0) {
+            if (--LifeCount==0) {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        Cast.Initiate(RespawnDelayEffectPrefab.GetComponent<Effect>(), null, transform, null, false, null);
     }
 
     void OnGUI() {
@@ -866,11 +872,12 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);
-        GUI.Label(new Rect(20, 160, 200, 20), _state.getNames());
+        GUI.Label(new Rect(20, 160, 200, 20), State.getNames());
     }
 
     /* ICollidable */
     private Collider _collider;
+    public Collider Collider { get { return _collider; } }
     public int ImmaterialStack { get; set; } = 0;
 
     bool OnControllerColliderHit(ControllerColliderHit hit) {
@@ -892,15 +899,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         ) {
             return false;
         } else {
-            return _state.HandleCollisionWithStates(other, info);
+            return State.HandleCollisionWithStates(other, info);
         }
     }
 
     public void HandleCollisions() {
         CollisionUtils.HandleCollisions(this);
     }
-
-    public Collider Collider { get { return GetComponent<Collider>(); } }
 
     /* Control Recording */
     private bool _recordingControls;

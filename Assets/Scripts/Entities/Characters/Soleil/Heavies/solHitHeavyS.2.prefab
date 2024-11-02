@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4389762314818548743}
   m_Layer: 8
   m_Name: solHitHeavyS.2
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -120,12 +120,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AboutResolution: 0
+  TargetResolution: 0
   Duration: 9
-  Origin: {fileID: 0}
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
+  Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
-  indefinite: 0
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -160,15 +173,11 @@ MonoBehaviour:
   - PolarPosition: {x: 7.195111, y: 1.0139848}
     Dimension: {x: 0.6, y: 0.2, z: 0.2}
     Rotation: {x: 0, y: 0.20075588, z: 0, w: 0.9796413}
-  Collider: {fileID: 0}
-  effects: []
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
-  damage: 40
+  RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0
-  KnockbackCoordinateSystem: 0
+  damageExpression:
+    expression: 0
+  KnockbackReference: 0
   BaseKnockbackVector: {x: -2, y: 0, z: 15}
   HitTier: 3
-  hitLagDuration: 7
-  hitStunDuration: 20

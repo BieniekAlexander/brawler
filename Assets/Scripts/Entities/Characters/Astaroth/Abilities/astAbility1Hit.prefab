@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1568748315190447676}
   m_Layer: 8
   m_Name: astAbility1Hit
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,12 +118,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afab953a169b7264aa242dba2fcbaecc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AboutResolution: 0
+  TargetResolution: 0
   Duration: 5
-  Origin: {fileID: 0}
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
+  Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
-  indefinite: 0
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -134,9 +147,6 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 5, y: 5, z: 5}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  effects:
-  - {fileID: 7134396115805570166, guid: 95059c8501938204286e2a822d6dc958, type: 3}
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
+  RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0

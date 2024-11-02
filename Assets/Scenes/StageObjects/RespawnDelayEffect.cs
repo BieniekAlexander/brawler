@@ -1,21 +1,13 @@
 using UnityEngine;
 
-public class RingOutEffect : Effect
+public class RespawnDelayEffect : Effect
 {
-    [SerializeField] public int RingOutDamage = 250;
     private Character Effected;
 
     protected override void OnInitialize() {
         Effected = About.GetComponent<Character>();
-        Effected.TakeDamage(Effected.transform.position, RingOutDamage, HitTier.Pure);
         Effected.Velocity = Vector3.zero;
-        // TODO this is currently damaging shields - probably strip all effects from the character first (Armor is an effect)
-
-        if (Effected == null) {
-            Destroy(gameObject);
-        } else {
-            Effected.gameObject.SetActive(false);
-        }
+        Effected.gameObject.SetActive(false);
     }
 
     protected override void OnDestruction() {
@@ -25,6 +17,7 @@ public class RingOutEffect : Effect
             GameObject randomSpawn = spawns[Random.Range(0, spawns.Length)];
             c.transform.position = randomSpawn.transform.position;
             Effected.gameObject.SetActive(true);
+            Effected.OnRespawn();
         }
     }
 

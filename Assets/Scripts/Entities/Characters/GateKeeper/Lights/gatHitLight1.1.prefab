@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8826511796677745375}
   m_Layer: 8
   m_Name: gatHitLight1.1
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 7
+  Duration: 5
   BusyTimer: 0
   Encumbers: 0
   Stuns: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 50
+    expression: 10
   KnockbackReference: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 8}
   HitTier: 1

@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System;
 using UnityEngine.Rendering;
 
-public class CharacterAI : Agent
+public class CharacterAgent : Agent
 {
     // tracking agent stats
     [SerializeField] Character enemy;
@@ -97,11 +97,8 @@ public class CharacterAI : Agent
 
     public override void OnEpisodeBegin() {
         episodeTimer = maxEpisodeTimer;
-        character.HP = Character.HPMax;
-        lastFrameHP = Character.HPMax;
-
-        character.SwitchState(character.StateFactory.Idle());
-        character.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
-        enemy.transform.position = new UnityEngine.Vector3(UnityEngine.Random.Range(-5f, 5f), 1.2f, UnityEngine.Random.Range(-5f, 5f)); // TODO I'm so lazy
+        character.OnRespawn();
+        enemy.OnRespawn();
+        lastFrameHP = character.HP;
     }
 }

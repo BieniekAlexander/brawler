@@ -76,6 +76,8 @@ public class CharacterStateBlocking : CharacterState {
         } else if (Character.InputBlocking) {
             return null;
         } else {
+            Character.UnsetBusy();
+
             if (Character.Parried) {
                 Character.Parried = false;
                 return Factory.Ready();   
@@ -91,6 +93,7 @@ public class CharacterStateBlocking : CharacterState {
         Character.Shield.gameObject.SetActive(true);
         Character.Shield.ShieldTier = ShieldTier.Blocking;
         Character.Parried = false;
+        Character.SetBusy(false, false, 180f);
     }
 
     public override void ExitState() {
@@ -141,6 +144,8 @@ public class CharacterStateShielding : CharacterState {
         } else if (Character.InputBlocking) {
             return Factory.Blocking();
         } else {
+            Character.UnsetBusy();
+
             if (Character.Parried){
                 Character.Parried = false;
                 return Factory.Ready();
@@ -156,6 +161,7 @@ public class CharacterStateShielding : CharacterState {
         Character.Shield.gameObject.SetActive(true);
         Character.Shield.ShieldTier = ShieldTier.Shielding;
         Character.Parried = false;
+        Character.SetBusy(false, false, 180f);
     }
 
     public override void ExitState() {
@@ -181,12 +187,13 @@ public class CharacterStateShielding : CharacterState {
                 _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0
             );
+
+            Character.Velocity = MovementUtils.ClampMagnitude(
+                MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration),
+                Character.BaseSpeed,
+                Mathf.Infinity
+            );
         }
-        Character.Velocity = MovementUtils.ClampMagnitude(
-            MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration),
-            Character.BaseSpeed,
-            Mathf.Infinity
-        );
     }
 
     public override void InitializeSubState(){}

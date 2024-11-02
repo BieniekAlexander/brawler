@@ -1,8 +1,19 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+[Serializable]
+public class CastSlot {
+    public Cast CastPrefab;
+    public int RespawnDuration;
+    public Transform About;
+
+    [HideInInspector] public int RespawnTimer;
+    [HideInInspector] public Cast ActiveCast; 
+}
 
 /// <summary>
 /// ref: https://youtube.com/watch?v=bdJZeMsKQg8
@@ -11,6 +22,7 @@ public class SceneController : MonoBehaviour
 {
     [SerializeField] List<Character> CharacterPrefabs;
     [SerializeField] HazardHandler HazardHandlerPrefab;
+    [SerializeField] List <CastSlot> CastSlots;
     private List<Character> Characters = new();
     private HazardHandler HazardHandler;
     public static SceneController Instance;
@@ -24,6 +36,13 @@ public class SceneController : MonoBehaviour
         return GameObject.FindGameObjectsWithTag("SpawnPoint"); // "GetComponentsInChildren" name misleading - will return parent too
     }
 
+    public static GameObject[] GetSceneTerrainObstructions() {
+        return GameObject.FindGameObjectsWithTag("Terrain:Obstruction");
+    }
+
+    public static GameObject[] GetSceneTerrainPaths() {
+        return GameObject.FindGameObjectsWithTag("Terrain:Path");
+    }
 
     void Awake() {
         if (Instance == null) {
@@ -39,6 +58,7 @@ public class SceneController : MonoBehaviour
     void InitializeScene() {
         GameObject[] spawnGameObjects = GetSceneSpawns();
 
+        // initialize characters
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
             Char.TeamBitMask = (1<<i);
@@ -48,7 +68,16 @@ public class SceneController : MonoBehaviour
                 Char.gameObject.name = "Player";
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
+            } else {
+                // CharacterBehavior cb = Char.gameObject.AddComponent(typeof(CharacterBehavior)) as CharacterBehavior;
+                // cb.enemy = Characters[_meId];
             }
+        }
+
+        // initialize stage casts
+        for (int i = 0; i < CastSlots.Count; i++) {
+            CastSlots[i].ActiveCast = Cast.Initiate(CastSlots[i].CastPrefab, null, CastSlots[i].About, CastSlots[i].About, false, null);
+            CastSlots[i].RespawnTimer = CastSlots[i].RespawnDuration;
         }
 
         // set up UI, if a canvas is provided
@@ -58,6 +87,17 @@ public class SceneController : MonoBehaviour
             if (HazardHandlerPrefab != null) {
                 HazardHandler = Instantiate(HazardHandlerPrefab);
                 HazardHandler.Initialize(Characters[0].transform);
+            }
+        }
+    }
+
+    void FixedUpdate() {
+        for (int i = 0; i < CastSlots.Count; i++) {
+            if (CastSlots[i].ActiveCast==null) {
+                if (--CastSlots[i].RespawnTimer==0) {
+                     CastSlots[i].ActiveCast = Cast.Initiate(CastSlots[i].CastPrefab, null, CastSlots[i].About, CastSlots[i].About, false, null);
+                     CastSlots[i].RespawnTimer = CastSlots[i].RespawnDuration;
+                }
             }
         }
     }

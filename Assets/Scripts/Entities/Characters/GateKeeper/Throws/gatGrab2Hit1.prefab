@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7490620579285712553}
   m_Layer: 8
   m_Name: gatGrab2Hit1
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
   AboutResolution: 2
   TargetResolution: 0
   Duration: 1
-  Busies: 0
+  BusyTimer: 0
   Encumbers: 0
   Stuns: 0
   RotationCap: 180

@@ -49,7 +49,7 @@ public static class MovementUtils {
 }
 
 public class CharacterStateIdle : CharacterState {
-    private float _acceleration = 50f;
+    private float _acceleration = 7.5f*60f;// was 50f
 
     public CharacterStateIdle(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -99,7 +99,7 @@ public class CharacterStateIdle : CharacterState {
 }
 
 public class CharacterStateWalking : CharacterState {
-    private float _acceleration = 50f;
+    private float _acceleration = 60f*7.5f; // was 50f
 
     public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {

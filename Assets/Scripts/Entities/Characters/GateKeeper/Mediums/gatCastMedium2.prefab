@@ -54,8 +54,8 @@ MonoBehaviour:
   Range: 0
   RecastCooldown: 0
   AttackCooldown: 0
-  DestroyOnRecast: 1
-  DestroyOnAttack: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 1
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
@@ -64,7 +64,7 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 09000000
+    m_keys: 10000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: cba33c63934e84844a33993018c0d7c8, type: 3}

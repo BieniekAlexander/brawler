@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1599280204520550164}
   m_Layer: 8
   m_Name: gatAbility1Hit
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -47,12 +47,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 0
+  AboutResolution: 0
   TargetResolution: 0
   Duration: 5
-  EncumberTime: 0
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
@@ -70,13 +76,12 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: -0.4}
     Dimension: {x: 5, y: 5, z: 5}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
+  RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
     expression: (* 2 (Data (Parent this)))
-  KnockbackCoordinateSystem: 0
+  KnockbackReference: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 10}
   HitTier: 2
 --- !u!135 &-1535738910800765000

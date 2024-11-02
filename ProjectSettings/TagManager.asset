@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Character
   - SpawnPoint
+  - Terrain:Path
+  - Terrain:Obstruction
+  - Hit
   layers:
   - Default
   - TransparentFX

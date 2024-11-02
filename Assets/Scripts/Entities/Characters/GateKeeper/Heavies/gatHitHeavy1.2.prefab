@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8826511796677745375}
   m_Layer: 8
   m_Name: gatHitHeavy1.2
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
   AboutResolution: 0
   TargetResolution: 0
   Duration: 12
-  Busies: 0
+  BusyTimer: 0
   Encumbers: 0
   Stuns: 0
   RotationCap: 180
@@ -113,9 +113,9 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 50
+    expression: 75
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 2, y: 0, z: 11}
+  BaseKnockbackVector: {x: 2, y: 0, z: 7}
   HitTier: 3
 --- !u!23 &-3587656788900788176
 MeshRenderer:

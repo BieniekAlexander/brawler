@@ -44,12 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c695389259c127545a97053f119c777f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 0
+  AboutResolution: 0
   TargetResolution: 0
-  Duration: 60000
-  EncumberTime: 0
+  Duration: 300
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
   Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:

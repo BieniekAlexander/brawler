@@ -6,7 +6,7 @@ using UnityEngine;
 // specifies that C must subclass Castable - I'm not sure that this is what I want yet
 [Serializable]
 public class FieldExpression<C, T> where C : Cast {
-    [SerializeField] string expression;
+    [SerializeField] public string expression;
     public T Value { get; set; }
 
     public FieldExpression(string initialExpression) {

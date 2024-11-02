@@ -33,7 +33,13 @@ public class CanvasController : MonoBehaviour {
         HealthBars.RemoveAll(bar => bar==null);
 
         for (int i = 0; i < HealthBars.Count; i++) {
-            Vector2 ViewportPosition = Cam.WorldToViewportPoint(HealthBars[i].Character.transform.position+offset);
+            HPBarVisuals healthBar = HealthBars[i];
+
+            if (healthBar.Character.isActiveAndEnabled != healthBar.isActiveAndEnabled) {
+                healthBar.gameObject.SetActive(healthBar.Character.isActiveAndEnabled);
+            }
+
+            Vector2 ViewportPosition = Cam.WorldToViewportPoint(healthBar.Character.transform.position+offset);
             Vector2 WorldObject_ScreenPosition = new Vector2(
                 (ViewportPosition.x*CanvasRect.sizeDelta.x)-(CanvasRect.sizeDelta.x*0.5f),
                 (ViewportPosition.y*CanvasRect.sizeDelta.y)-(CanvasRect.sizeDelta.y*0.5f)

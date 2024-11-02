@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 112980778584238824}
   m_Layer: 0
   m_Name: MineHit
-  m_TagString: Untagged
+  m_TagString: Hit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,11 +118,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c676aa56bad3f4f4899345bf63a6f9d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AboutResolution: 0
+  TargetResolution: 0
   Duration: 5
-  Origin: {fileID: 0}
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
+  Range: 0
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
   Target: {fileID: 0}
-  Mirror: 0
-  Frame: 0
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
     m_keys: 
     m_values: []
@@ -145,15 +159,11 @@ MonoBehaviour:
   - PolarPosition: {x: 0, y: 0}
     Dimension: {x: 0.5, y: 0.5, z: 0.5}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
-  Collider: {fileID: 0}
-  effects: []
-  RedundantCollisions: 0
-  DissapearOnTrigger: 0
-  damage: 100
+  RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0
-  KnockbackCoordinateSystem: 0
+  damageExpression:
+    expression: 0
+  KnockbackReference: 0
   BaseKnockbackVector: {x: 0, y: 0, z: 15}
   HitTier: 3
-  hitLagDuration: 7
-  hitStunDuration: 35

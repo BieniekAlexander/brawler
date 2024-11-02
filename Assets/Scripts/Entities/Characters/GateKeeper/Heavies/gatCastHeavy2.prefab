@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 36
+  Duration: 75
   BusyTimer: 36
   Encumbers: 1
   Stuns: 0
@@ -54,8 +54,8 @@ MonoBehaviour:
   Range: 0
   RecastCooldown: 0
   AttackCooldown: 0
-  DestroyOnRecast: 1
-  DestroyOnAttack: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 1
   DestroyOnCollision: 0
   DestroyWithParent: 0
   DataExpression:
@@ -64,7 +64,7 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 0c000000
+    m_keys: 1c000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: 2d6603bc942e83044bd84b294e33c797, type: 3}

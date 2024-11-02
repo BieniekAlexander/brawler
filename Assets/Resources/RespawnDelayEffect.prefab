@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3344000902430616029}
-  - component: {fileID: -4402768598185200423}
+  - component: {fileID: 1073674751462483208}
   m_Layer: 0
-  m_Name: RingOutEffect
+  m_Name: RespawnDelayEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-4402768598185200423
+--- !u!114 &1073674751462483208
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,13 +41,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7127559429390055597}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5bb9061d11ec654c86dd32e19199503, type: 3}
+  m_Script: {fileID: 11500000, guid: f0d1898f75e916f4db3d10679f619e67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AboutResolution: 2
+  AboutResolution: 0
   TargetResolution: 0
-  Duration: 60
-  Busies: 0
+  Duration: 300
+  BusyTimer: 0
   Encumbers: 0
   Stuns: 0
   RotationCap: 180
@@ -69,4 +69,3 @@ MonoBehaviour:
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  RingOutDamage: 250

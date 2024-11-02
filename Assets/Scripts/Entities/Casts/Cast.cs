@@ -145,7 +145,10 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
 
     protected virtual void OnInitialize() {
         FieldExpressionParser.instance.RenderValue(this, DataExpression);
-        transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
+
+        if (Target!=About) {
+            transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);
+        }
 
         if (BusyTimer>0 && Caster is Character c) {
             c.SetBusy(BusyTimer, Encumbers, Stuns, RotationCap);
@@ -227,6 +230,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         );
 
         if (DestroyOnRecast) {
+            ret |= true;
             Destroy(gameObject);
         }
 

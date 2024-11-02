@@ -15,13 +15,13 @@ public static class KnockBackUtils {
 
     public static int getHitStun(Vector3 knockbackVector) {
         int hitstun = Mathf.FloorToInt(
-            MovementUtils.inXZ(knockbackVector).magnitude * .8f
+            MovementUtils.inXZ(knockbackVector).magnitude * 1.6f
         );
         
         return hitstun;
     }
 
-    public static float KnockBackDecay = 10f;
+    public static float KnockBackDecay = 5f;
 }
 
 public class CharacterStateHitStopped : CharacterState {

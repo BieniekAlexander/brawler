@@ -61,8 +61,8 @@ public class AnimationStateController : MonoBehaviour
     void Update()
     {
         // movement
-        _animator.SetBool(_runningHash, _character.Velocity.sqrMagnitude > 1);
-        _animator.SetBool(_sprintingHash, _character.Velocity.sqrMagnitude > Mathf.Pow(_character.BaseSpeed+.5f, 2));
+        _animator.SetBool(_runningHash, _character.Velocity.sqrMagnitude > .0025);
+        _animator.SetBool(_sprintingHash, _character.Velocity.sqrMagnitude > Mathf.Pow(_character.BaseSpeed+.01f, 2));
 
         // disadvantage
         _animator.SetBool(_hitStunnedHash, _character.StateIsActive(typeof(CharacterStateHitStopped)));

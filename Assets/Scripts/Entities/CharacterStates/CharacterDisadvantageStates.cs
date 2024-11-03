@@ -15,13 +15,13 @@ public static class KnockBackUtils {
 
     public static int getHitStun(Vector3 knockbackVector) {
         int hitstun = Mathf.FloorToInt(
-            MovementUtils.inXZ(knockbackVector).magnitude * 1.6f
+            MovementUtils.inXZ(knockbackVector).magnitude * 60f
         );
         
         return hitstun;
     }
 
-    public static float KnockBackDecay = 5f;
+    public static float KnockBackDecay = .02f;
 }
 
 public class CharacterStateHitStopped : CharacterState {
@@ -83,6 +83,7 @@ public class CharacterStatePushedBack : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
+        Debug.Log($"KnockbackDecay: {KnockBackUtils.KnockBackDecay}");
 
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
@@ -102,9 +103,10 @@ public class CharacterStatePushedBack : CharacterState {
     public override void FixedUpdateState() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
+            Debug.Log(Character.Velocity);
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay*Time.deltaTime
+                -KnockBackUtils.KnockBackDecay
             );
         }
     }
@@ -159,7 +161,7 @@ public class CharacterStateKnockedBack : CharacterState {
             Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay*Time.deltaTime
+                -KnockBackUtils.KnockBackDecay
             );
         }
     }
@@ -217,7 +219,7 @@ public class CharacterStateBlownBack : CharacterState {
             Character.HitStunTimer--;
             Character.Velocity = MovementUtils.ChangeMagnitude(
                 MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay*Time.deltaTime
+                -KnockBackUtils.KnockBackDecay
             );
         }
     }

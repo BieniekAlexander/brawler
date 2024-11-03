@@ -31,7 +31,7 @@ public class CharacterStateKnockedDown : CharacterState {
 }
 
 public class CharacterStateTumbling : CharacterState {
-    private float _tumbleAcceleration = 10f;
+    private float _tumbleAcceleration = .2f;
     
     public CharacterStateTumbling(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -62,7 +62,7 @@ public class CharacterStateTumbling : CharacterState {
     public override void FixedUpdateState() {
         Character.Velocity = MovementUtils.ChangeMagnitude(
             MovementUtils.inXZ(Character.Velocity),
-            -_tumbleAcceleration*Time.deltaTime
+            -_tumbleAcceleration
         ) + MovementUtils.inY(Character.Velocity);
     }
 
@@ -78,7 +78,7 @@ public class CharacterStateTumbling : CharacterState {
 }
 
 public class CharacterStateRolling : CharacterState {
-    private float _rollSpeed = 12.5f;
+    private float _rollSpeed = .36f;
     private int _recoveryDuration = 15;
 
     public CharacterStateRolling(Character _machine, CharacterStateFactory _factory)

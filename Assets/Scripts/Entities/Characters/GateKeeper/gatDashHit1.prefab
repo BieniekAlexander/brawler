@@ -84,7 +84,7 @@ MonoBehaviour:
   damageExpression:
     expression: 0
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 0, y: 0, z: 3}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.2}
   HitTier: 1
 --- !u!33 &5145615926806013107
 MeshFilter:

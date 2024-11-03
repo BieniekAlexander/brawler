@@ -5,7 +5,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     /* Movement */
     public Vector3 Velocity { get; set; } = new();
     public CommandMovement CommandMovement { get; set; }
-    [SerializeField] float RotationalControl = 120f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
+    [SerializeField] float RotationalControl = 2f; // I'll just give this the rocket behavior - if it can't rotate, it'll be a normal projectile
 
     new public void Awake() {
         _collider = GetComponent<Collider>();
@@ -51,13 +51,13 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
             transform.rotation = Quaternion.RotateTowards(
                 Quaternion.Euler(Velocity.normalized),
                 targetRotation,
-                RotationalControl * Time.deltaTime);
+                RotationalControl);
 
             // force movement only in XZ
             Velocity = MovementUtils.inXZ(transform.rotation * Velocity.normalized * BaseSpeed * (240 - Quaternion.Angle(transform.rotation, targetRotation)) / 240);
         }
 
-        transform.position += Velocity * Time.deltaTime;
+        transform.position += Velocity;
     }
 
     public Transform Transform { get { return transform; } }

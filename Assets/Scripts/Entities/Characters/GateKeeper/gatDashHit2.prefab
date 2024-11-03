@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 5
+  Duration: 60
   BusyTimer: 0
   Encumbers: 0
   Stuns: 0
@@ -82,7 +82,7 @@ MonoBehaviour:
   damageExpression:
     expression: 0
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 0, y: 0, z: 12}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.5}
   HitTier: 1
 --- !u!135 &-3343229369199216502
 SphereCollider:

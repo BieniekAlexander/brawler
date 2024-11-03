@@ -116,7 +116,7 @@ public class CharacterStateBlocking : CharacterState {
                 MovementUtils.ClampMagnitude(
                     MovementUtils.ChangeMagnitude(
                         MovementUtils.inXZ(Character.Velocity),
-                        -dSpeed*Time.deltaTime
+                        -dSpeed
                     ),
                     Character.BaseSpeed,
                     Mathf.Infinity
@@ -129,8 +129,8 @@ public class CharacterStateBlocking : CharacterState {
 }
 
 public class CharacterStateShielding : CharacterState {
-    private float _maxAcceleration = 3f;
-    private float _rotationalSpeed = 300f*Mathf.Deg2Rad;
+    private float _maxAcceleration = .05f;
+    private float _rotationalSpeed = 5f*Mathf.Deg2Rad;
     private int _exposedDuration = 15;
 
     public CharacterStateShielding(Character _machine, CharacterStateFactory _factory)
@@ -177,14 +177,14 @@ public class CharacterStateShielding : CharacterState {
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
         Vector3 shieldDirection = Character.InputAimDirection;
         float directionDot = Mathf.Max(Vector3.Dot(MovementUtils.inXZ(Character.Velocity).normalized, shieldDirection), 0);
-        float acceleration = _maxAcceleration*directionDot*Time.deltaTime;
+        float acceleration = _maxAcceleration*directionDot;
         Vector3 direction = Vector3.RotateTowards(Character.Velocity, -shieldDirection, 90f*Mathf.Deg2Rad*directionDot, 0);
 
         if (Character.Running) {
             Character.Velocity = Vector3.RotateTowards(
                 MovementUtils.inXZ(Character.Velocity),
                 direction,
-                _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
+                _rotationalSpeed, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0
             );
 

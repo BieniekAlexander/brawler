@@ -42,14 +42,14 @@ public static class MovementUtils {
     }
 
     public static void Push(IMoves pushing, IMoves pushed, Vector3 normal) {
-            Vector3 dvNormal = normal*Mathf.Max(pushing.BaseSpeed, pushed.BaseSpeed)*Time.deltaTime;
+            Vector3 dvNormal = normal*Mathf.Max(pushing.BaseSpeed, pushed.BaseSpeed)*.1f;
             pushing.Velocity += dvNormal;
             pushed.Velocity = pushing.Velocity-dvNormal;
     }
 }
 
 public class CharacterStateIdle : CharacterState {
-    private float _acceleration = 7.5f*60f;// was 50f
+    private float _acceleration = .01f;
 
     public CharacterStateIdle(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -74,7 +74,7 @@ public class CharacterStateIdle : CharacterState {
     }
 
     public override void FixedUpdateState() {
-        Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration*Time.deltaTime));
+        Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration));
     }
 
     public override void InitializeSubState() {}
@@ -99,7 +99,7 @@ public class CharacterStateIdle : CharacterState {
 }
 
 public class CharacterStateWalking : CharacterState {
-    private float _acceleration = 60f*7.5f; // was 50f
+    private float _acceleration = .01f;
 
     public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -130,7 +130,7 @@ public class CharacterStateWalking : CharacterState {
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
         float dSpeed = Mathf.Clamp(
             Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
-            0, _acceleration*Time.deltaTime
+            0, _acceleration
         );
 
         Vector3 newVelocity = Vector3.ClampMagnitude(
@@ -161,8 +161,8 @@ public class CharacterStateWalking : CharacterState {
 
 
 public class CharacterStateRunning : CharacterState {
-    private float _rotationalSpeed = 120f*Mathf.Deg2Rad; // how quickly the character can rotate velocity
-    private float _acceleration = 10f;
+    private float _rotationalSpeed = 2f*Mathf.Deg2Rad; // how quickly the character can rotate velocity
+    private float _acceleration = .01f;
 
     public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -172,7 +172,7 @@ public class CharacterStateRunning : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (MovementUtils.inXZ(Character.Velocity).magnitude<=7.51f) {
+        } else if (MovementUtils.inXZ(Character.Velocity).magnitude<=.108f) {
             return Factory.Walking();
         } else {
             return null;
@@ -189,7 +189,7 @@ public class CharacterStateRunning : CharacterState {
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
         float speed = (Character.Running)
             ? horizontalVelocity.magnitude
-            : horizontalVelocity.magnitude - _acceleration*Time.deltaTime;
+            : horizontalVelocity.magnitude - _acceleration;
 
         Character.Velocity = MovementUtils.setXZ(
             Character.Velocity,
@@ -197,7 +197,7 @@ public class CharacterStateRunning : CharacterState {
             ? Vector3.RotateTowards(
                 horizontalVelocity.normalized,
                 Character.MoveDirection,
-                _rotationalSpeed*Time.deltaTime, // rotate at speed according to whether we're running TODO tune rotation scaling
+                _rotationalSpeed, // rotate at speed according to whether we're running TODO tune rotation scaling
                 0) * speed
             : horizontalVelocity.normalized * speed
         );

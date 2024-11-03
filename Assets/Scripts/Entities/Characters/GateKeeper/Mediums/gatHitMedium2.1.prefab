@@ -115,7 +115,7 @@ MonoBehaviour:
   damageExpression:
     expression: 75
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 3, y: 0, z: 12}
+  BaseKnockbackVector: {x: 0.1, y: 0, z: 0.55}
   HitTier: 2
 --- !u!23 &-3587656788900788176
 MeshRenderer:

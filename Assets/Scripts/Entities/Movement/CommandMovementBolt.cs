@@ -10,12 +10,12 @@ public class CommandMovementBolt: CommandMovement {
         Vector3 trajectory = (Target.position-About.position).normalized
             * Mathf.Min(
                 (Target.position-Mover.Transform.position).magnitude,
-                Speed*Duration*Time.fixedDeltaTime
+                Speed*Duration
             );
 
         initialSpeed = Mathf.Max(Mover.Velocity.magnitude, Mover.BaseSpeed);
         Mover.Velocity = trajectory.normalized*Mathf.Max(initialSpeed, Speed);
-        Duration = Mathf.FloorToInt(trajectory.magnitude/Speed/Time.fixedDeltaTime);
+        Duration = Mathf.FloorToInt(trajectory.magnitude/Speed);
     }
 
     protected override void OnDestruction() {

@@ -82,7 +82,7 @@ MonoBehaviour:
   damageExpression:
     expression: (* 2 (AP (Caster this)))
   KnockbackReference: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 10}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.6}
   HitTier: 2
 --- !u!135 &-1535738910800765000
 SphereCollider:

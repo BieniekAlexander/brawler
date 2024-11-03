@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 public static class ContextSteering {
-    private static float PathScanDistance = 7.5f*12f/60f;
+    private static float PathScanDistance = 3f;
 
     // https://kidscancode.org/godot_recipes/3.x/ai/context_map/index.html
     public static void SetDirectionWeights(Transform mover, Transform target, List<Vector2> directions, List<float> interests) {

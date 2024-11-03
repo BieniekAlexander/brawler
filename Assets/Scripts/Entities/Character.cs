@@ -112,7 +112,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /* Controls */
     private CharacterControls characterControls;
     private bool RotatingClockwise = false;
-    public float MinimumRotationThreshold { get; private set; } = 1f; // TODO put this in some kind of control config
+    public float MinimumRotationThreshold { get; private set; } = 1f; // TODO put this in some kind of control config; minimum rotation to mirror casts
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
 
@@ -645,6 +645,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     void FixedUpdate() {
+        if (KnockBack!=Vector3.zero && HitStopTimer==0) {
+            Debug.Log($"KnockBack: {KnockBack}");
+        }
+
         if (_recordingControls) {
             WriteCharacterFrameInput(_recordControlStream);
         } else if (_collectingControls) {
@@ -667,7 +671,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
-        cc.Move(Velocity*Time.deltaTime);
+        cc.Move(Velocity);
         HandleCharges();
 
         if (--CastBufferTimer == 0) {
@@ -702,11 +706,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     private Vector3 GetDecayedVector(Vector3 vector, float decayRate) {
-        return vector.normalized*Mathf.Max(vector.magnitude-decayRate*Time.deltaTime, 0);
+        return vector.normalized*Mathf.Max(vector.magnitude-decayRate, 0);
     }
 
     /* IMoves Methods */
-    public float BaseSpeed { get; set; } = 7.5f;
+    public float BaseSpeed { get; set; } = .125f;
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
     public Vector3 Velocity { get; set; } = Vector3.zero;
@@ -715,10 +719,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public float RotationCap {get; set; } = 180f;
     public Transform ForceMoveDestination { get; set; } = null; // taunts, fears, etc.
     public CommandMovement CommandMovement { get; set; } = null;
-    private float gravity = -.5f;
+    private float gravity = -.01f;
     private float standingY; private float standingOffset = .1f;
     public HitTier KnockBackHitTier { get; set; }
-    public float KnockBackDecay { get; private set; } = 1f;
     public Vector3 KnockBack { get; set; } = new();
     public int HitStunTimer { get; set; } = 0;
     public int HitStopTimer { get; set; } = 0;
@@ -791,6 +794,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 }
                 
                 KnockBack = knockBackFactor*knockBackVector;
+                HitStunTimer = hitStunDuration;
 
                 if (hitStopDuration > 0) {
                     HitStopTimer = hitStopDuration;
@@ -868,7 +872,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void OnGUI() {
         // TODO remove: here for debugging
         if (!me) return;
-        GUI.Label(new Rect(20, 40, 200, 20), MovementUtils.inXZ(Velocity).magnitude+"m/s");
+        GUI.Label(new Rect(20, 40, 200, 20), MovementUtils.inXZ(Velocity).magnitude+"m/tick");
         GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);

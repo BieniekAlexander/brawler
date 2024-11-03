@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class CommandMovementDash: CommandMovement {
     private float initialSpeed;
-    private float _boostSpeedBump = 2.5f;
+    private float _boostSpeedBump = .1f;
     private float boostDecay;
     private float _boostSpeedEnd;
 

@@ -165,7 +165,7 @@ public static class CollisionUtils {
                 out Vector3 direction,
                 out float distance
             )) {
-                return direction * (Mover.BaseSpeed*Time.deltaTime*.2f+.1f);
+                return direction * (Mover.BaseSpeed*.2f+.02f);
             } else {
                 return Vector3.zero;
             }

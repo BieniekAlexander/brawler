@@ -90,7 +90,7 @@ public class CharacterStateRolling : CharacterState {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Idle();
+            return Factory.Walking();
         } else {
             return null;
         }
@@ -141,7 +141,7 @@ public class CharacterStateGettingUp : CharacterState {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Idle();
+            return Factory.Walking();
         } else {
             return null;
         }
@@ -181,7 +181,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Idle();
+            return Factory.Walking();
         } else {
             return null;
         }

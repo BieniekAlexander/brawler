@@ -20,7 +20,7 @@ public abstract class CharacterState {
     }
 
     public static CharacterState GetSpawnState(CharacterStateFactory factory) {
-        CharacterState root = factory.Idle();
+        CharacterState root = factory.Walking();
         root.SetSubState(factory.Ready());
         return root;
     }

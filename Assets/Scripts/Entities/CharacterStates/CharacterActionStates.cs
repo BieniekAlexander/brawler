@@ -36,7 +36,6 @@ public class CharacterStateBusy : CharacterState {
     : base(_machine, _factory) {
         _isRootState = false;
         _validExitParentStates = new CharacterState[] { // TODO I don't remember why I did this
-            Factory.Idle(),
             Factory.Walking(),
             Factory.Running()
         };

@@ -48,56 +48,6 @@ public static class MovementUtils {
     }
 }
 
-public class CharacterStateIdle : CharacterState {
-    private float _acceleration = .01f;
-
-    public CharacterStateIdle(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
-
-    public override CharacterState CheckGetNewState() {
-        if (Character.CommandMovement != null) {
-            return Factory.CommandMovement();
-        } else if (!Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
-            return Factory.Walking();
-        } else {
-            return null;
-        }
-    }
-
-    public override void EnterState() {
-        base.EnterState();
-    }
-
-    public override void ExitState() {
-    }
-
-    public override void FixedUpdateState() {
-        Character.Velocity = MovementUtils.setXZ(Character.Velocity, Character.MoveDirection*(_acceleration));
-    }
-
-    public override void InitializeSubState() {}
-
-    /// <summary>
-    /// If I'm stationary and inside another character, push myself out
-    /// </summary>
-    /// <param name="collidable"></param>
-    /// <param name="info"></param>
-    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is Character otherCharacter) {
-            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
-            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
-            return true;
-        } else if (collidable is StageTerrain terrain) {
-            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
-
 public class CharacterStateWalking : CharacterState {
     private float _acceleration = .01f;
 
@@ -109,8 +59,6 @@ public class CharacterStateWalking : CharacterState {
     public override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (Mathf.Approximately(MovementUtils.inXZ(Character.Velocity).magnitude, 0f)) {
-            return Factory.Idle();
         } else if (MovementUtils.inXZ(Character.Velocity).magnitude>Character.BaseSpeed+.1f) {
             return Factory.Running();
         } else {

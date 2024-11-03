@@ -36,7 +36,7 @@ public class CharacterStateHitStopped : CharacterState {
                 HitTier.Heavy => Factory.BlownBack(),
                 HitTier.Medium => Factory.KnockedBack(),
                 HitTier.Light => Factory.PushedBack(),
-                _ => Factory.Idle()
+                _ => Factory.Walking()
             };
         } else {
             return null;
@@ -75,7 +75,7 @@ public class CharacterStatePushedBack : CharacterState {
 
     public override CharacterState CheckGetNewState() {
         if (Character.HitStunTimer<=0) {
-            return Factory.Idle();
+            return Factory.Walking();
         } else {
             return null;
         }

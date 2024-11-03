@@ -11,7 +11,6 @@ public class CharacterStateFactory {
         _character = character;
 
         // Movement
-        _stateDict["Idle"] = new CharacterStateIdle(_character, this);
         _stateDict["Walking"] = new CharacterStateWalking(_character, this);
         _stateDict["Running"] = new CharacterStateRunning(_character, this);
         _stateDict["CommandMovement"] = new CharacterStateCommandMovement(_character, this);
@@ -35,7 +34,6 @@ public class CharacterStateFactory {
     }
 
     // movement
-    public CharacterState Idle() => _stateDict["Idle"];
     public CharacterState Walking() => _stateDict["Walking"];
     public CharacterState Running() => _stateDict["Running"];
     public CharacterState CommandMovement() => _stateDict["CommandMovement"];

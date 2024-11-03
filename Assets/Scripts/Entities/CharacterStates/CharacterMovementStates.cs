@@ -70,8 +70,7 @@ public class CharacterStateWalking : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() {
-    }
+    public override void ExitState() { }
 
     public override void FixedUpdateState() {
         // TODO what if I'm in the air? Air control?
@@ -100,6 +99,10 @@ public class CharacterStateWalking : CharacterState {
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain && info!=null) {
             Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else if (collidable is Character otherCharacter) {
+            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
+            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
             return true;
         } else {
             return false;

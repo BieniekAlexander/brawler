@@ -24,7 +24,7 @@ public class AnimationStateController : MonoBehaviour
 
     // action
     int _readyHash;
-    int _shieldingHash;
+    int _blockingHash;
     int _busyHash;
 
 
@@ -52,7 +52,7 @@ public class AnimationStateController : MonoBehaviour
 
         // action
         _readyHash = Animator.StringToHash("ActionReady");
-        _shieldingHash = Animator.StringToHash("ActionShielding");
+        _blockingHash = Animator.StringToHash("ActionBlocking");
         _busyHash = Animator.StringToHash("ActionBusy");
 
     }
@@ -79,9 +79,6 @@ public class AnimationStateController : MonoBehaviour
         // action
         _animator.SetBool(_readyHash, _character.StateIsActive(typeof(CharacterStateReady)));
         _animator.SetBool(_busyHash, _character.StateIsActive(typeof(CharacterStateBusy)));
-        _animator.SetBool(_shieldingHash,
-            _character.StateIsActive(typeof(CharacterStateBlocking))
-            || _character.StateIsActive(typeof(CharacterStateShielding))
-        );
+        _animator.SetBool(_blockingHash, _character.StateIsActive(typeof(CharacterStateBlocking)));
     }
 }

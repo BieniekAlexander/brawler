@@ -2,7 +2,7 @@ using System;
 using UnityEditor.Experimental.GraphView;
 
 public abstract class CharacterState {
-    // reference: https://www.youtube.com/watch?v=Vt8aZDPzRjI
+    // reference: https://www.youtube.com/watch?v=Vt8aZDPzRjIaaaaaaaaaaa
     private Character _character;
     public Character Character { get { return _character; } set { _character = value; } }
 
@@ -12,16 +12,16 @@ public abstract class CharacterState {
     protected bool _isRootState = false;
     public bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
 
-    protected CharacterState _superState;
-    protected CharacterState _subState;
+    private CharacterState _superState;
+    private CharacterState _subState;
     public CharacterState(Character _machine, CharacterStateFactory _factory) {
         Character = _machine;
         Factory = _factory;
     }
 
     public static CharacterState GetSpawnState(CharacterStateFactory factory) {
-        CharacterState root = factory.Walking();
-        root.SetSubState(factory.Ready());
+        CharacterState root = factory.Ready();
+        root.SetSubState(factory.Running());
         return root;
     }
 
@@ -29,11 +29,11 @@ public abstract class CharacterState {
         InitializeSubState();
     }
 
-    public abstract void FixedUpdateState();
-    public abstract void ExitState();
+    protected abstract void FixedUpdateState();
+    protected abstract void ExitState();
 
-    public abstract CharacterState CheckGetNewState();
-    public abstract void InitializeSubState();
+    protected abstract CharacterState CheckGetNewState();
+    protected abstract void InitializeSubState();
 
     public void FixedUpdateStates() {
         if (CheckGetNewState() is CharacterState newState) {
@@ -51,10 +51,6 @@ public abstract class CharacterState {
         ExitState();
         newState.EnterState();
 
-        if (_subState!=null){
-            newState.SetSubState(_subState);
-        }
-
         if (_isRootState) {
             Character.State = newState;
         } else if (_superState != null) {
@@ -62,13 +58,17 @@ public abstract class CharacterState {
         }
     }
 
-    protected void SetSuperState(CharacterState newSuperState) {
+    private void SetSuperState(CharacterState newSuperState) {
         _superState = newSuperState;
     }
 
     protected void SetSubState(CharacterState newSubState) {
+        if (_subState!=null) {
+        _subState.ExitState();
+        }
+
         _subState = newSubState;
-        newSubState.SetSuperState(this);
+        _subState.SetSuperState(this);
     }
 
     public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);

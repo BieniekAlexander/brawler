@@ -6,7 +6,7 @@ public class CharacterStateKnockedDown : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.InputMoveDirection != Vector2.zero) {
@@ -22,10 +22,9 @@ public class CharacterStateKnockedDown : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState(){}
-
-    public override void FixedUpdateState(){}
-    public override void InitializeSubState(){}
+    protected override void ExitState() {}
+    protected override void FixedUpdateState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
@@ -38,7 +37,7 @@ public class CharacterStateTumbling : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.InputMoveDirection != Vector2.zero) {
@@ -52,19 +51,15 @@ public class CharacterStateTumbling : CharacterState {
         }
     }
 
-    public override void EnterState(){
+    public override void EnterState() {
         base.EnterState();
     }
 
-    public override void ExitState(){}
-    public override void InitializeSubState(){}
-
-    public override void FixedUpdateState() {
-        Character.Velocity = MovementUtils.ChangeMagnitude(
-            MovementUtils.inXZ(Character.Velocity),
-            -_tumbleAcceleration
-        ) + MovementUtils.inY(Character.Velocity);
+    protected override void ExitState() {}
+    protected override void InitializeSubState() {
+        SetSubState(Factory.Sliding());
     }
+    protected override void FixedUpdateState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
@@ -86,11 +81,11 @@ public class CharacterStateRolling : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Walking();
+            return Factory.Ready();
         } else {
             return null;
         }
@@ -106,17 +101,16 @@ public class CharacterStateRolling : CharacterState {
         Character.InvulnerableStack++;
     }
 
-    public override void ExitState(){
+    protected override void ExitState(){
         Character.InvulnerableStack--;
         Character.UnsetBusy();
-        SetSubState(Factory.Ready());
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
@@ -137,11 +131,11 @@ public class CharacterStateGettingUp : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Walking();
+            return Factory.Ready();
         } else {
             return null;
         }
@@ -154,17 +148,16 @@ public class CharacterStateGettingUp : CharacterState {
         Character.InvulnerableStack++;
     }
 
-    public override void ExitState(){
+    protected override void ExitState(){
         Character.InvulnerableStack--;
         Character.UnsetBusy();
-        SetSubState(Factory.Ready());
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
@@ -177,11 +170,11 @@ public class CharacterStateGetUpAttacking : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer > 0) {
             return Factory.HitStopped();
         } else if (Character.RecoveryTimer == 0) {
-            return Factory.Walking();
+            return Factory.Ready();
         } else {
             return null;
         }
@@ -194,17 +187,16 @@ public class CharacterStateGetUpAttacking : CharacterState {
         Character.InvulnerableStack++;
     }
 
-    public override void ExitState() {
+    protected override void ExitState() {
         Character.InvulnerableStack--;
         Character.UnsetBusy(); // TODO
-        SetSubState(Factory.Ready());
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         Character.RecoveryTimer--;
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }

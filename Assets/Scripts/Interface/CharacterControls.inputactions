@@ -24,15 +24,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "running",
-                    "type": "Value",
-                    "id": "a19ed657-3f14-4501-9aac-6aef62a9dbd5",
-                    "expectedControlType": "Digital",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "dash",
                     "type": "PassThrough",
                     "id": "03841b82-074c-4841-af00-16aa08a8a2ac",
@@ -45,15 +36,6 @@
                     "name": "block",
                     "type": "Button",
                     "id": "6799233d-eda8-4a5c-a64d-cf710a687472",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "shield",
-                    "type": "Button",
-                    "id": "43efeb36-47c0-4ffc-8969-7f7968afa0d4",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -429,83 +411,6 @@
                     "action": "ultimate",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "676e2df3-15eb-4952-a404-a9a5a431ab50",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "running",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Button With One Modifier",
-                    "id": "d06e8647-70af-4679-ab6b-88fedfd0d11d",
-                    "path": "ButtonWithOneModifier(overrideModifiersNeedToBePressedFirst=true)",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Modifier",
-                    "id": "250e04b2-195c-4440-a97e-7826cb4bd674",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Button",
-                    "id": "61c051ab-0ba7-4d6a-8830-5a5c70c960b0",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Button With One Modifier",
-                    "id": "76f96e17-7442-46f8-8512-b557e10cc3e2",
-                    "path": "ButtonWithOneModifier(overrideModifiersNeedToBePressedFirst=true)",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "Modifier",
-                    "id": "1a649a60-cd11-40ce-bb2a-11bfe136690d",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "Button",
-                    "id": "166b5ce3-4b77-4373-98c6-0d66ab339c67",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 },
                 {
                     "name": "",
@@ -913,17 +818,6 @@
                     "action": "special2",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "0f660273-1f8c-4b3d-97d8-d79ed7fa45ae",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "shield",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "",

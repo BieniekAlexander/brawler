@@ -80,9 +80,9 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 300
+    expression: 100
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 0, y: 0, z: 9}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.25}
   HitTier: 1
 --- !u!23 &-3587656788900788176
 MeshRenderer:

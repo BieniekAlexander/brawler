@@ -5,23 +5,24 @@ public static class KnockBackUtils {
     public static int getHitLag(HitTier HitTier) {
         return (HitTier) switch {
             HitTier.Soft => 0,
-            HitTier.Light => 3,
-            HitTier.Medium => 5,
-            HitTier.Heavy => 7,
-            HitTier.Pure => 10, // TODO play around with these values
+            HitTier.Light => 7,
+            HitTier.Medium => 10,
+            HitTier.Heavy => 15,
+            HitTier.Pure => 15, // TODO play around with these values
             _ => throw new NotImplementedException($"Unknown HitTier value: {HitTier}")
         };
     }
 
-    public static int getHitStun(Vector3 knockbackVector) {
-        int hitstun = Mathf.FloorToInt(
-            MovementUtils.inXZ(knockbackVector).magnitude * 60f
-        );
-        
-        return hitstun;
+    public static int getHitStun(HitTier HitTier) {
+        return (HitTier) switch {
+            HitTier.Soft => 0,
+            HitTier.Light => 10,
+            HitTier.Medium => 15,
+            HitTier.Heavy => 20,
+            HitTier.Pure => 20, // TODO play around with these values
+            _ => throw new NotImplementedException($"Unknown HitTier value: {HitTier}")
+        };
     }
-
-    public static float KnockBackDecay = .02f;
 }
 
 public class CharacterStateHitStopped : CharacterState {
@@ -30,13 +31,13 @@ public class CharacterStateHitStopped : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStopTimer==0) {
             return Character.KnockBackHitTier switch {
                 HitTier.Heavy => Factory.BlownBack(),
                 HitTier.Medium => Factory.KnockedBack(),
                 HitTier.Light => Factory.PushedBack(),
-                _ => Factory.Walking()
+                _ => Factory.Ready()
             };
         } else {
             return null;
@@ -48,21 +49,13 @@ public class CharacterStateHitStopped : CharacterState {
         Character.Shield.gameObject.SetActive(false);
     }
 
-    public override void ExitState() { }
-    public override void InitializeSubState() {
-        if (!Character.Busy){
-            Character.SetBusy(true, true, 0f);
-        }
-
-        SetSubState(Factory.Busy());
-    }
-
+    protected override void ExitState() {}
+    protected override void InitializeSubState() {}
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         Character.HitStopTimer--;
     }
-
 }
 
 public class CharacterStatePushedBack : CharacterState {
@@ -73,9 +66,9 @@ public class CharacterStatePushedBack : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.HitStunTimer<=0) {
-            return Factory.Walking();
+            return Factory.Ready();
         } else {
             return null;
         }
@@ -83,7 +76,6 @@ public class CharacterStatePushedBack : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
-        Debug.Log($"KnockbackDecay: {KnockBackUtils.KnockBackDecay}");
 
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
@@ -100,23 +92,19 @@ public class CharacterStatePushedBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
-            Debug.Log(Character.Velocity);
-            Character.Velocity = MovementUtils.ChangeMagnitude(
-                MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay
-            );
         }
     }
 
-    public override void ExitState() {
+    protected override void ExitState() {
         Character.UnsetBusy();
-        SetSubState(Factory.Ready());
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {
+        SetSubState(Factory.Sliding());
+    }
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }
@@ -129,7 +117,7 @@ public class CharacterStateKnockedBack : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         // TODO implement knockdown, teching
         if (Character.HitStunTimer<=0) {
             return Factory.Tumbling();
@@ -156,19 +144,17 @@ public class CharacterStateKnockedBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
-            Character.Velocity = MovementUtils.ChangeMagnitude(
-                MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay
-            );
         }
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {
+        SetSubState(Factory.Sliding());
+    }
 
-    public override void ExitState() { }
+    protected override void ExitState() {}
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain) {
             Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
@@ -187,7 +173,7 @@ public class CharacterStateBlownBack : CharacterState {
         _isRootState = true;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         // TODO implement knockdown
         if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.KnockedDown();
@@ -214,18 +200,16 @@ public class CharacterStateBlownBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
-            Character.Velocity = MovementUtils.ChangeMagnitude(
-                MovementUtils.inXZ(Character.Velocity),
-                -KnockBackUtils.KnockBackDecay
-            );
         }
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {
+        SetSubState(Factory.Sliding());
+    }
 
-    public override void ExitState() { }
+    protected override void ExitState() { }
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
 }

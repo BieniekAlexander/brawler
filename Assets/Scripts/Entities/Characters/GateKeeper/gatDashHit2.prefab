@@ -33,7 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6660201854597282026
 MonoBehaviour:
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 60
+  Duration: 5
   BusyTimer: 0
   Encumbers: 0
   Stuns: 0
@@ -82,7 +82,7 @@ MonoBehaviour:
   damageExpression:
     expression: 0
   KnockbackReference: 1
-  BaseKnockbackVector: {x: 0, y: 0, z: 0.5}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.25}
   HitTier: 1
 --- !u!135 &-3343229369199216502
 SphereCollider:

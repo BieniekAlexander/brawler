@@ -17,15 +17,15 @@ public static class MovementUtils {
         return inY(change) + inXZ(vector);
     }
 
-    public static Vector3 ChangeMagnitude(Vector3 vector, float changeInMagnitude, bool clampToZero = true) {
+    public static Vector3 ChangeMagnitude(Vector3 vector, float changeInMagnitude, float clampMinimum=0f, float clampMaximum=Mathf.Infinity) {
         if ((vector.magnitude+changeInMagnitude)<0) {
             changeInMagnitude=-vector.magnitude;
         }
 
         return ClampMagnitude(
                 vector.normalized * (vector.magnitude + changeInMagnitude),
-                clampToZero ? 0 : Mathf.NegativeInfinity,
-                Mathf.Infinity
+                clampMinimum,
+                clampMaximum
             );
     }
 
@@ -46,21 +46,27 @@ public static class MovementUtils {
             pushing.Velocity += dvNormal;
             pushed.Velocity = pushing.Velocity-dvNormal;
     }
+
+    public static float StrafeSpeedMultiplier(Vector3 aimDirection, Vector3 moveDirection) {
+        float dot = Vector3.Dot(aimDirection.normalized, moveDirection.normalized);
+
+        if (dot>0) {
+            return 1f;
+        } else {
+            return 1f+dot/5f;
+        }
+    }
 }
 
-public class CharacterStateWalking : CharacterState {
-    private float _acceleration = .01f;
-
-    public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
+public class CharacterStateRunning : CharacterState {
+    public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
-        _isRootState = true;
+        _isRootState = false;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (MovementUtils.inXZ(Character.Velocity).magnitude>Character.BaseSpeed+.1f) {
-            return Factory.Running();
         } else {
             return null;
         }
@@ -70,31 +76,37 @@ public class CharacterStateWalking : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() { }
+    protected override void ExitState() { }
 
-    public override void FixedUpdateState() {
+    protected override void FixedUpdateState() {
         // TODO what if I'm in the air? Air control?
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
+        float strafeSpeed = Character.BaseSpeed * MovementUtils.StrafeSpeedMultiplier(Character.MoveDirection, Character.InputAimDirection);
+
         float dSpeed = Mathf.Clamp(
             Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
-            0, _acceleration
+            0, Character.RunAcceleration
         );
 
         Vector3 newVelocity = Vector3.ClampMagnitude(
             horizontalVelocity + dSpeed*(
                 (Character.MoveDirection == Vector3.zero)
-                ? (Character.Running ? Vector3.zero : (-horizontalVelocity.normalized))
+                ? -horizontalVelocity.normalized
                 : Character.MoveDirection
             ),
-            Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude)
+            Mathf.Max(
+                strafeSpeed,
+                horizontalVelocity.magnitude-Character.Friction
+            )
         );
+
         Character.Velocity = MovementUtils.setXZ(
             Character.Velocity,
             (Vector3.Dot(horizontalVelocity, newVelocity)<0) ? Vector3.zero : newVelocity
         );
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain && info!=null) {
@@ -110,21 +122,15 @@ public class CharacterStateWalking : CharacterState {
     }
 }
 
-
-public class CharacterStateRunning : CharacterState {
-    private float _rotationalSpeed = 2f*Mathf.Deg2Rad; // how quickly the character can rotate velocity
-    private float _acceleration = .01f;
-
-    public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
+public class CharacterStateSliding : CharacterState {
+    public CharacterStateSliding(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
-        _isRootState = true;
+        _isRootState = false;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (MovementUtils.inXZ(Character.Velocity).magnitude<=.108f) {
-            return Factory.Walking();
         } else {
             return null;
         }
@@ -134,38 +140,23 @@ public class CharacterStateRunning : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() {}
+    protected override void ExitState() {}
 
-    public override void FixedUpdateState() {
-        Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
-        float speed = (Character.Running)
-            ? horizontalVelocity.magnitude
-            : horizontalVelocity.magnitude - _acceleration;
-
-        Character.Velocity = MovementUtils.setXZ(
-            Character.Velocity,
-            (Character.MoveDirection!=Vector3.zero)
-            ? Vector3.RotateTowards(
-                horizontalVelocity.normalized,
-                Character.MoveDirection,
-                _rotationalSpeed, // rotate at speed according to whether we're running TODO tune rotation scaling
-                0) * speed
-            : horizontalVelocity.normalized * speed
-        );
+    protected override void FixedUpdateState() {
+        if (Character.InputMoveDirection == Vector2.zero && Character.IsGrounded()) {
+            Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
+        }
     }
 
-    public override void InitializeSubState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is Character otherCharacter) {
-            if (info!=null && MovementUtils.inXZ(otherCharacter.Velocity).sqrMagnitude < MovementUtils.inXZ(Character.Velocity).sqrMagnitude) {
-                MovementUtils.Push(Character, otherCharacter, info.Normal);
-                return true;
-            } else {
-                return false;
-            }
-        } else if (collidable is StageTerrain terrain) {
+        if (collidable is StageTerrain terrain && info!=null) {
             Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else if (collidable is Character otherCharacter) {
+            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
+            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
             return true;
         } else {
             return false;
@@ -176,10 +167,10 @@ public class CharacterStateRunning : CharacterState {
 public class CharacterStateCommandMovement : CharacterState {
     public CharacterStateCommandMovement(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
-        _isRootState = true;
+        _isRootState = false;
     }
 
-    public override CharacterState CheckGetNewState() {
+    protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement == null) {
             return Factory.Running();
         } else {
@@ -191,12 +182,11 @@ public class CharacterStateCommandMovement : CharacterState {
         base.EnterState();
     }
 
-    public override void ExitState() {
+    protected override void ExitState() {
         Character.UnsetBusy();
-        SetSubState(Factory.Ready());
     }
-    public override void FixedUpdateState() { }
-    public override void InitializeSubState() {}
+    protected override void FixedUpdateState() {}
+    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         return Character.CommandMovement.OnCollideWith(collidable, info);

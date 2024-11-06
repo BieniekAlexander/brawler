@@ -82,7 +82,7 @@ MonoBehaviour:
   damageExpression:
     expression: 50
   KnockbackReference: 0
-  BaseKnockbackVector: {x: 0, y: 0, z: 0.4}
+  BaseKnockbackVector: {x: 0, y: 0, z: 0.2}
   HitTier: 1
 --- !u!135 &-1535738910800765000
 SphereCollider:

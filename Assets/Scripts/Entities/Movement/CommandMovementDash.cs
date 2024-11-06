@@ -2,38 +2,25 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class CommandMovementDash: CommandMovement {
-    private float initialSpeed;
-    private float _boostSpeedBump = .1f;
-    private float boostDecay;
-    private float _boostSpeedEnd;
-
-    protected override void OnInitialize() {
-        base.OnInitialize();
-
-        _boostSpeedEnd = Mathf.Max(MovementUtils.inXZ(Mover.Velocity).magnitude, Mover.BaseSpeed)+_boostSpeedBump;
-        float boostSpeedStart = _boostSpeedEnd + 2*_boostSpeedBump;
-        boostDecay = (_boostSpeedEnd-boostSpeedStart)/Duration;
-
-        Vector3 v = (Mover as Character).InputAimDirection;
-        Mover.Velocity = new Vector3(v.x, 0, v.z).normalized*boostSpeedStart;
-    }
+    private int chargeDuration = 5; // TODO temp implementation
+    private float _boostSpeedBump = .125f;
+    
+    override protected void OnDestruction() {}
 
     override protected void Tick() {
-        Vector3 horizontalVelocity = MovementUtils.inXZ(Mover.Velocity);
-        Mover.Velocity = horizontalVelocity.normalized * (horizontalVelocity.magnitude+boostDecay);
-    }
+        Character c = Mover as Character;
 
-    override protected void OnDestruction() {
-        Mover.Velocity = Mover.Velocity.normalized * _boostSpeedEnd;
+        if (chargeDuration--==0) {
+            Mover.Velocity += c.InputAimDirection.normalized * _boostSpeedBump;
+        } else if (chargeDuration<0) {
+            if (c.InputCastId == (int)CastId.Dash) {
+                Mover.Velocity = c.InputAimDirection.normalized * Mover.Velocity.magnitude;
+            }
+        }
     }
 
     override public bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (base.OnCollideWith(collidable, info)) {
-            Destroy(gameObject);
-            return true;
-        } else {
-            return false;
-        }
+        return base.OnCollideWith(collidable, info);
     }
 
     override public bool AppliesTo(GameObject go) => go.GetComponent<Character>() != null;

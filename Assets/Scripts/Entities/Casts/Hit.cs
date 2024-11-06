@@ -89,7 +89,7 @@ public class Hit : Trigger, ICollidable {
                 ;
             } else {
                 Vector3 knockBackVector = GetKnockBackVector(OtherMover.Transform.position);
-                int hitStunDuration = KnockBackUtils.getHitStun(knockBackVector);
+                int hitStunDuration = KnockBackUtils.getHitStun(HitTier);
                 int hitLagDuration = KnockBackUtils.getHitLag(HitTier);
 
                 float shieldKnockBackFactor = OtherMover.TakeKnockBack(

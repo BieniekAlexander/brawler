@@ -103,7 +103,7 @@ MonoBehaviour:
   damageExpression:
     expression: 50
   KnockbackReference: 1
-  BaseKnockbackVector: {x: -0.1, y: 0, z: 0.6}
+  BaseKnockbackVector: {x: -0.1, y: 0, z: 0.18}
   HitTier: 3
 --- !u!23 &-3587656788900788176
 MeshRenderer:

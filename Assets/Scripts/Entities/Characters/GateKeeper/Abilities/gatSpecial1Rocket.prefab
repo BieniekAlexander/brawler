@@ -124,7 +124,7 @@ MonoBehaviour:
   AboutResolution: 3
   TargetResolution: 0
   Duration: 90
-  Busies: 0
+  BusyTimer: 0
   Encumbers: 0
   Stuns: 0
   RotationCap: 180
@@ -152,7 +152,7 @@ MonoBehaviour:
       - {fileID: 1916127504584190134, guid: 1201ee918149d3f46a19b8f6b00593a6, type: 3}
   RotationalControl: 0
   baseSpeedExpression:
-    expression: 20
+    expression: .3
   _hp: 50
 --- !u!96 &2350912441906259594
 TrailRenderer:

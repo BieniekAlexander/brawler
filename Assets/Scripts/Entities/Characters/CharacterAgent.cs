@@ -43,7 +43,7 @@ public class CharacterAgent : Agent
         // TODO maybe give it some read of the closest world edge position?
         sensor.AddObservation(character.isActiveAndEnabled); // +1
         sensor.AddObservation(getDistancesToEdges(character.transform, floor)); // +2 = 3
-        sensor.AddObservation(enemy.transform.position-character.transform.position); // +3 = 6
+        sensor.AddObservation(enemy.transform.position-character.transform.position); // +3 = 668
         sensor.AddObservation(character.Velocity); // +3 = 9
         sensor.AddObservation(character.IsGrounded()); // +1 = 10
     }
@@ -72,9 +72,7 @@ public class CharacterAgent : Agent
                 actions.DiscreteActions[1]-1    // [0,2] -> [-1,1]
             ).normalized,
             actions.DiscreteActions[2]==1, // blocking
-            actions.DiscreteActions[3]==1, // shielding
-            actions.DiscreteActions[4]==1, // running
-            actions.DiscreteActions[5]-1 // CastId TODO expand set of values
+            actions.DiscreteActions[3]-1 // CastId TODO expand set of values
         );
         
         character.LoadCharacterFrameInput(i);

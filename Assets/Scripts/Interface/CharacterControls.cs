@@ -46,15 +46,6 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""running"",
-                    ""type"": ""Value"",
-                    ""id"": ""a19ed657-3f14-4501-9aac-6aef62a9dbd5"",
-                    ""expectedControlType"": ""Digital"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
                     ""name"": ""dash"",
                     ""type"": ""PassThrough"",
                     ""id"": ""03841b82-074c-4841-af00-16aa08a8a2ac"",
@@ -67,15 +58,6 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""name"": ""block"",
                     ""type"": ""Button"",
                     ""id"": ""6799233d-eda8-4a5c-a64d-cf710a687472"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""shield"",
-                    ""type"": ""Button"",
-                    ""id"": ""43efeb36-47c0-4ffc-8969-7f7968afa0d4"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -451,83 +433,6 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                     ""action"": ""ultimate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""676e2df3-15eb-4952-a404-a9a5a431ab50"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""running"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""Button With One Modifier"",
-                    ""id"": ""d06e8647-70af-4679-ab6b-88fedfd0d11d"",
-                    ""path"": ""ButtonWithOneModifier(overrideModifiersNeedToBePressedFirst=true)"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""Modifier"",
-                    ""id"": ""250e04b2-195c-4440-a97e-7826cb4bd674"",
-                    ""path"": ""<Keyboard>/shift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Button"",
-                    ""id"": ""61c051ab-0ba7-4d6a-8830-5a5c70c960b0"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Button With One Modifier"",
-                    ""id"": ""76f96e17-7442-46f8-8512-b557e10cc3e2"",
-                    ""path"": ""ButtonWithOneModifier(overrideModifiersNeedToBePressedFirst=true)"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""Modifier"",
-                    ""id"": ""1a649a60-cd11-40ce-bb2a-11bfe136690d"",
-                    ""path"": ""<Keyboard>/ctrl"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Button"",
-                    ""id"": ""166b5ce3-4b77-4373-98c6-0d66ab339c67"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -938,17 +843,6 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0f660273-1f8c-4b3d-97d8-d79ed7fa45ae"",
-                    ""path"": ""<Keyboard>/tab"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""shield"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""a34993f6-0f2f-4a36-9409-cd5f4654da24"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
@@ -1022,10 +916,8 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
         m_character = asset.FindActionMap("character", throwIfNotFound: true);
         m_character_aim = m_character.FindAction("aim", throwIfNotFound: true);
         m_character_movement = m_character.FindAction("movement", throwIfNotFound: true);
-        m_character_running = m_character.FindAction("running", throwIfNotFound: true);
         m_character_dash = m_character.FindAction("dash", throwIfNotFound: true);
         m_character_block = m_character.FindAction("block", throwIfNotFound: true);
-        m_character_shield = m_character.FindAction("shield", throwIfNotFound: true);
         m_character_light1 = m_character.FindAction("light1", throwIfNotFound: true);
         m_character_light2 = m_character.FindAction("light2", throwIfNotFound: true);
         m_character_boostedLight = m_character.FindAction("boostedLight", throwIfNotFound: true);
@@ -1108,10 +1000,8 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
     private List<ICharacterActions> m_CharacterActionsCallbackInterfaces = new List<ICharacterActions>();
     private readonly InputAction m_character_aim;
     private readonly InputAction m_character_movement;
-    private readonly InputAction m_character_running;
     private readonly InputAction m_character_dash;
     private readonly InputAction m_character_block;
-    private readonly InputAction m_character_shield;
     private readonly InputAction m_character_light1;
     private readonly InputAction m_character_light2;
     private readonly InputAction m_character_boostedLight;
@@ -1137,10 +1027,8 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
         public CharacterActions(@CharacterControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @aim => m_Wrapper.m_character_aim;
         public InputAction @movement => m_Wrapper.m_character_movement;
-        public InputAction @running => m_Wrapper.m_character_running;
         public InputAction @dash => m_Wrapper.m_character_dash;
         public InputAction @block => m_Wrapper.m_character_block;
-        public InputAction @shield => m_Wrapper.m_character_shield;
         public InputAction @light1 => m_Wrapper.m_character_light1;
         public InputAction @light2 => m_Wrapper.m_character_light2;
         public InputAction @boostedLight => m_Wrapper.m_character_boostedLight;
@@ -1175,18 +1063,12 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
             @movement.started += instance.OnMovement;
             @movement.performed += instance.OnMovement;
             @movement.canceled += instance.OnMovement;
-            @running.started += instance.OnRunning;
-            @running.performed += instance.OnRunning;
-            @running.canceled += instance.OnRunning;
             @dash.started += instance.OnDash;
             @dash.performed += instance.OnDash;
             @dash.canceled += instance.OnDash;
             @block.started += instance.OnBlock;
             @block.performed += instance.OnBlock;
             @block.canceled += instance.OnBlock;
-            @shield.started += instance.OnShield;
-            @shield.performed += instance.OnShield;
-            @shield.canceled += instance.OnShield;
             @light1.started += instance.OnLight1;
             @light1.performed += instance.OnLight1;
             @light1.canceled += instance.OnLight1;
@@ -1254,18 +1136,12 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
             @movement.started -= instance.OnMovement;
             @movement.performed -= instance.OnMovement;
             @movement.canceled -= instance.OnMovement;
-            @running.started -= instance.OnRunning;
-            @running.performed -= instance.OnRunning;
-            @running.canceled -= instance.OnRunning;
             @dash.started -= instance.OnDash;
             @dash.performed -= instance.OnDash;
             @dash.canceled -= instance.OnDash;
             @block.started -= instance.OnBlock;
             @block.performed -= instance.OnBlock;
             @block.canceled -= instance.OnBlock;
-            @shield.started -= instance.OnShield;
-            @shield.performed -= instance.OnShield;
-            @shield.canceled -= instance.OnShield;
             @light1.started -= instance.OnLight1;
             @light1.performed -= instance.OnLight1;
             @light1.canceled -= instance.OnLight1;
@@ -1344,10 +1220,8 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
     {
         void OnAim(InputAction.CallbackContext context);
         void OnMovement(InputAction.CallbackContext context);
-        void OnRunning(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
-        void OnShield(InputAction.CallbackContext context);
         void OnLight1(InputAction.CallbackContext context);
         void OnLight2(InputAction.CallbackContext context);
         void OnBoostedLight(InputAction.CallbackContext context);

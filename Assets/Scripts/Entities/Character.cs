@@ -76,16 +76,12 @@ public class CharacterFrameInput {
         Vector3 aimDirection,
         Vector2 moveDirection,
         bool blocking,
-        bool shielding,
-        bool running,
         int castId) {
         MoveDirectionX = moveDirection.x;
         MoveDirectionZ = moveDirection.y;
         AimDirectionX = aimDirection.x;
         AimDirectionZ = aimDirection.z;
         Blocking = blocking;
-        Shielding = shielding;
-        Running = running;
         CastId = castId;
     }
 
@@ -94,8 +90,6 @@ public class CharacterFrameInput {
     public float AimDirectionX = 0f;
     public float AimDirectionZ = 0f;
     public bool Blocking = false;
-    public bool Shielding = false;
-    public bool Running = false;
     public int CastId = -1;
 }
 
@@ -153,10 +147,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    public bool InputRunning { get; set; } = false;
-    public bool Running { get { return InputRunning && StunStack==0; } }
     public bool InputBlocking { get; set; } = false;
-    public bool InputShielding { get; set; } = false;
 
     /* Signals */
     // this is a very bad way to implement this, but I just want to propagate damage dealt by my RL agent to learning
@@ -191,10 +182,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public void OnMovement(InputAction.CallbackContext context) {
         InputMoveDirection = context.ReadValue<Vector2>();
-    }
-
-    public void OnRunning(InputAction.CallbackContext context) {
-        InputRunning=context.ReadValueAsButton();
     }
 
     public void OnDash(InputAction.CallbackContext context) {
@@ -253,9 +240,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     // shields
     public void OnBlock(InputAction.CallbackContext context) {
         InputBlocking = context.ReadValueAsButton();
-    }
-    public void OnShield(InputAction.CallbackContext context) {
-        InputShielding = context.ReadValueAsButton();
     }
 
     // throws
@@ -317,8 +301,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             InputAimDirection,
             MoveDirection,
             InputBlocking,
-            InputShielding,
-            InputRunning,
             InputCastId
         );
     }
@@ -645,10 +627,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     void FixedUpdate() {
-        if (KnockBack!=Vector3.zero && HitStopTimer==0) {
-            Debug.Log($"KnockBack: {KnockBack}");
-        }
-
         if (_recordingControls) {
             WriteCharacterFrameInput(_recordControlStream);
         } else if (_collectingControls) {
@@ -711,6 +689,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* IMoves Methods */
     public float BaseSpeed { get; set; } = .125f;
+    public float RunAcceleration = .01f;
+    public readonly float Friction = .003f;
+
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
     public Vector3 Velocity { get; set; } = Vector3.zero;
@@ -726,12 +707,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int HitStunTimer { get; set; } = 0;
     public int HitStopTimer { get; set; } = 0;
     public int RecoveryTimer { get; set; } = 0;
-
-    public static float GetKnockBackFactor(HitTier HitTier, ShieldTier ShieldTier) {
-        if (HitTier==HitTier.Soft) return 0;
-        else if (HitTier==HitTier.Pure) return 1;
-        else return ((int)HitTier - (int)ShieldTier)/(float)HitTier;
-    }
 
     /// <summary>
     /// Returns true if the contact point is between the <paramref name="Character"/>'s center and their <paramref name="Shield"/>
@@ -776,8 +751,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 // - set 
             }
 
-            knockBackFactor = GetKnockBackFactor(hitTier, (Shield.isActiveAndEnabled ? Shield.ShieldTier : 0));
-            return knockBackFactor;
+            return 0; // TODO more interesting knockback interactions
         } else {
             if (InvulnerableStack>0) {
                 return 0;
@@ -921,8 +895,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             InputAimDirection,
             InputMoveDirection,
             InputBlocking,
-            InputShielding,
-            InputRunning,
             InputCastId
         );
 
@@ -933,10 +905,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public void LoadCharacterFrameInput(CharacterFrameInput input) {
         InputAimDirection = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
         InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
-        InputRunning = input.Running;
         InputCastId = input.CastId;
         InputBlocking = input.Blocking;
-        InputShielding = input.Shielding;
     }
 
     public CharacterFrameInput ReadCharacterFrameInput(FileStream inputStream) {

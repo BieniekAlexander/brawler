@@ -54,7 +54,7 @@ MonoBehaviour:
   Range: 0
   RecastCooldown: 0
   AttackCooldown: 0
-  DestroyOnRecast: 0
+  DestroyOnRecast: 1
   DestroyOnAttack: 0
   DestroyOnCollision: 0
   DestroyWithParent: 0
@@ -69,7 +69,9 @@ MonoBehaviour:
     - data:
       - {fileID: 377234719705160766, guid: b23fb15eba976a44894bdf164e79bc29, type: 3}
   ConditionCastablesMap:
-    m_keys: 00000000
+    m_keys: 0000000001000000
     m_values:
+    - data:
+      - {fileID: 3227000705878653559, guid: 0128fcea500fdef4da52e573eaab4257, type: 3}
     - data:
       - {fileID: 3227000705878653559, guid: 0128fcea500fdef4da52e573eaab4257, type: 3}

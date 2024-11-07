@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 public static class KnockBackUtils {
-    public static int getHitLag(HitTier HitTier) {
+    public static int getHitStop(HitTier HitTier) {
         return (HitTier) switch {
             HitTier.Soft => 0,
             HitTier.Light => 7,
@@ -22,39 +22,6 @@ public static class KnockBackUtils {
             HitTier.Pure => 20, // TODO play around with these values
             _ => throw new NotImplementedException($"Unknown HitTier value: {HitTier}")
         };
-    }
-}
-
-public class CharacterStateHitStopped : CharacterState {
-    public CharacterStateHitStopped(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
-
-    protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer==0) {
-            return Character.KnockBackHitTier switch {
-                HitTier.Heavy => Factory.BlownBack(),
-                HitTier.Medium => Factory.KnockedBack(),
-                HitTier.Light => Factory.PushedBack(),
-                _ => Factory.Ready()
-            };
-        } else {
-            return null;
-        }
-    }
-
-    public override void EnterState() {
-        base.EnterState();
-        Character.Shield.gameObject.SetActive(false);
-    }
-
-    protected override void ExitState() {}
-    protected override void InitializeSubState() {}
-    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
-
-    protected override void FixedUpdateState() {
-        Character.HitStopTimer--;
     }
 }
 

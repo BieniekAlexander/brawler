@@ -15,12 +15,13 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     override protected void OnInitialize() {
         base.OnInitialize();
         FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
-        Velocity = Caster.GetOriginTransform().rotation*Vector3.forward*BaseSpeed;
+        Velocity = Caster.GetAboutTransform().rotation*Vector3.forward*BaseSpeed;
     }
 
     protected override void Tick() {
         Move();
         HandleCollisions();
+        HitStopTimer--;
     }
 
     protected override bool OnRecast(Transform target) {
@@ -89,6 +90,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
     [SerializeField] private int _hp;
     public int HP { get { return _hp; } }
     public int AP { get { return 0; } }
+    public int HitStopTimer { get; set; }
     public List<Armor> Armors { get { return null; } set {; } }
     public int ParryWindow { get { return 0; } set {; } }
     public int InvulnerableStack { get { return 0; } set {; } }

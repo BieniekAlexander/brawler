@@ -51,6 +51,7 @@ public interface IDamageable
     public List<Armor> Armors { get; }
     public int AP { get; }
     int ParryWindow { get; set; } // if hit during the window, reflect projectiles, ignore damage, and maybe hitstun?
+    public int HitStopTimer { get; set; }
 
     // Status effects
     int InvulnerableStack { get; set; } // can't be damaged

@@ -19,7 +19,6 @@ public class CharacterStateFactory {
         _stateDict["Blocking"] = new CharacterStateBlocking(_character, this);
         _stateDict["Busy"] = new CharacterStateBusy(_character, this);
         // Disadvantage
-        _stateDict["HitStopped"] = new CharacterStateHitStopped(_character, this);
         _stateDict["PushedBack"] = new CharacterStatePushedBack(_character, this);
         _stateDict["KnockedBack"] = new CharacterStateKnockedBack(_character, this);
         _stateDict["BlownBack"] = new CharacterStateBlownBack(_character, this);
@@ -43,7 +42,6 @@ public class CharacterStateFactory {
     public CharacterState Busy() => _stateDict["Busy"];
 
     // disadvantage
-    public CharacterState HitStopped() => _stateDict["HitStopped"];
     public CharacterState PushedBack() => _stateDict["PushedBack"];
     public CharacterState KnockedBack() => _stateDict["KnockedBack"];
     public CharacterState BlownBack() => _stateDict["BlownBack"];

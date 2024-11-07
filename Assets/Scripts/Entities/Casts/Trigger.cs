@@ -256,7 +256,9 @@ public class Trigger : Cast, ICollidable, ICasts {
         // TODO gonna leave out UpdateTransform because these might not be moving, but maybe they 
         if (CollisionLog != null) {
             foreach (ICollidable c in CollisionLog.Keys.ToList()) {
-                CollisionLog[c]--;
+                if (c is IDamageable d && d.HitStopTimer <= 0) {
+                    CollisionLog[c]--;
+                }
             }
         }
 

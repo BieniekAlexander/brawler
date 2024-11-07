@@ -59,7 +59,7 @@ public class CastableGenerator : MonoBehaviour, ICasts {
         }
     }
 
-    public Transform GetOriginTransform() {
+    public Transform GetAboutTransform() {
         return transform;
     }
 

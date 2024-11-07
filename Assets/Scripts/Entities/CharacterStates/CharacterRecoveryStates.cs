@@ -7,9 +7,7 @@ public class CharacterStateKnockedDown : CharacterState {
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer > 0) {
-            return Factory.HitStopped();
-        } else if (Character.InputMoveDirection != Vector2.zero) {
+        if (Character.InputMoveDirection != Vector2.zero) {
             return Factory.GettingUp();
         } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
@@ -38,9 +36,7 @@ public class CharacterStateTumbling : CharacterState {
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer > 0) {
-            return Factory.HitStopped();
-        } else if (Character.InputMoveDirection != Vector2.zero) {
+        if (Character.InputMoveDirection != Vector2.zero) {
             return Factory.GettingUp();
         } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
@@ -82,9 +78,7 @@ public class CharacterStateRolling : CharacterState {
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer > 0) {
-            return Factory.HitStopped();
-        } else if (Character.RecoveryTimer == 0) {
+        if (Character.RecoveryTimer == 0) {
             return Factory.Ready();
         } else {
             return null;
@@ -132,9 +126,7 @@ public class CharacterStateGettingUp : CharacterState {
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer > 0) {
-            return Factory.HitStopped();
-        } else if (Character.RecoveryTimer == 0) {
+        if (Character.RecoveryTimer == 0) {
             return Factory.Ready();
         } else {
             return null;
@@ -171,9 +163,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (Character.HitStopTimer > 0) {
-            return Factory.HitStopped();
-        } else if (Character.RecoveryTimer == 0) {
+        if (Character.RecoveryTimer == 0) {
             return Factory.Ready();
         } else {
             return null;

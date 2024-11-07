@@ -444,7 +444,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         return RotatingClockwise;
     }
 
-    public Transform GetOriginTransform() {
+    public Transform GetAboutTransform() {
         return transform;
     }
 
@@ -638,21 +638,25 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             UnsetBusy();
         }
 
-        State.FixedUpdateStates();
 
-        if (HitStopTimer==0) {
+        if (HitStopTimer--<=0) {
+            State.FixedUpdateStates();
+
             // TODO I think I'm gonna need more vertical velocity considerations wrt state
             if (!IsGrounded()) {
                 Velocity += Vector3.up*gravity;
             } else {
                 Velocity = MovementUtils.setY(Velocity, Vector3.zero);
             }
+            
+            cc.Move(Velocity);
+        } else {
+            Debug.Log(HitStopTimer);
         }
-
-        cc.Move(Velocity);
+        
         HandleCharges();
 
-        if (--CastBufferTimer == 0) {
+        if (CastBufferTimer-- == 0) {
             InputCastId = -1;
         } else if (InputCastId >= 0) {
             if (StartCast(InputCastId)) {
@@ -705,7 +709,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public HitTier KnockBackHitTier { get; set; }
     public Vector3 KnockBack { get; set; } = new();
     public int HitStunTimer { get; set; } = 0;
-    public int HitStopTimer { get; set; } = 0;
     public int RecoveryTimer { get; set; } = 0;
 
     /// <summary>
@@ -769,11 +772,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 
                 KnockBack = knockBackFactor*knockBackVector;
                 HitStunTimer = hitStunDuration;
+                HitStopTimer = hitStopDuration;
 
-                if (hitStopDuration > 0) {
-                    HitStopTimer = hitStopDuration;
-                    SwitchState(StateFactory.HitStopped());
-                } else if (KnockBack != Vector3.zero) {
+                if (KnockBack != Vector3.zero) {
                     if (hitTier >= HitTier.Heavy) {
                         SwitchState(StateFactory.BlownBack());
                     } else if (hitTier == HitTier.Medium) {
@@ -798,6 +799,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public int HP {get; private set;} = 1000;
     public static int HPMax = 1000;
     private int healMax; private int healMaxOffset = 100;
+    public int HitStopTimer { get; set; } = 0;
     public List<Armor> Armors { get; } = new List<Armor>();
     public int AP {get { return Enumerable.Sum(from Armor armor in Armors select armor.AP ); } }
     public int ParryWindow { get; set; } = 0;

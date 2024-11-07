@@ -11,7 +11,7 @@ public class AnimationStateController : MonoBehaviour
     // TODO maybe some jumping stuff
 
     // disadvantage
-    int _hitStunnedHash;
+    int _hitStoppedHash;
     int _pushedBackHash;
     int _knockedBackHash;
     int _blownBackHash;
@@ -39,7 +39,7 @@ public class AnimationStateController : MonoBehaviour
         _sprintingHash = Animator.StringToHash("MovementSprinting");
 
         // disadvantage
-        _hitStunnedHash = Animator.StringToHash("DisadvantageHitStunned");
+        _hitStoppedHash = Animator.StringToHash("DisadvantageHitStopped");
         _pushedBackHash = Animator.StringToHash("DisadvantagePushedBack");
         _knockedBackHash = Animator.StringToHash("DisadvantageKnockedBack");
         _blownBackHash = Animator.StringToHash("DisadvantageBlownBack");
@@ -65,7 +65,7 @@ public class AnimationStateController : MonoBehaviour
         _animator.SetBool(_sprintingHash, _character.Velocity.sqrMagnitude > Mathf.Pow(_character.BaseSpeed+.01f, 2));
 
         // disadvantage
-        _animator.SetBool(_hitStunnedHash, _character.StateIsActive(typeof(CharacterStateHitStopped)));
+        _animator.SetBool(_hitStoppedHash, _character.HitStopTimer>0);
         _animator.SetBool(_pushedBackHash, _character.StateIsActive(typeof(CharacterStatePushedBack)));
         _animator.SetBool(_knockedBackHash, _character.StateIsActive(typeof(CharacterStateKnockedBack)));
         _animator.SetBool(_blownBackHash, _character.StateIsActive(typeof(CharacterStateBlownBack)));

@@ -39,7 +39,7 @@ public class Hit : Trigger, ICollidable {
                     MovementUtils.inXZ(targetPosition - transform.position).normalized
                 ) * BaseKnockbackVector;
             case KnockbackReference.Caster:
-                return Caster.GetOriginTransform().rotation * new Vector3(
+                return Caster.GetAboutTransform().rotation * new Vector3(
                     Mirrored?BaseKnockbackVector.x:-BaseKnockbackVector.x,
                     BaseKnockbackVector.y,
                     BaseKnockbackVector.z
@@ -90,11 +90,11 @@ public class Hit : Trigger, ICollidable {
             } else {
                 Vector3 knockBackVector = GetKnockBackVector(OtherMover.Transform.position);
                 int hitStunDuration = KnockBackUtils.getHitStun(HitTier);
-                int hitLagDuration = KnockBackUtils.getHitLag(HitTier);
+                int hitStopDuration = KnockBackUtils.getHitStop(HitTier);
 
                 float shieldKnockBackFactor = OtherMover.TakeKnockBack(
                     hitInfo.point,
-                    hitLagDuration,
+                    hitStopDuration,
                     knockBackVector,
                     hitStunDuration,
                     HitTier
@@ -104,11 +104,13 @@ public class Hit : Trigger, ICollidable {
                     // TODO this might apply knockback to things other than characters
                     thisMover.TakeKnockBack(
                         thisMover.Transform.position,
-                        hitLagDuration,
+                        hitStopDuration,
                         shieldKnockBackFactor*knockBackVector,
                         hitStunDuration,
                         HitTier
                     );
+                } else if (Caster!=null && Caster.GetAboutTransform()==About && Caster is IDamageable damageable) {
+                    damageable.HitStopTimer = hitStopDuration;
                 }
 
                 ret = true;

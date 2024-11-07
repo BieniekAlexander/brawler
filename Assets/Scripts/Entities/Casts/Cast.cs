@@ -267,7 +267,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     /* ICasts Methods */
     public int TeamBitMask {get {return (Caster!=null)?Caster.TeamBitMask:0;}}
     public bool IsRotatingClockwise() => !Mirrored;
-    public Transform GetOriginTransform() => transform;
+    public Transform GetAboutTransform() => transform;
     public Transform GetTargetTransform() => Target; // TODO this will probably depend on the cast, and I think this is a good default?
 
     protected virtual void Tick() { }
@@ -278,8 +278,10 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
         if (FrameCastablesMap.ContainsKey(Frame)) {
             _castCastables(FrameCastablesMap[Frame]);
         }
-
-        if (++Frame >= Duration && !Indefinite) {
+        
+        if (Caster!=null && About==Caster.GetAboutTransform() && Caster is IDamageable d && d.HitStopTimer > 0) { // Caster is hitstopped
+                return;
+        } else if (++Frame >= Duration && !Indefinite) {
             Destroy(gameObject);
         }
     }
@@ -304,7 +306,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
                 
                 switch (Castable.AboutResolution) {
                     case AboutResolution.ShallowCopyCaster:
-                        castableAbout = Caster.GetOriginTransform();
+                        castableAbout = Caster.GetAboutTransform();
                         break;
                     case AboutResolution.ShallowCopyAbout:
                         castableAbout = About;

@@ -6,7 +6,7 @@ using UnityEngine;
 public interface ICasts {
     /// <summary/>
     /// <returns>The transform that indicates the origin position for any <typeparamref name="Castable"/>s</returns>
-    public Transform GetOriginTransform();
+    public Transform GetAboutTransform();
 
     /// <summary/>
     /// <returns>The transform that indicates the target position for any <typeparamref name="Castable"/>s</returns>

@@ -7,7 +7,7 @@ In brief, I really enjoyed [Battlerite](https://store.steampowered.com/app/50437
 
 # Development
 ## Initializing Project in Unity
-[See documentation here!](https://unityatscale.com/unity-version-control-guide/how-to-setup-unity-project-on-github/)
+- [Setting Up an Existing Repo in Unity](https://stackoverflow.com/a/71301724/3600382)
 
 ## Installing Packages
 Some of the packages that I'm using in this project aren't easily accessible with the Unity package manager - see the packages listed below:

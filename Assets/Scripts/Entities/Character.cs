@@ -650,8 +650,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
             
             cc.Move(Velocity);
-        } else {
-            Debug.Log(HitStopTimer);
         }
         
         HandleCharges();

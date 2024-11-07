@@ -453,7 +453,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -482,6 +481,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -599,7 +601,7 @@ MonoBehaviour:
     CastPrefab: {fileID: 6926152612496824558, guid: 47b9e5e42bcccc14d90386c0888fcf52,
       type: 3}
     Costs:
-      charges: 0
+      charges: 1
       energy: 0
     Cooldown: 60
     DefaultChargeCount: 1
@@ -623,7 +625,7 @@ MonoBehaviour:
     CastPrefab: {fileID: 585766600846117122, guid: 31915890dbae8b2418757e8099c90292,
       type: 3}
     Costs:
-      charges: 0
+      charges: 1
       energy: 0
     Cooldown: 40
     DefaultChargeCount: 1
@@ -647,7 +649,7 @@ MonoBehaviour:
     CastPrefab: {fileID: 799165592850238794, guid: 521bbdf56313d1842875469ae25827cb,
       type: 3}
     Costs:
-      charges: 0
+      charges: 1
       energy: 0
     Cooldown: 40
     DefaultChargeCount: 1
@@ -671,7 +673,7 @@ MonoBehaviour:
     CastPrefab: {fileID: 8598508159451603624, guid: 795b9e2be3f95f146af44074bb6013a3,
       type: 3}
     Costs:
-      charges: 0
+      charges: 1
       energy: 0
     Cooldown: 55
     DefaultChargeCount: 1
@@ -772,7 +774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!95 &1514126615896770914
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -786,6 +788,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1

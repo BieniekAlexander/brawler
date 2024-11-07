@@ -437,7 +437,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""581e2e5c-e670-4a6f-b20f-664ea0e77f72"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

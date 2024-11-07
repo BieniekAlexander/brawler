@@ -2,20 +2,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class CommandMovementDash: CommandMovement {
-    private int chargeDuration = 5; // TODO temp implementation
-    private float _boostSpeedBump = .125f;
+    [SerializeField] public float _boostSpeedBump = .2f;
     
-    override protected void OnDestruction() {}
-
-    override protected void Tick() {
-        Character c = Mover as Character;
-
-        if (chargeDuration--==0) {
-            Mover.Velocity += c.InputAimDirection.normalized * _boostSpeedBump;
-        } else if (chargeDuration<0) {
-            if (c.InputCastId == (int)CastId.Dash) {
-                Mover.Velocity = c.InputAimDirection.normalized * Mover.Velocity.magnitude;
-            }
+    override protected void OnInitialize() {
+        if (About != null && About.gameObject.GetComponent<Character>() is Character c) {
+            c.Velocity += c.InputAimDirection.normalized * _boostSpeedBump;
         }
     }
 

@@ -143,8 +143,14 @@ public class CharacterStateSliding : CharacterState {
     protected override void ExitState() {}
 
     protected override void FixedUpdateState() {
-        if (Character.InputMoveDirection == Vector2.zero && Character.IsGrounded()) {
-            Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
+        float movementDotAim = Vector3.Dot(Character.InputMoveDirection, Character.InputAimDirection);
+
+        if (Character.IsGrounded()) {
+            if (movementDotAim<-.5f) {
+                Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.RunAcceleration);
+            } else if (movementDotAim<.5f) {
+                Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
+            }
         }
     }
 

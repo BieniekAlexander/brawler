@@ -598,7 +598,7 @@ MonoBehaviour:
     type: 3}
   castSlots:
   - Name: Dash
-    CastPrefab: {fileID: 6926152612496824558, guid: 47b9e5e42bcccc14d90386c0888fcf52,
+    CastPrefab: {fileID: -8167662292094154702, guid: 7d64190e038d36a42b7dbc4efeedd6d5,
       type: 3}
     Costs:
       charges: 1

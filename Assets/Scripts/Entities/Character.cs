@@ -768,6 +768,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     CommandMovement = null;
                 }
                 
+                Destroy(_activeCastable);
+                _activeCastable = null;
                 KnockBack = knockBackFactor*knockBackVector;
                 HitStunTimer = hitStunDuration;
                 HitStopTimer = hitStopDuration;

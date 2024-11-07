@@ -6,7 +6,8 @@ public class CommandMovementDash: CommandMovement {
     
     override protected void OnInitialize() {
         if (About != null && About.gameObject.GetComponent<Character>() is Character c) {
-            c.Velocity += c.InputAimDirection.normalized * _boostSpeedBump;
+            c.Velocity = c.InputAimDirection.normalized * (Mathf.Max(c.BaseSpeed, c.Velocity.magnitude) + _boostSpeedBump);
+            ;
         }
     }
 

@@ -30,7 +30,6 @@ public class CharacterAgent : Agent
         );
 
         return ret;
-        
     }
 
     public void Awake() {

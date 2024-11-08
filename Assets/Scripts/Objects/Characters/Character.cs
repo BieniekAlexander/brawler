@@ -70,29 +70,6 @@ public enum CastId {
     
 }
 
-[Serializable]
-public class CharacterFrameInput {
-    public CharacterFrameInput(
-        Vector3 aimDirection,
-        Vector2 moveDirection,
-        bool blocking,
-        int castId) {
-        MoveDirectionX = moveDirection.x;
-        MoveDirectionZ = moveDirection.y;
-        AimDirectionX = aimDirection.x;
-        AimDirectionZ = aimDirection.z;
-        Blocking = blocking;
-        CastId = castId;
-    }
-
-    public float MoveDirectionX = 0f;
-    public float MoveDirectionZ = 0f;
-    public float AimDirectionX = 0f;
-    public float AimDirectionZ = 0f;
-    public bool Blocking = false;
-    public int CastId = -1;
-}
-
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
     [SerializeField] public bool me = false;

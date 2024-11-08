@@ -70,7 +70,7 @@ public class SceneController : MonoBehaviour
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             } else {
                 CharacterBehavior cb = Char.gameObject.AddComponent(typeof(CharacterBehavior)) as CharacterBehavior;
-                cb.enemy = Characters[_meId];
+                cb.Enemy = Characters[_meId];
             }
         }
 

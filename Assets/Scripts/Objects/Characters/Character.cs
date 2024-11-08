@@ -764,13 +764,16 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             knockBackFactor = 1;
 
             if (knockBackFactor > 0) {
-                if (CommandMovement!=null){
+                if (CommandMovement!=null) {
                     Destroy(CommandMovement.gameObject);
                     CommandMovement = null;
                 }
                 
-                Destroy(_activeCastable);
-                _activeCastable = null;
+                if (_activeCastable!=null) {
+                    Destroy(_activeCastable.gameObject);
+                    _activeCastable = null;
+                }
+                
                 KnockBack = knockBackFactor*knockBackVector;
                 HitStunTimer = hitStunDuration;
                 HitStopTimer = hitStopDuration;

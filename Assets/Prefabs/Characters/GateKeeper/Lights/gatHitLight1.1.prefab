@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.84339136, z: 0, w: -0.5372998}
   m_LocalPosition: {x: -13.072045, y: 0, z: 0.39063278}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4918249452027163949
 MonoBehaviour:
@@ -73,21 +73,21 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -6.3611584, y: 0.902557}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.5283302, y: 0.525609, z: 0.47270393, w: 0.47026947}
-  - PolarPosition: {x: -5.6104913, y: 1.0229002}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.5252223, y: 0.5225171, z: 0.47615474, w: 0.47370246}
-  - PolarPosition: {x: -5.1850824, y: 1.1065279}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.52345103, y: 0.52075493, z: 0.4781013, w: 0.475639}
-  - PolarPosition: {x: -4.9655027, y: 1.1553359}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.52253395, y: 0.51984257, z: 0.47910345, w: 0.47663602}
-  - PolarPosition: {x: -4.9655027, y: 1.1553359}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.52253395, y: 0.51984257, z: 0.47910345, w: 0.47663602}
+  - PolarPosition: {x: -6.3611584, y: 0.90255684}
+    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
+    Rotation: {x: 0.5283302, y: 0.525609, z: 0.47270393, w: 0.47026953}
+  - PolarPosition: {x: -5.545528, y: 1.0348433}
+    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
+    Rotation: {x: 0.5249523, y: 0.5222485, z: 0.47645244, w: 0.47399873}
+  - PolarPosition: {x: -5.129691, y: 1.1184796}
+    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
+    Rotation: {x: 0.52321976, y: 0.52052504, z: 0.47835422, w: 0.47589076}
+  - PolarPosition: {x: -4.819792, y: 1.1902087}
+    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
+    Rotation: {x: 0.5219242, y: 0.51923615, z: 0.47976747, w: 0.4772967}
+  - PolarPosition: {x: -4.342305, y: 1.3207914}
+    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
+    Rotation: {x: 0.5199206, y: 0.5172428, z: 0.48193806, w: 0.47945616}
   - PolarPosition: {x: -4.9655027, y: 1.1553359}
     Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
     Rotation: {x: 0.52253395, y: 0.51984257, z: 0.47910345, w: 0.47663602}
@@ -119,6 +119,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

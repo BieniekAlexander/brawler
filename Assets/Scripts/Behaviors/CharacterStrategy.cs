@@ -5,8 +5,7 @@ using System.Collections.Generic;
 /// Potential strategies:<br/>
 /// - Neutral:<br/>
 ///     - Rush      -> Rush in on a passive opponent and try to hit<br/>
-///     - Poke      -> Preemptively stuff your opponent's approaches<br/>
-///     - Punish    -> catch your opponent's preemptive attack with a punish<br/>
+///     - Wait      -> Keep distance from opponent, occasionally throwing out pokes<br/>
 /// - Advantage:<br/>
 ///     - Pursue    -> Continue attacking your opponent to press the advantage<br/>
 ///     - Reset     -> reestablish a neutral state, setting up for an advantage<br/>
@@ -20,7 +19,7 @@ public class CharacterStrategyFactory {
     public CharacterStrategyFactory() {
         // Neutral
         _strategyDict["Rush"] = new CharacterStrategyRush(this);
-        _strategyDict["Space"] = new CharacterStrategyWait(this);
+        _strategyDict["Wait"] = new CharacterStrategyWait(this);
         // Advantage
         _strategyDict["Pursue"] = new CharacterStrategyPursue(this);
         _strategyDict["Reset"] = new CharacterStrategyReset(this);
@@ -30,7 +29,7 @@ public class CharacterStrategyFactory {
     }
 
     public CharacterStrategy Rush() => _strategyDict["Rush"];
-    public CharacterStrategy Wait() => _strategyDict["Space"];
+    public CharacterStrategy Wait() => _strategyDict["Wait"];
     public CharacterStrategy Pursue() => _strategyDict["Pursue"];
     public CharacterStrategy Reset() => _strategyDict["Reset"];
     public CharacterStrategy Flee() => _strategyDict["Flee"];

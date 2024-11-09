@@ -1,8 +1,14 @@
 using System;
-using UnityEditor.Experimental.GraphView;
+
+public enum CharacterStateType {
+    ACTION,
+    DISADVANTAGE,
+    RECOVERY,
+    MOVEMENT
+}
 
 public abstract class CharacterState {
-    // reference: https://www.youtube.com/watch?v=Vt8aZDPzRjIaaaaaaaaaaa
+    // reference: https://www.youtube.com/watch?v=Vt8aZDPzRjI
     private Character _character;
     public Character Character { get { return _character; } set { _character = value; } }
 
@@ -10,10 +16,11 @@ public abstract class CharacterState {
     public CharacterStateFactory Factory { get { return _factory; } set { _factory = value; } }
 
     protected bool _isRootState = false;
+    public abstract CharacterStateType Type { get; }
     public bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
 
-    private CharacterState _superState;
-    private CharacterState _subState;
+    protected CharacterState SuperState {get; private set; }
+    protected CharacterState SubState {get; private set; }
     public CharacterState(Character _machine, CharacterStateFactory _factory) {
         Character = _machine;
         Factory = _factory;
@@ -41,8 +48,8 @@ public abstract class CharacterState {
         } else {
             FixedUpdateState();
 
-            if (_subState != null) {
-                _subState.FixedUpdateStates();
+            if (SubState != null) {
+                SubState.FixedUpdateStates();
             }
         }
     }
@@ -53,22 +60,22 @@ public abstract class CharacterState {
 
         if (_isRootState) {
             Character.State = newState;
-        } else if (_superState != null) {
-            _superState.SetSubState(newState);
+        } else if (SuperState != null) {
+            SuperState.SetSubState(newState);
         }
     }
 
     private void SetSuperState(CharacterState newSuperState) {
-        _superState = newSuperState;
+        SuperState = newSuperState;
     }
 
     protected void SetSubState(CharacterState newSubState) {
-        if (_subState!=null) {
-        _subState.ExitState();
+        if (SubState!=null) {
+        SubState.ExitState();
         }
 
-        _subState = newSubState;
-        _subState.SetSuperState(this);
+        SubState = newSubState;
+        SubState.SetSuperState(this);
     }
 
     public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);
@@ -76,8 +83,8 @@ public abstract class CharacterState {
     public bool StateInHierarchy(Type stateType) {
         if (this.GetType()==stateType) {
             return true;
-        } else if (_subState != null) {
-            return _subState.StateInHierarchy(stateType);
+        } else if (SubState != null) {
+            return SubState.StateInHierarchy(stateType);
         } else {
             return false;
         }
@@ -88,8 +95,8 @@ public abstract class CharacterState {
 
         ret |= OnCollideWith(collidable, info);
 
-        if (_subState != null) {
-           ret |= _subState.HandleCollisionWithStates(collidable, info);
+        if (SubState != null) {
+           ret |= SubState.HandleCollisionWithStates(collidable, info);
         }
 
         return ret;
@@ -100,7 +107,7 @@ public abstract class CharacterState {
     }
 
     public string getNames() {
-        string subStateNames = (_subState!=null)?_subState.getNames():"";
+        string subStateNames = (SubState!=null)?SubState.getNames():"";
         return $"{this}->{subStateNames}";
     }
 }

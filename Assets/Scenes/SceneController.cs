@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -61,7 +59,7 @@ public class SceneController : MonoBehaviour
         // initialize characters
         for (int i = 0; i < CharacterPrefabs.Count; i++) {
             Character Char = Instantiate(CharacterPrefabs[i], spawnGameObjects[i].transform.position, Quaternion.identity);
-            Char.TeamBitMask = (1<<i);
+            Char.TeamBitMask = 1<<i;
             Characters.Add(Char);
 
             if (i == _meId) {
@@ -69,8 +67,8 @@ public class SceneController : MonoBehaviour
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             } else {
-                CharacterBehavior cb = Char.gameObject.AddComponent(typeof(CharacterBehavior)) as CharacterBehavior;
-                cb.Enemy = Characters[_meId];
+                // CharacterBehavior cb = Char.gameObject.AddComponent(typeof(CharacterBehavior)) as CharacterBehavior;
+                // cb.Enemy = Characters[_meId];
             }
         }
 

@@ -218,10 +218,10 @@ public class CastPlayer : MonoBehaviour {
             SaveCurrentCast();
             InitializeCast(castIds[editorIndex]);
         } else if (CheckControl(CastEditorControls.NextCast, Input.GetKeyDown)) {
-            editorIndex = MathUtils.mod(+1, castIds.Length);
+            editorIndex = MathUtils.mod(editorIndex+1, castIds.Length);
             InitializeCast(castIds[editorIndex]);
         } else if (CheckControl(CastEditorControls.PreviousCast, Input.GetKeyDown)) {
-            editorIndex = MathUtils.mod(+1, castIds.Length);
+            editorIndex = MathUtils.mod(editorIndex-1, castIds.Length);
             InitializeCast(castIds[editorIndex]);
         }
     }

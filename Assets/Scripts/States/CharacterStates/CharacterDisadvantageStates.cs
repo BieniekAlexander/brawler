@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class KnockBackUtils {
     public static int getHitStop(HitTier HitTier) {
-        return (HitTier) switch {
+        return HitTier switch {
             HitTier.Soft => 0,
             HitTier.Light => 7,
             HitTier.Medium => 10,
@@ -14,7 +14,7 @@ public static class KnockBackUtils {
     }
 
     public static int getHitStun(HitTier HitTier) {
-        return (HitTier) switch {
+        return HitTier switch {
             HitTier.Soft => 0,
             HitTier.Light => 10,
             HitTier.Medium => 15,
@@ -26,6 +26,8 @@ public static class KnockBackUtils {
 }
 
 public class CharacterStatePushedBack : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.DISADVANTAGE; }}
+
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
     public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory)
@@ -43,6 +45,7 @@ public class CharacterStatePushedBack : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
+        Character.SetBusy(true, true, 0f);
 
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
@@ -77,6 +80,7 @@ public class CharacterStatePushedBack : CharacterState {
 }
 
 public class CharacterStateKnockedBack : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.DISADVANTAGE; }}
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
     public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory)
@@ -95,6 +99,7 @@ public class CharacterStateKnockedBack : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
+        Character.SetBusy(true, true, 0f);
 
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,
@@ -133,6 +138,7 @@ public class CharacterStateKnockedBack : CharacterState {
 }
 
 public class CharacterStateBlownBack : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.DISADVANTAGE; }}
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
     public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory)
@@ -151,6 +157,7 @@ public class CharacterStateBlownBack : CharacterState {
 
     public override void EnterState() {
         base.EnterState();
+        Character.SetBusy(true, true, 0f);
 
         Character.KnockBack = Vector3.RotateTowards(
             Character.KnockBack,

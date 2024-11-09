@@ -454,7 +454,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private bool _busyStunned;
     public bool Busy {get {return _busyTimer != 0; }}
 
-    public void SetBusy(bool encumbered, bool stunned, float rotationCap) {SetBusy(-1, encumbered, stunned, RotationCap);}
+    public void SetBusy(bool encumbered, bool stunned, float rotationCap) {SetBusy(-1, encumbered, stunned, rotationCap);}
     public void SetBusy(int newBusyTimer, bool encumbered, bool stunned, float rotationCap) {
         _busyTimer = newBusyTimer;
 

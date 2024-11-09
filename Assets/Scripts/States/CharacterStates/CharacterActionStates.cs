@@ -1,7 +1,8 @@
-using System.Linq;
 using UnityEngine;
 
 public class CharacterStateReady : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.ACTION; }}
+
     public CharacterStateReady(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
@@ -31,7 +32,9 @@ public class CharacterStateReady : CharacterState {
 }
 
 public class CharacterStateBusy : CharacterState {
-public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
+    public override CharacterStateType Type {get {return CharacterStateType.ACTION; }}
+
+    public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
     }
@@ -59,6 +62,7 @@ public CharacterStateBusy(Character _machine, CharacterStateFactory _factory)
 }
 
 public class CharacterStateBlocking : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.ACTION; }}
     private float _maxAcceleration = .002f;
     private float _rotationalSpeed = 5f*Mathf.Deg2Rad;
     private int _exposedDuration = 15;

@@ -1,6 +1,8 @@
 using UnityEngine;
 
 public class CharacterStateKnockedDown : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+
     public CharacterStateKnockedDown(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
@@ -28,8 +30,8 @@ public class CharacterStateKnockedDown : CharacterState {
 }
 
 public class CharacterStateTumbling : CharacterState {
-    private float _tumbleAcceleration = .2f;
-    
+    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+
     public CharacterStateTumbling(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = true;
@@ -51,7 +53,10 @@ public class CharacterStateTumbling : CharacterState {
         base.EnterState();
     }
 
-    protected override void ExitState() {}
+    protected override void ExitState() {
+        Character.UnsetBusy();
+    }
+
     protected override void InitializeSubState() {
         SetSubState(Factory.Sliding());
     }
@@ -69,6 +74,8 @@ public class CharacterStateTumbling : CharacterState {
 }
 
 public class CharacterStateRolling : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+
     private float _rollSpeed = .36f;
     private int _recoveryDuration = 15;
 
@@ -95,7 +102,7 @@ public class CharacterStateRolling : CharacterState {
         Character.InvulnerableStack++;
     }
 
-    protected override void ExitState(){
+    protected override void ExitState() {
         Character.InvulnerableStack--;
         Character.UnsetBusy();
     }
@@ -118,7 +125,9 @@ public class CharacterStateRolling : CharacterState {
 }
 
 public class CharacterStateGettingUp : CharacterState {
-    private int _recoveryDuration = 15;
+    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+
+    private int _recoveryDuration = 60;
 
     public CharacterStateGettingUp(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -140,7 +149,7 @@ public class CharacterStateGettingUp : CharacterState {
         Character.InvulnerableStack++;
     }
 
-    protected override void ExitState(){
+    protected override void ExitState() {
         Character.InvulnerableStack--;
         Character.UnsetBusy();
     }
@@ -155,7 +164,9 @@ public class CharacterStateGettingUp : CharacterState {
 }
 
 public class CharacterStateGetUpAttacking : CharacterState {
-    private int _recoveryDuration = 60;
+    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+
+    private int _recoveryDuration = 15;
 
     public CharacterStateGetUpAttacking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -179,7 +190,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
 
     protected override void ExitState() {
         Character.InvulnerableStack--;
-        Character.UnsetBusy(); // TODO
+        Character.UnsetBusy();
     }
 
     protected override void FixedUpdateState() {

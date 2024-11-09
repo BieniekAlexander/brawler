@@ -59,6 +59,8 @@ public static class MovementUtils {
 }
 
 public class CharacterStateRunning : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+
     public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
@@ -123,6 +125,8 @@ public class CharacterStateRunning : CharacterState {
 }
 
 public class CharacterStateSliding : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+
     public CharacterStateSliding(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
@@ -148,7 +152,7 @@ public class CharacterStateSliding : CharacterState {
         if (Character.IsGrounded()) {
             if (movementDotAim<-.5f) {
                 Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.RunAcceleration);
-            } else if (movementDotAim<.5f) {
+            } else if (movementDotAim<.5f || SuperState.Type!=CharacterStateType.ACTION) {
                 Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
             }
         }
@@ -171,6 +175,8 @@ public class CharacterStateSliding : CharacterState {
 }
 
 public class CharacterStateCommandMovement : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+
     public CharacterStateCommandMovement(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
@@ -188,9 +194,7 @@ public class CharacterStateCommandMovement : CharacterState {
         base.EnterState();
     }
 
-    protected override void ExitState() {
-        Character.UnsetBusy();
-    }
+    protected override void ExitState() {}
     protected override void FixedUpdateState() {}
     protected override void InitializeSubState() {}
 

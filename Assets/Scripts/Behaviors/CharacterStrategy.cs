@@ -20,8 +20,7 @@ public class CharacterStrategyFactory {
     public CharacterStrategyFactory() {
         // Neutral
         _strategyDict["Rush"] = new CharacterStrategyRush(this);
-        _strategyDict["Poke"] = new CharacterStrategyPoke(this);
-        _strategyDict["Punish"] = new CharacterStrategyPunish(this);
+        _strategyDict["Space"] = new CharacterStrategyWait(this);
         // Advantage
         _strategyDict["Pursue"] = new CharacterStrategyPursue(this);
         _strategyDict["Reset"] = new CharacterStrategyReset(this);
@@ -31,8 +30,7 @@ public class CharacterStrategyFactory {
     }
 
     public CharacterStrategy Rush() => _strategyDict["Rush"];
-    public CharacterStrategy Poke() => _strategyDict["Poke"];
-    public CharacterStrategy Punish() => _strategyDict["Punish"];
+    public CharacterStrategy Wait() => _strategyDict["Space"];
     public CharacterStrategy Pursue() => _strategyDict["Pursue"];
     public CharacterStrategy Reset() => _strategyDict["Reset"];
     public CharacterStrategy Flee() => _strategyDict["Flee"];
@@ -40,10 +38,10 @@ public class CharacterStrategyFactory {
 }
 
 public abstract class CharacterStrategy {
-    CharacterStrategyFactory Factory;
+    protected CharacterStrategyFactory _factory;
 
     public CharacterStrategy(CharacterStrategyFactory factory) {
-        Factory = factory;
+        _factory = factory;
     }
 
     /// <summary>
@@ -63,24 +61,44 @@ public abstract class CharacterStrategy {
 
 public class CharacterStrategyRush: CharacterStrategy {
     public CharacterStrategyRush(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
-}
-
-public class CharacterStrategyPoke: CharacterStrategy {
-    public CharacterStrategyPoke(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
-}
-
-public class CharacterStrategyPunish: CharacterStrategy {
-    public CharacterStrategyPunish(CharacterStrategyFactory factory): base(factory) {}
-
     override public CharacterAction GetAction(CharacterBehavior state) {
-        return CharacterActionFactory.Approach();
+        if (CharacterObservations.CloseToEnemy(state)) {
+            return CharacterActionFactory.Attack();
+        } else {
+            return CharacterActionFactory.Approach();
+        }
     }
 
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
+    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) {
+        // TODO put these values somewhere 
+        if (Random.Range(0f, 1f)<.005f) { // E[x]=~3.3s
+            return _factory.Wait();
+        } else {
+            return null;
+        }
+    }
+}
+
+
+public class CharacterStrategyWait: CharacterStrategy {
+    public CharacterStrategyWait(CharacterStrategyFactory factory): base(factory) {}
+
+    override public CharacterAction GetAction(CharacterBehavior state) {
+        if (CharacterObservations.CloseToEnemy(state) || Random.Range(0f, 1f)<.005f) { // E[x]=3.3s
+            return CharacterActionFactory.Attack();
+        } else {
+            return CharacterActionFactory.Space();
+        }
+    }
+
+    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) {
+        // TODO put these values somewhere 
+        if (Random.Range(0f, 1f)<.003f) { // E[x]=~5.5s
+            return _factory.Rush();
+        } else {    
+            return null;
+        }
+    }
 }
 
 public class CharacterStrategyPursue: CharacterStrategy {

@@ -307,8 +307,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <param name="castId"></param>
     /// <returns>whether a cast/recast was initiated</returns>
     private bool StartCast(int castId) {
-        if (!Busy && attackCastIdSet.Contains(castId) && _activeCastable!=null) {
-            if (_activeCastable.OnAttackCastables(CursorTransform)) {
+        if (!Busy && attackCastIdSet.Contains(castId) && ActiveCastable!=null) {
+            if (ActiveCastable.OnAttackCastables(CursorTransform)) {
                 return true;
             }
         }
@@ -328,8 +328,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         } else if (!Busy && _hasResourcesForCast(castContainer.CastSlot.Costs)) {
             useCastResources(castContainer.CastSlot.Costs);
 
-            if (_activeCastable!=null && _activeCastable.DestroyOnRecast) {
-                Destroy(_activeCastable.gameObject);
+            if (ActiveCastable!=null && ActiveCastable.DestroyOnRecast) {
+                Destroy(ActiveCastable.gameObject);
             }
 
             Transform castOrigin = transform;
@@ -347,7 +347,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
 
             Cast castPrefab = castContainer.CastSlot.CastPrefab;
-            _activeCastable = Cast.Initiate(
+            ActiveCastable = Cast.Initiate(
                 castPrefab,
                 this,
                 castOrigin,
@@ -397,7 +397,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
     public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
     public int CastBufferTimer { get; private set; } = 0;
-    private Cast _activeCastable = null;
+    public Cast ActiveCastable = null;
     private int _nextCastId;
     public int InputCastId {
         get { return _nextCastId; }
@@ -706,7 +706,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 Vector2 b = mid + perp*Shield.transform.localScale.x/2;
                 Vector2 c = mid - perp*Shield.transform.localScale.x/2;
 
-                if (MathUtils.pointInTriangle(s, a, b, c)) {
+                if (MathUtils.PointInTriangle(s, a, b, c)) {
                     return true;
                 } else {
                     return false;
@@ -746,9 +746,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     CommandMovement = null;
                 }
                 
-                if (_activeCastable!=null) {
-                    Destroy(_activeCastable.gameObject);
-                    _activeCastable = null;
+                if (ActiveCastable!=null) {
+                    Destroy(ActiveCastable.gameObject);
+                    ActiveCastable = null;
                 }
                 
                 KnockBack = knockBackFactor*knockBackVector;

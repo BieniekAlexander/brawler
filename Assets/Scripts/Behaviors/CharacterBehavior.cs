@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class CharacterBehavior : MonoBehaviour {
     // Objects of interest
@@ -23,7 +21,7 @@ public class CharacterBehavior : MonoBehaviour {
     public void Awake() {
         Character = GetComponent<Character>();
         factory = new();
-        strategy = factory.Punish();
+        strategy = factory.Wait();
         input = new();
     }
 
@@ -43,11 +41,25 @@ public class CharacterBehavior : MonoBehaviour {
             strategy = newStrategy;
         }
 
-        if (action == null) {
+        if (action == null || action.IsDone(this)) {
             action = strategy.GetAction(this);
         }
 
         action.ApplyTo(this, input);
         Character.LoadCharacterFrameInput(input);
+    }
+}
+
+public static class CharacterObservations {
+    public static bool CloseToEnemy(CharacterBehavior state) {
+        return (state.Character.transform.position-state.Enemy.transform.position).magnitude < 2f;
+    }
+
+    public static bool SpacedFromEnemy(CharacterBehavior state) {
+        return (state.Character.transform.position-state.Enemy.transform.position).magnitude < 4f;
+    }
+
+    public static bool CastBufferEmpty(CharacterBehavior state) {
+        return state.Character.InputCastId == -1;
     }
 }

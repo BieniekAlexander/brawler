@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering; 
 
 public static class ContextSteering {
     private static float PathScanDistance = 3f;
@@ -17,12 +15,28 @@ public static class ContextSteering {
         new Vector2(-1, -1).normalized
     };
 
-    // https://kidscancode.org/godot_recipes/3.x/ai/context_map/index.html
-    public static void SetDirectionWeights(Transform mover, Vector3 target, List<float> interests) {
-        Vector2 horizontalPlanePath = new(target.x - mover.position.x, target.z - mover.position.z);
+    private static float _getInterest(Vector3 position, Vector3 target, Vector2 steerDirection, Range range) {
+        if (range != null) {
+            float rangeMean = range.Mean(); // NOTE: just looking at the mean for performance
+            float distance = MathUtils.RayDistanceToCircle(
+                new Vector2(position.x, position.z),
+                steerDirection,
+                new Vector2(target.x, target.z),
+                rangeMean
+            );
 
+            return 1-Mathf.Abs(distance)/100; // TODO something without magic numbers :^) https://www.wolframalpha.com/input?i=1-abs%28x%29%2F100
+        } else {
+            Vector2 horizontalPlanePath = new(target.x - position.x, target.z - position.z);
+            return Mathf.Max(0, Vector2.Dot(steerDirection, horizontalPlanePath));
+        }
+    }
+
+    public static void SetDirectionWeights(Transform mover, Vector3 target, List<float> interests, Range range) {
+        // adapted from https://kidscancode.org/godot_recipes/3.x/ai/context_map/index.html
         for (int i = 0; i < SteerDirections.Count; i++) {
-            interests[i] = Mathf.Max(0, Vector2.Dot(SteerDirections[i], horizontalPlanePath));
+            Vector2 horizontalPlanePath = new(mover.transform.position.x - target.x, mover.transform.position.z - target.z);
+            interests[i] = _getInterest(mover.position, target, SteerDirections[i], range);
 
             if (interests[i]>0) {
                 // check for obstructions to collide with
@@ -59,11 +73,15 @@ public static class ContextSteering {
         }
     }
 
-    public static Vector2 GetSteerDirection(Transform mover, Vector3 target, List<float> interests) {
-        SetDirectionWeights(mover, target, interests);
-
+    public static Vector2 GetSteerDirection(Transform mover, Vector3 target, List<float> interests, Range range = null) {
         Vector2 maxDirection = Vector2.zero;
         float maxInterest = .1f;
+        SetDirectionWeights(mover, target, interests, range);
+
+        if (range!=null && interests.Max() < maxInterest) {
+            // TODO hacky solution - if range is set such that the character can't find any path, it'll get stuck behind obstacles
+            SetDirectionWeights(mover, target, interests, null);
+        }
 
         for (int i = 1; i < interests.Count; i++) {
             if (interests[i]>maxInterest) {
@@ -77,72 +95,118 @@ public static class ContextSteering {
 }
 
 public static class AttackBehaviorUtils { // super rough implementation to get some attack behavior going
-    public static int GetAttackCastId(Transform mover, Transform target) {
-        Vector2 horizontalPlanePath = new(target.position.x - mover.position.x, target.position.z - mover.position.z);
-
-        if (horizontalPlanePath.magnitude<2f) {
-            return Random.Range((int) CastId.Light1, (int) CastId.HeavyS);
-        } else {
-            return -1;
-        }
+    public static int GetAttackCastId() {
+        return Random.Range((int) CastId.Light1, (int) CastId.HeavyS);
     }
 }
 
-/// <summary>
-/// Contains functions to be applied to CharacterFrameInput
-/// </summary>
 public static class ActionAtoms {
-    public static void AimAtEnemy(CharacterFrameInput input, CharacterBehavior state) {
-        Vector3 aimDirection = state.Enemy.transform.position-state.Character.transform.position;
-        input.AimDirectionX = aimDirection.x;
-        input.AimDirectionZ = aimDirection.z;
-    }
-
-    public static void Block(CharacterFrameInput input, CharacterBehavior state) {
-        input.Blocking = true;
-    }
-
-    // TODO current implementation will run every frame - find a way to reassess this according to state stored in CharacterBehavior
-    public static void MoveTowardsEnemy(CharacterFrameInput input, CharacterBehavior state) {
+    // Movement
+    public static void MoveTowardsEnemy(CharacterBehavior state, CharacterFrameInput input) {
+        // TODO current implementation will run every frame - find a way to reassess this according to state stored in CharacterBehavior
         Vector2 SteerDirection = ContextSteering.GetSteerDirection(
             state.Character.transform,
             state.Enemy.transform.position,
-            state.SteerInterests
+            state.SteerInterests,
+            null
         );
 
         input.MoveDirectionX = SteerDirection.x;
         input.MoveDirectionZ = SteerDirection.y;
     }
+
+    public static void SpaceFromEnemy(CharacterBehavior state, CharacterFrameInput input) {
+        // TODO currently gets stock behind objects if they obstruct the interection of steerDir with the enemy circle
+        Vector2 SteerDirection = ContextSteering.GetSteerDirection(
+            state.Character.transform,
+            state.Enemy.transform.position,
+            state.SteerInterests,
+            new Range(){Min=3, Max=4}
+        );
+
+        input.MoveDirectionX = SteerDirection.x;
+        input.MoveDirectionZ = SteerDirection.y;
+    }
+
+    public static void MoveTowardsEnemy(CharacterFrameInput input, CharacterBehavior state) {
+        Vector2 SteerDirection = ContextSteering.GetSteerDirection(
+            state.Character.transform,
+            state.Enemy.transform.position,
+            state.SteerInterests,
+            null // TODO consider getting an ideal jab range
+        );
+
+        input.MoveDirectionX = SteerDirection.x;
+        input.MoveDirectionZ = SteerDirection.y;
+    }
+
+    // Aim
+    public static void AimAtEnemy(CharacterBehavior state, CharacterFrameInput input) {
+        Vector3 aimDirection = state.Enemy.transform.position-state.Character.transform.position;
+        input.AimDirectionX = aimDirection.x;
+        input.AimDirectionZ = aimDirection.z;
+    }
+
+    // Attack
+    public static void StartAttack(CharacterBehavior state, CharacterFrameInput input) {
+        input.CastId = AttackBehaviorUtils.GetAttackCastId();
+    }
+
+    // Block
+    public static void Block(CharacterBehavior state, CharacterFrameInput input) {
+        input.Blocking = true;
+    }
 }
 
 public class CharacterAction {
-    public List<(System.Action<CharacterFrameInput, CharacterBehavior>, bool)> Atoms;
-
-    public CharacterAction(List<(System.Action<CharacterFrameInput, CharacterBehavior>, bool)> atoms) {
-        Atoms = atoms;
-    }
+    public List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)> Atoms { get; set; }
+    public System.Func<CharacterBehavior, bool> EndCondition { get; set; }
 
     public void ApplyTo(CharacterBehavior state, CharacterFrameInput input) {
         input.Reset();
 
         for (int i = Atoms.Count-1; i >= 0; i--) {
-            System.Action<CharacterFrameInput, CharacterBehavior> action = Atoms[i].Item1;
+            System.Action<CharacterBehavior, CharacterFrameInput> action = Atoms[i].Item1;
             bool persist = Atoms[i].Item2;
-            action(input, state);
+            action(state, input);
 
             if (!persist) {
                 Atoms.RemoveAt(i);
             }
         }
     }
+
+    public bool IsDone(CharacterBehavior state) {
+        return EndCondition(state);
+    }
 }
 
 public static class CharacterActionFactory {
     public static CharacterAction Approach() {
-        return new CharacterAction(
-            new List<(System.Action<CharacterFrameInput, CharacterBehavior>, bool)>(){
-                (ActionAtoms.MoveTowardsEnemy, true)
-            }
-        );
+        return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
+                (ActionAtoms.MoveTowardsEnemy, true),
+                (ActionAtoms.AimAtEnemy, true)
+            }, EndCondition = CharacterObservations.CloseToEnemy
+        };
+    }
+
+    public static CharacterAction Attack() {
+        return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
+                (ActionAtoms.MoveTowardsEnemy, true),
+                (ActionAtoms.AimAtEnemy, true),
+                (ActionAtoms.StartAttack, false)
+            }, EndCondition = CharacterObservations.CastBufferEmpty
+        };
+    }
+
+    public static CharacterAction Space() {
+        return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
+                (ActionAtoms.SpaceFromEnemy, true),
+                (ActionAtoms.AimAtEnemy, true)
+            }, EndCondition = CharacterObservations.SpacedFromEnemy
+        };
     }
 }

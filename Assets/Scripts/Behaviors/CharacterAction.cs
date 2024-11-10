@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using ServiceStack;
 using UnityEngine;
 
 public static class ContextSteering {
@@ -102,8 +103,21 @@ public static class AttackBehaviorUtils { // super rough implementation to get s
 
 public static class ActionAtoms {
     // Movement
+    public static void MoveAtEnemy(CharacterBehavior state, CharacterFrameInput input) {
+        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Character.transform.position).normalized;
+        Vector2 SteerDirection = EnumUtils<Vector2>.ArgMax(ContextSteering.SteerDirections, i => Vector2.Dot(direction, i));
+        input.MoveDirectionX = SteerDirection.x;
+        input.MoveDirectionZ = SteerDirection.y;
+    }
+
+    public static void MoveFromEnemy(CharacterBehavior state, CharacterFrameInput input) {
+        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Character.transform.position).normalized;
+        Vector2 SteerDirection = EnumUtils<Vector2>.ArgMax(ContextSteering.SteerDirections, i => -Vector2.Dot(direction, i));
+        input.MoveDirectionX = SteerDirection.x;
+        input.MoveDirectionZ = SteerDirection.y;
+    }
+
     public static void MoveTowardsEnemy(CharacterBehavior state, CharacterFrameInput input) {
-        // TODO current implementation will run every frame - find a way to reassess this according to state stored in CharacterBehavior
         Vector2 SteerDirection = ContextSteering.GetSteerDirection(
             state.Character.transform,
             state.Enemy.transform.position,
@@ -115,7 +129,7 @@ public static class ActionAtoms {
         input.MoveDirectionZ = SteerDirection.y;
     }
 
-    public static void SpaceFromEnemy(CharacterBehavior state, CharacterFrameInput input) {
+    public static void SpaceNearEnemy(CharacterBehavior state, CharacterFrameInput input) {
         // TODO currently gets stock behind objects if they obstruct the interection of steerDir with the enemy circle
         Vector2 SteerDirection = ContextSteering.GetSteerDirection(
             state.Character.transform,
@@ -128,16 +142,9 @@ public static class ActionAtoms {
         input.MoveDirectionZ = SteerDirection.y;
     }
 
-    public static void MoveTowardsEnemy(CharacterFrameInput input, CharacterBehavior state) {
-        Vector2 SteerDirection = ContextSteering.GetSteerDirection(
-            state.Character.transform,
-            state.Enemy.transform.position,
-            state.SteerInterests,
-            null // TODO consider getting an ideal jab range
-        );
-
-        input.MoveDirectionX = SteerDirection.x;
-        input.MoveDirectionZ = SteerDirection.y;
+    // Attack
+    public static void Dash(CharacterBehavior state, CharacterFrameInput input) {
+        input.CastId = (int) CastId.Dash;
     }
 
     // Aim
@@ -184,7 +191,7 @@ public class CharacterAction {
 public static class CharacterActionFactory {
     public static CharacterAction Approach() {
         return new CharacterAction(){
-            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
                 (ActionAtoms.MoveTowardsEnemy, true),
                 (ActionAtoms.AimAtEnemy, true)
             }, EndCondition = CharacterObservations.CloseToEnemy
@@ -193,7 +200,7 @@ public static class CharacterActionFactory {
 
     public static CharacterAction Attack() {
         return new CharacterAction(){
-            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
                 (ActionAtoms.MoveTowardsEnemy, true),
                 (ActionAtoms.AimAtEnemy, true),
                 (ActionAtoms.StartAttack, false)
@@ -203,10 +210,46 @@ public static class CharacterActionFactory {
 
     public static CharacterAction Space() {
         return new CharacterAction(){
-            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>(){
-                (ActionAtoms.SpaceFromEnemy, true),
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
+                (ActionAtoms.SpaceNearEnemy, true),
                 (ActionAtoms.AimAtEnemy, true)
             }, EndCondition = CharacterObservations.SpacedFromEnemy
+        };
+    }
+
+    public static CharacterAction BackPedal() {
+        return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
+                (ActionAtoms.MoveFromEnemy, true),
+                (ActionAtoms.AimAtEnemy, true)
+            }, EndCondition = CharacterObservations.SpacedFromEnemy
+        };
+    }
+
+    public static CharacterAction HastenGetUp() {
+         return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
+                (ActionAtoms.MoveAtEnemy, true),
+                (ActionAtoms.AimAtEnemy, true)
+            }, EndCondition = CharacterObservations.SpacedFromEnemy
+        };
+    }
+
+    public static CharacterAction Idle() {
+         return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
+                (ActionAtoms.AimAtEnemy, true)
+            }, EndCondition = CharacterObservations.FarFromEnemy
+        };
+    }
+
+    public static CharacterAction DashIn() {
+         return new CharacterAction(){
+            Atoms = new List<(System.Action<CharacterBehavior, CharacterFrameInput>, bool)>() {
+                (ActionAtoms.MoveAtEnemy, true),
+                (ActionAtoms.AimAtEnemy, true),
+                (ActionAtoms.Dash, false)
+            }, EndCondition = CharacterObservations.FarFromEnemy
         };
     }
 }

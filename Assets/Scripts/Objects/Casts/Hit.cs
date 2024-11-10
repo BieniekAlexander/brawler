@@ -109,7 +109,7 @@ public class Hit : Trigger, ICollidable {
                         hitStunDuration,
                         HitTier
                     );
-                } else if (Caster!=null && Caster.GetAboutTransform()==About && Caster is IDamageable damageable) {
+                } else if (Caster!=null && Caster.GetAboutTransform()==About && Caster is IDamageable damageable && shieldKnockBackFactor>0f) {
                     damageable.HitStopTimer = hitStopDuration;
                 }
 

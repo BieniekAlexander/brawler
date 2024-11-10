@@ -1,43 +1,78 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Potential strategies:<br/>
-/// - Neutral:<br/>
-///     - Rush      -> Rush in on a passive opponent and try to hit<br/>
-///     - Wait      -> Keep distance from opponent, occasionally throwing out pokes<br/>
-/// - Advantage:<br/>
-///     - Pursue    -> Continue attacking your opponent to press the advantage<br/>
-///     - Reset     -> reestablish a neutral state, setting up for an advantage<br/>
-/// - Escape:<br/>
-///     - Flee      -> Get away from your opponent to reset to neutral<br/>
-///     - Reverse   -> Punish your opponent's pursuit to put them in disadvantage<br/>
+/// - Rush  -> Rush in on an opponent<br/>
+/// - Wait  -> Keep a safe distance from opponent<br/>
+/// - Flee  -> Make more space from your opponent<br/>
 /// </summary>
 public class CharacterStrategyFactory {
-    Dictionary<string, CharacterStrategy> _strategyDict = new Dictionary<string, CharacterStrategy>();
+    /// <summary>
+    /// For each character state, describes the character's proclivity to transition to another strategy
+    /// </summary>
+    /// <remarks>
+    /// E.g. if a character has a .001/1 chance of transitioning to <typeparamref name="CharacterStateFlee"/>,
+    /// there's a .1% chance to switch to that strategy each frame, which averages out to happening once every 1/.001/60f=16.666 seconds
+    /// </remarks>
+    Dictionary<string, Dictionary<CharacterStateType, (float[], CharacterStrategy[])>> _transitionDict;
+    Dictionary<string, CharacterStrategy> _strategyDict;
 
     public CharacterStrategyFactory() {
-        // Neutral
-        _strategyDict["Rush"] = new CharacterStrategyRush(this);
-        _strategyDict["Wait"] = new CharacterStrategyWait(this);
-        // Advantage
-        _strategyDict["Pursue"] = new CharacterStrategyPursue(this);
-        _strategyDict["Reset"] = new CharacterStrategyReset(this);
-        // Escape
-        _strategyDict["Flee"] = new CharacterStrategyFlee(this);
-        _strategyDict["Reverse"] = new CharacterStrategyReverse(this);
+        _strategyDict = new() {
+            {"Rush", new CharacterStrategyRush(this)},
+            {"Wait", new CharacterStrategyWait(this)},
+            {"Flee", new CharacterStrategyFlee(this)}
+        };
+
+        _transitionDict = new() {
+            {
+                "Rush", new() {
+                    {CharacterStateType.ACTION, (new float[]{.994f, .005f, .001f}, new CharacterStrategy[]{null, Wait, Flee})},
+                    {CharacterStateType.DISADVANTAGE, (new float[]{.992f, .004f, .004f}, new CharacterStrategy[]{null, Wait, Flee})},
+                    {CharacterStateType.RECOVERY, (new float[]{.992f, .004f, .004f}, new CharacterStrategy[]{null, Wait, Flee})}
+                }
+            }, {
+                "Wait", new() {
+                    {CharacterStateType.ACTION, (new float[]{.997f, .002f, .001f}, new CharacterStrategy[]{null, Rush, Flee})},
+                    {CharacterStateType.DISADVANTAGE, (new float[]{.99f, .001f, .009f}, new CharacterStrategy[]{null, Rush, Flee})},
+                    {CharacterStateType.RECOVERY, (new float[]{.99f, .001f, .009f}, new CharacterStrategy[]{null, Rush, Flee})}
+                }
+            }, {
+                "Flee", new() {
+                    {CharacterStateType.ACTION, (new float[]{.99f, .008f, .002f}, new CharacterStrategy[]{null, Wait, Rush})},
+                    {CharacterStateType.DISADVANTAGE, (new float[]{.99f, .009f, .001f}, new CharacterStrategy[]{null, Wait, Rush})},
+                    {CharacterStateType.RECOVERY, (new float[]{.99f, .009f, .001f}, new CharacterStrategy[]{null, Wait, Rush})}
+                }
+            }
+        };
     }
 
-    public CharacterStrategy Rush() => _strategyDict["Rush"];
-    public CharacterStrategy Wait() => _strategyDict["Wait"];
-    public CharacterStrategy Pursue() => _strategyDict["Pursue"];
-    public CharacterStrategy Reset() => _strategyDict["Reset"];
-    public CharacterStrategy Flee() => _strategyDict["Flee"];
-    public CharacterStrategy Reverse() => _strategyDict["Reverse"];
+    public CharacterStrategy Rush { get {return _strategyDict["Rush"];}}
+    public CharacterStrategy Wait { get {return _strategyDict["Wait"];}}
+    public CharacterStrategy Flee { get {return _strategyDict["Flee"];}}
+
+    /// <summary>
+    /// Switch the Behavior's current strategy, given character behavior
+    /// </summary>
+    /// <param name="behavior"/>
+    /// <returns></returns>
+    public CharacterStrategy GetNewStrategy(CharacterBehavior behavior, CharacterStrategy currentStrategy) {
+        Dictionary<CharacterStateType, (float[], CharacterStrategy[])> strategyTransitions = _transitionDict[currentStrategy.Name];
+
+        if (strategyTransitions.ContainsKey(behavior.StateType)) {
+            (float[], CharacterStrategy[]) transitionOptions = strategyTransitions[behavior.StateType];
+            return RandomUtils.Choice(transitionOptions.Item1, transitionOptions.Item2);
+        } else {
+            return null;
+        }
+    }
 }
 
 public abstract class CharacterStrategy {
     protected CharacterStrategyFactory _factory;
+    abstract public string Name { get; }
 
     public CharacterStrategy(CharacterStrategyFactory factory) {
         _factory = factory;
@@ -48,78 +83,67 @@ public abstract class CharacterStrategy {
     /// </summary>
     /// <param name="perspective"/>
     /// <returns></returns>
-    public abstract CharacterAction GetAction(CharacterBehavior state);
-
-    /// <summary>
-    /// Switch the Behavior's current strategy, given some observations, plus some randomness
-    /// </summary>
-    /// <param name="perspective"/>
-    /// <returns></returns>
-    public abstract CharacterStrategy GetNewStrategy(CharacterBehavior state);
+    public abstract CharacterAction GetAction(CharacterBehavior behavior);
 }
 
 public class CharacterStrategyRush: CharacterStrategy {
+    override public string Name { get {return "Rush";} }
     public CharacterStrategyRush(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) {
-        if (CharacterObservations.CloseToEnemy(state)) {
-            return CharacterActionFactory.Attack();
-        } else {
-            return CharacterActionFactory.Approach();
-        }
-    }
 
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) {
-        // TODO put these values somewhere 
-        if (Random.Range(0f, 1f)<.005f) { // E[x]=~3.3s
-            return _factory.Wait();
-        } else {
-            return null;
+    override public CharacterAction GetAction(CharacterBehavior behavior) {
+        if (behavior.StateType == CharacterStateType.ACTION) {
+            if (CharacterObservations.CloseToEnemy(behavior)) {
+                return CharacterActionFactory.Attack();
+            } else if (Random.Range(0f, 1f)<.5f) {
+                return CharacterActionFactory.DashIn();
+            } else {
+                return CharacterActionFactory.Approach();
+            }
+        } else if (behavior.StateType == CharacterStateType.DISADVANTAGE) {
+            return CharacterActionFactory.HastenGetUp();
+        } else if (behavior.StateType == CharacterStateType.RECOVERY) {
+            return CharacterActionFactory.Approach(); // TODO make get-up attack
         }
+
+        throw new System.NotImplementedException($"Can't pick a valid action for {behavior.BehaviorSummary}");
     }
 }
 
 
 public class CharacterStrategyWait: CharacterStrategy {
+    override public string Name { get {return "Wait";} }
     public CharacterStrategyWait(CharacterStrategyFactory factory): base(factory) {}
 
-    override public CharacterAction GetAction(CharacterBehavior state) {
-        if (CharacterObservations.CloseToEnemy(state) || Random.Range(0f, 1f)<.005f) { // E[x]=3.3s
-            return CharacterActionFactory.Attack();
-        } else {
+    override public CharacterAction GetAction(CharacterBehavior behavior) {
+        if (behavior.StateType == CharacterStateType.ACTION) {
+            if (CharacterObservations.CloseToEnemy(behavior) || Random.Range(0f, 1f)<.005f) { // E[x]=3.3s
+                return CharacterActionFactory.Attack();
+            } else {
+                return CharacterActionFactory.Space();
+            }
+        } else if (behavior.StateType == CharacterStateType.DISADVANTAGE) {
+            return CharacterActionFactory.Idle();
+        } else if (behavior.StateType == CharacterStateType.RECOVERY) {
             return CharacterActionFactory.Space();
         }
+
+        throw new System.NotImplementedException($"Can't pick a valid action for {behavior.BehaviorSummary}");
     }
-
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) {
-        // TODO put these values somewhere 
-        if (Random.Range(0f, 1f)<.003f) { // E[x]=~5.5s
-            return _factory.Rush();
-        } else {    
-            return null;
-        }
-    }
-}
-
-public class CharacterStrategyPursue: CharacterStrategy {
-    public CharacterStrategyPursue(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
-}
-
-public class CharacterStrategyReset: CharacterStrategy {
-    public CharacterStrategyReset(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
 }
 
 public class CharacterStrategyFlee: CharacterStrategy {
+    override public string Name { get {return "Flee";} }
     public CharacterStrategyFlee(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
-}
 
-public class CharacterStrategyReverse: CharacterStrategy {
-    public CharacterStrategyReverse(CharacterStrategyFactory factory): base(factory) {}
-    override public CharacterAction GetAction(CharacterBehavior state) => null;
-    override public CharacterStrategy GetNewStrategy(CharacterBehavior state) => null;
+    override public CharacterAction GetAction(CharacterBehavior behavior) {
+        if (behavior.StateType == CharacterStateType.ACTION) {
+            return CharacterActionFactory.BackPedal(); // TODO something else
+        } else if (behavior.StateType == CharacterStateType.DISADVANTAGE) {
+            return CharacterActionFactory.Idle(); // TODO something else
+        } else if (behavior.StateType == CharacterStateType.RECOVERY) {
+            return CharacterActionFactory.BackPedal(); // TODO something else
+        }
+
+        throw new System.NotImplementedException($"Can't pick a valid action for {behavior.BehaviorSummary}");
+    }
 }

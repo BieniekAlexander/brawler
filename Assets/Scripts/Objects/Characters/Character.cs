@@ -458,14 +458,20 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public void SetBusy(int newBusyTimer, bool encumbered, bool stunned, float rotationCap) {
         _busyTimer = newBusyTimer;
 
-        if (encumbered) {
+        if (encumbered && !_busyEncumbered) {
             _busyEncumbered = true;
             EncumberedStack++;
+        } else if (!encumbered && _busyEncumbered) {
+            _busyEncumbered = false;
+            EncumberedStack--;
         }
 
-        if (stunned) {
+        if (stunned && !_busyStunned) { // maybe rip _busyStunned to getters and setters
             _busyStunned = true;
             StunStack++;
+        } else if (!stunned && _busyStunned) {
+            _busyStunned = false;
+            StunStack--;
         }
 
         if (rotationCap < 175) {

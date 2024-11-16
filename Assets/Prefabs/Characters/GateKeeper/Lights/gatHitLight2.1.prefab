@@ -101,7 +101,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 30
+    expression: 40
   KnockbackReference: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 0.175}
   HitTier: 1

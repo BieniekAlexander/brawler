@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿#if UNITY_EDITOR
 using UnityEditor;
-using System;
 
 [CustomPropertyDrawer(typeof(StringStringDictionary))]
 [CustomPropertyDrawer(typeof(ObjectColorDictionary))]
@@ -13,3 +10,4 @@ public class AnySerializableDictionaryPropertyDrawer : SerializableDictionaryPro
 [CustomPropertyDrawer(typeof(ColorArrayStorage))]
 [CustomPropertyDrawer(typeof(CastableArrayStorage))] // TODO mine
 public class AnySerializableDictionaryStoragePropertyDrawer: SerializableDictionaryStoragePropertyDrawer {}
+#endif

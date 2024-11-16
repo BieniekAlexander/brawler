@@ -67,7 +67,8 @@ public class SceneController : MonoBehaviour
                 Char.SetMe();
                 GameObject.Find("Main Camera").GetComponent<CameraMovement>().TransTarget = Char.transform;
             } else {
-                CharacterBehavior cb = Char.gameObject.AddComponent(typeof(CharacterBehavior)) as CharacterBehavior;
+                CharacterBehavior cb = Char.gameObject.GetComponent<CharacterBehavior>();
+                cb.enabled = true;
                 cb.Enemy = Characters[_meId];
             }
         }

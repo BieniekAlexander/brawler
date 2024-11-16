@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CharacterBehavior : MonoBehaviour {
     // Objects of interest
-    public Character Character;
-    public Character Enemy;
-    public List<Cast> Threats;
+    [HideInInspector] public Character Me;
+    [HideInInspector] public Character Enemy;
+    [HideInInspector] public List<Cast> Threats; // hitboxes, projectiles, etc., things to avoid
 
     // state
-    public CharacterStateType StateType {get {return Character.State.Type; }}
+    public CharacterStateType StateType {get {return Me.State.Type; }}
 
     // Strategy
     private CharacterStrategyFactory factory;
@@ -17,13 +18,15 @@ public class CharacterBehavior : MonoBehaviour {
     private CharacterAction action;
     private CharacterFrameInput input;
 
-    // Context Based Steering
-    public int steerEvaluationRate = 5; private int steerEvaluationTimer = 0;
+    // Movement
+    [HideInInspector] public int steerEvaluationRate = 5; private int steerEvaluationTimer = 0;
     public List<float> SteerInterests = Enumerable.Repeat(0f, ContextSteering.SteerDirections.Count).ToList();
-    
+    public NavMeshPath NMPath;
+
     /* MonoBehavior */
-    public void Awake() {
-        Character = GetComponent<Character>();
+    public void Start() {
+        Me = GetComponent<Character>();
+        NMPath = new();
         factory = new();
         strategy = factory.Wait;
         input = new();
@@ -43,7 +46,7 @@ public class CharacterBehavior : MonoBehaviour {
         }
 
         action.ApplyTo(this, input);
-        Character.LoadCharacterFrameInput(input);
+        Me.LoadCharacterFrameInput(input);
     }
 
     /* Observation */
@@ -59,23 +62,23 @@ public class CharacterBehavior : MonoBehaviour {
     /* Debug */
     public string BehaviorSummary {get {
         return $@"
-            Character={Character.name}
-            State={Character.State}
+            Character={Me.name}
+            State={Me.State}
         ";
     }}
 }
 
 public static class CharacterObservations {
     public static bool CloseToEnemy(CharacterBehavior behavior) {
-        return (behavior.Character.transform.position-behavior.Enemy.transform.position).magnitude < 2f;
+        return (behavior.Me.transform.position-behavior.Enemy.transform.position).magnitude < 2f;
     }
 
     public static bool SpacedFromEnemy(CharacterBehavior behavior) {
-        return (behavior.Character.transform.position-behavior.Enemy.transform.position).magnitude < 4f;
+        return (behavior.Me.transform.position-behavior.Enemy.transform.position).magnitude < 4f;
     }
 
     public static bool CastBufferEmpty(CharacterBehavior behavior) {
-        return behavior.Character.InputCastId == -1;
+        return behavior.Me.InputCastId == -1;
     }
 
     public static bool NotDisadvantage(CharacterBehavior behavior) {
@@ -83,6 +86,6 @@ public static class CharacterObservations {
     }
 
     public static bool FarFromEnemy(CharacterBehavior behavior) {
-        return (behavior.Character.transform.position-behavior.Enemy.transform.position).magnitude > 6f;
+        return (behavior.Me.transform.position-behavior.Enemy.transform.position).magnitude > 6f;
     }
 }

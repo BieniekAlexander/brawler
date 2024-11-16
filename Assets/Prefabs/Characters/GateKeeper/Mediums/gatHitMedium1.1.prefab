@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.84339136, z: 0, w: -0.5372998}
   m_LocalPosition: {x: -13.072045, y: 0, z: 0.39063278}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4918249452027163949
 MonoBehaviour:
@@ -107,7 +107,7 @@ MonoBehaviour:
   HitsEnemies: 1
   HitsFriendlies: 0
   damageExpression:
-    expression: 50
+    expression: 90
   KnockbackReference: 1
   BaseKnockbackVector: {x: 0, y: 0, z: 0.2}
   HitTier: 2
@@ -128,6 +128,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

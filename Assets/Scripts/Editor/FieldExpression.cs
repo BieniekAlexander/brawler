@@ -28,7 +28,19 @@ public class FieldExpression<C, T> where C : Cast {
     }
 }
 
-public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> {
+public static class FieldExpressionParserFactory {
+    private static FieldExpressionParser _fieldExpressionParser;
+    public static FieldExpressionParser singleton { get {
+            if (_fieldExpressionParser==null) {
+                _fieldExpressionParser = new();
+            }
+
+            return _fieldExpressionParser;
+        }
+    }
+}
+
+public class FieldExpressionParser {
     // ref: https://sharpscript.net/lisp/unity#annotated-unity-repl-transcript
     private Lisp.Interpreter interpreter;
     private ScriptContext scriptContext;
@@ -44,7 +56,7 @@ public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> 
         public Cast Parent(Cast c) => c.Parent;
     }
 
-    public void OnEnable() {
+    public FieldExpressionParser() {
         scriptContext = new ScriptContext {
             ScriptLanguages = { ScriptLisp.Language },
             AllowScriptingOfAllTypes = true,
@@ -68,6 +80,8 @@ public class FieldExpressionParser : ScriptableSingleton<FieldExpressionParser> 
     }
 }
 
+
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(FieldExpression<,>))]
 public class FieldExpressionPropertyDrawer : PropertyDrawer {
     // reference: https://www.youtube.com/watch?v=ur-qy6SjVQw
@@ -93,3 +107,4 @@ public class FieldExpressionPropertyDrawer : PropertyDrawer {
         EditorGUI.EndProperty();
     }
 }
+#endif

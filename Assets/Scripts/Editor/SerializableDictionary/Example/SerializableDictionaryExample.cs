@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,3 +22,4 @@ public class SerializableDictionaryExample : MonoBehaviour {
 		m_objectColorDictionary = new ObjectColorDictionary() { {gameObject, Color.blue}, {this, Color.red} };
 	}
 }
+#endif

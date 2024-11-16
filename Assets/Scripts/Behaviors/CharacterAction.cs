@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using ServiceStack;
 using UnityEngine;
+using UnityEngine.AI;
 
 public static class ContextSteering {
     private static float PathScanDistance = 3f;
@@ -34,6 +34,10 @@ public static class ContextSteering {
     }
 
     public static void SetDirectionWeights(Transform mover, Vector3 target, List<float> interests, Range range) {
+        if (!NavMesh.SamplePosition(mover.position, out NavMeshHit navMeshHit, 1f, NavMesh.AllAreas)) {
+            return;
+        }
+
         // adapted from https://kidscancode.org/godot_recipes/3.x/ai/context_map/index.html
         for (int i = 0; i < SteerDirections.Count; i++) {
             Vector2 horizontalPlanePath = new(mover.transform.position.x - target.x, mover.transform.position.z - target.z);
@@ -55,18 +59,8 @@ public static class ContextSteering {
                     continue;
                 } 
                 
-                // check if the nearby space is walkable
-                // TODO this doesn't operate as intended when there's a pit between the player and the pathscan point
-                bool walkable = false;
-
-                foreach (GameObject go in GameObject.FindGameObjectsWithTag("Terrain:Path")) {
-                    Collider pathCollider = go.GetComponent<Collider>();
-                    walkable |= pathCollider.bounds.Contains(
-                        mover.position + Vector3.down*1.5f + currentDirection*PathScanDistance
-                    );
-                }
-
-                if (!walkable) {
+                // check if we hit the end of the NavMesh
+                if (NavMesh.Raycast(navMeshHit.position, navMeshHit.position+5*currentDirection, out NavMeshHit _, NavMesh.AllAreas)) {
                     interests[i] = 0;
                     continue;
                 }
@@ -104,42 +98,82 @@ public static class AttackBehaviorUtils { // super rough implementation to get s
 public static class ActionAtoms {
     // Movement
     public static void MoveAtEnemy(CharacterBehavior state, CharacterFrameInput input) {
-        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Character.transform.position).normalized;
+        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Me.transform.position).normalized;
         Vector2 SteerDirection = EnumUtils<Vector2>.ArgMax(ContextSteering.SteerDirections, i => Vector2.Dot(direction, i));
         input.MoveDirectionX = SteerDirection.x;
         input.MoveDirectionZ = SteerDirection.y;
     }
 
     public static void MoveFromEnemy(CharacterBehavior state, CharacterFrameInput input) {
-        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Character.transform.position).normalized;
+        Vector2 direction = MovementUtils.inXZ(state.Enemy.transform.position - state.Me.transform.position).normalized;
         Vector2 SteerDirection = EnumUtils<Vector2>.ArgMax(ContextSteering.SteerDirections, i => -Vector2.Dot(direction, i));
         input.MoveDirectionX = SteerDirection.x;
         input.MoveDirectionZ = SteerDirection.y;
     }
 
     public static void MoveTowardsEnemy(CharacterBehavior state, CharacterFrameInput input) {
-        Vector2 SteerDirection = ContextSteering.GetSteerDirection(
-            state.Character.transform,
+        Vector2 steerDirection = ContextSteering.GetSteerDirection(
+            state.Me.transform,
             state.Enemy.transform.position,
             state.SteerInterests,
             null
         );
 
-        input.MoveDirectionX = SteerDirection.x;
-        input.MoveDirectionZ = SteerDirection.y;
+        if (steerDirection==Vector2.zero) {
+            Vector3 start = MovementUtils.inXZ(state.Me.transform.position);
+            Vector3 end = MovementUtils.inXZ(state.Enemy.transform.position);
+
+            if (
+                    NavMesh.CalculatePath(
+                    start,
+                    end,
+                    NavMesh.AllAreas,
+                    state.NMPath
+                    ) && state.NMPath.corners.Length>1
+            ) {
+                steerDirection = ContextSteering.GetSteerDirection(
+                    state.Me.transform,
+                    state.NMPath.corners[1],
+                    state.SteerInterests,
+                    null
+                );
+            }
+        }
+
+        input.MoveDirectionX = steerDirection.x;
+        input.MoveDirectionZ = steerDirection.y;
     }
 
     public static void SpaceNearEnemy(CharacterBehavior state, CharacterFrameInput input) {
         // TODO currently gets stock behind objects if they obstruct the interection of steerDir with the enemy circle
-        Vector2 SteerDirection = ContextSteering.GetSteerDirection(
-            state.Character.transform,
+        Vector2 steerDirection = ContextSteering.GetSteerDirection(
+            state.Me.transform,
             state.Enemy.transform.position,
             state.SteerInterests,
             new Range(){Min=3, Max=4}
         );
 
-        input.MoveDirectionX = SteerDirection.x;
-        input.MoveDirectionZ = SteerDirection.y;
+        if (steerDirection==Vector2.zero) { // TODO wrap this somehow so that the code isn't copied smh
+            Vector3 start = MovementUtils.inXZ(state.Me.transform.position);
+            Vector3 end = MovementUtils.inXZ(state.Enemy.transform.position);
+
+            if (NavMesh.CalculatePath(
+                start,
+                end,
+                NavMesh.AllAreas,
+                state.NMPath
+            )) {
+                steerDirection = ContextSteering.GetSteerDirection(
+                    state.Me.transform,
+                    state.NMPath.corners[1],
+                    state.SteerInterests,
+                    null
+                );
+            }
+        }
+
+        input.MoveDirectionX = steerDirection.x;
+        input.MoveDirectionZ = steerDirection.y;
     }
 
     // Attack
@@ -149,7 +183,7 @@ public static class ActionAtoms {
 
     // Aim
     public static void AimAtEnemy(CharacterBehavior state, CharacterFrameInput input) {
-        Vector3 aimDirection = state.Enemy.transform.position-state.Character.transform.position;
+        Vector3 aimDirection = state.Enemy.transform.position-state.Me.transform.position;
         input.AimDirectionX = aimDirection.x;
         input.AimDirectionZ = aimDirection.z;
     }

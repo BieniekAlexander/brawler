@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -282,3 +283,4 @@ public class CastPlayer : MonoBehaviour {
         GUI.Label(new Rect(20, 70, 200, 20), $"Frame {frame}/{duration-1} (total {duration})");
     }
 }
+#endif

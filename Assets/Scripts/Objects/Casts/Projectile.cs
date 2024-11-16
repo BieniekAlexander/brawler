@@ -14,7 +14,7 @@ public class Projectile : Cast, IMoves, ICollidable, IDamageable, ICasts {
 
     override protected void OnInitialize() {
         base.OnInitialize();
-        FieldExpressionParser.instance.RenderValue(this, baseSpeedExpression);
+        FieldExpressionParserFactory.singleton.RenderValue(this, baseSpeedExpression);
         Velocity = Caster.GetAboutTransform().rotation*Vector3.forward*BaseSpeed;
     }
 

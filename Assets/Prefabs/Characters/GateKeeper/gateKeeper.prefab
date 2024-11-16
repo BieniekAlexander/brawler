@@ -431,6 +431,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1514126615896770914}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 644e42b65e393b84ebda2b56949eda7e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5139024230135778853}
   m_SourcePrefab: {fileID: 100100000, guid: 644e42b65e393b84ebda2b56949eda7e, type: 3}
 --- !u!1 &459646023120923706 stripped
 GameObject:
@@ -594,8 +598,6 @@ MonoBehaviour:
   me: 0
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}
-  ParryInvulnerabilityPrefab: {fileID: -868168471956183718, guid: ac1b3db686c9bf647af1e23771ca1023,
-    type: 3}
   castSlots:
   - Name: Dash
     CastPrefab: {fileID: -8167662292094154702, guid: 7d64190e038d36a42b7dbc4efeedd6d5,
@@ -757,6 +759,7 @@ MonoBehaviour:
       energy: 100
     Cooldown: 1800
     DefaultChargeCount: 1
+  ActiveCastable: {fileID: 0}
   Parried: 0
   RunAcceleration: 0.01
   LifeCount: -1
@@ -794,3 +797,28 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-5139024230135778853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459646023120923706}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ede0ca59d95b0dd4ab5926ef81955b83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Me: {fileID: 0}
+  Enemy: {fileID: 0}
+  Threats: []
+  steerEvaluationRate: 5
+  SteerInterests:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0

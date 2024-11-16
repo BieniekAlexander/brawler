@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TempleSummit.unity
     guid: 112db0a509d1dc643a81a7f8690ee8db
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Map.unity
     guid: 8e357c8eaecc8df479de7f8454eb4d06
   - enabled: 1
@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/HitTimelineStuff/HitEditor.unity
     guid: f49c99cffe23d184caae9dddf799f616
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TestArea.unity
     guid: 1373a26c243513e4c89bb31bb7992fe9
   - enabled: 1
@@ -26,3 +26,4 @@ EditorBuildSettings:
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: a6da16170968901438636a596bc3986b,
       type: 2}
+  m_UseUCBPForAssetBundles: 0

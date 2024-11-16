@@ -1,18 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using System;
 using UnityEngine;
-
-/* START MINE */
-[Serializable]
-public class FrameCastablesDictionary : SerializableDictionary<int, Cast[], CastableArrayStorage> { }
-
-[Serializable]
-public class ConditionCastablesDictionary : SerializableDictionary<CastableCondition, Cast[], CastableArrayStorage> { }
-
-[Serializable]
-public class CastableArrayStorage : SerializableDictionary.Storage<Cast[]> { }
-/* END MINE */
 
 [Serializable]
 public class StringStringDictionary : SerializableDictionary<string, string> {}
@@ -35,3 +23,4 @@ public class MyClass
 
 [Serializable]
 public class QuaternionMyClassDictionary : SerializableDictionary<Quaternion, MyClass> {}
+#endif

@@ -19,7 +19,7 @@ public class Hit : Trigger, ICollidable {
 
     override protected void OnInitialize() {
         base.OnInitialize();
-        FieldExpressionParser.instance.RenderValue(this, damageExpression);
+        FieldExpressionParserFactory.singleton.RenderValue(this, damageExpression);
     }
 
     /* Knockback */

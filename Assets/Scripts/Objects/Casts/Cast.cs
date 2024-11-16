@@ -144,7 +144,7 @@ public class Cast : MonoBehaviour, ICasts, ICollidable, IHealingTree<Cast> {
     }
 
     protected virtual void OnInitialize() {
-        FieldExpressionParser.instance.RenderValue(this, DataExpression);
+        FieldExpressionParserFactory.singleton.RenderValue(this, DataExpression);
 
         if (Target!=About) {
             transform.rotation = Quaternion.LookRotation(Target.position-About.position, Vector3.up);

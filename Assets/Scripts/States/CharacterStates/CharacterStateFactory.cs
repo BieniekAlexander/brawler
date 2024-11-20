@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using UnityEngine;
 
 public class CharacterStateFactory {
     // somebody suggested the following for visualization: https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Experimental.GraphView.GraphView.html
@@ -11,6 +11,9 @@ public class CharacterStateFactory {
 
         // Movement
         _stateDict["Running"] = new CharacterStateRunning(_character, this);
+        _stateDict["Dashing"] = new CharacterStateDashing(_character, this);
+        _stateDict["Slipping"] = new CharacterStateSlipping(_character, this);
+        _stateDict["BackDashing"] = new CharacterStateBackDashing(_character, this);
         _stateDict["Sliding"] = new CharacterStateSliding(_character, this);
         _stateDict["CommandMovement"] = new CharacterStateCommandMovement(_character, this);
         // Action
@@ -31,6 +34,9 @@ public class CharacterStateFactory {
 
     // movement
     public CharacterState Running() => _stateDict["Running"];
+    public CharacterState Dashing() => _stateDict["Dashing"];
+    public CharacterState BackDashing() => _stateDict["BackDashing"];
+    public CharacterState Slipping() => _stateDict["Slipping"];
     public CharacterState Sliding() => _stateDict["Sliding"];
     public CharacterState CommandMovement() => _stateDict["CommandMovement"];
 
@@ -49,6 +55,6 @@ public class CharacterStateFactory {
     public CharacterState Tumbling() => _stateDict["Tumbling"];
     public CharacterState KnockedDown() => _stateDict["KnockedDown"];
     public CharacterState GettingUp() => _stateDict["GettingUp"];
-    public CharacterState Rolling() => _stateDict["Rolling"];
     public CharacterState GetUpAttacking() => _stateDict["GetUpAttacking"];
+    public CharacterState Rolling() => _stateDict["Rolling"];
 }

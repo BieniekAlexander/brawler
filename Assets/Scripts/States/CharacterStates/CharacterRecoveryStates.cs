@@ -18,10 +18,7 @@ public class CharacterStateKnockedDown : CharacterState {
         }
     }
 
-    public override void EnterState(){
-        base.EnterState();
-    }
-
+    public override void EnterState() => base.EnterState();
     protected override void ExitState() {}
     protected override void FixedUpdateState() {}
     protected override void InitializeSubState() {}
@@ -76,8 +73,8 @@ public class CharacterStateTumbling : CharacterState {
 public class CharacterStateRolling : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
 
-    private float _rollSpeed = .36f;
-    private int _recoveryDuration = 15;
+    private float _rollSpeed = .15f;
+    private int _recoveryDuration = 30;
 
     public CharacterStateRolling(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
@@ -98,11 +95,12 @@ public class CharacterStateRolling : CharacterState {
         // otherwise, I'm having an issue where the roll happens, but the dash input is still buffered
         Character.InputCastId = -1;
         Character.RecoveryTimer = _recoveryDuration;
-        Character.Velocity = Character.InputAimDirection.normalized * _rollSpeed;
+        Character.Velocity = Character.InputAimVector.normalized * _rollSpeed;
         Character.InvulnerableStack++;
     }
 
     protected override void ExitState() {
+        Character.Velocity = Character.Velocity.normalized * .05f; 
         Character.InvulnerableStack--;
         Character.UnsetBusy();
     }

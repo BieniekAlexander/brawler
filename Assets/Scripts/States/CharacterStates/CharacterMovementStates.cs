@@ -1,5 +1,16 @@
 using UnityEngine;
 
+public enum AimMovementOrientation {
+    PARALLEL,
+    PERPENDICULAR,
+    ANTIPARALLEL
+}
+
+public enum RotationMovementOrientation {
+    WITH,
+    AGAINST
+}
+
 public static class MovementUtils {
     public static Vector3 inXZ(Vector3 vector) {
         return Vector3.Scale(vector, new Vector3(1, 0, 1));
@@ -38,7 +49,7 @@ public static class MovementUtils {
 
     public static Vector3 GetBounce(Vector3 velocity, Vector3 normal) {
             Vector3 bounceDirection = (velocity-2*Vector3.Project(velocity, normal)).normalized;
-            return MovementUtils.setXZ(velocity, bounceDirection*velocity.magnitude);
+            return setXZ(velocity, bounceDirection*velocity.magnitude);
     }
 
     public static void Push(IMoves pushing, IMoves pushed, Vector3 normal) {
@@ -48,12 +59,43 @@ public static class MovementUtils {
     }
 
     public static float StrafeSpeedMultiplier(Vector3 aimDirection, Vector3 moveDirection) {
-        float dot = Vector3.Dot(aimDirection.normalized, moveDirection.normalized);
+        float dot = Vector3.Dot(aimDirection, moveDirection);
 
         if (dot>0) {
             return 1f;
         } else {
             return 1f+dot/5f;
+        }
+    }
+
+    /// <summary>
+    /// Fires if a move direction button was recently pressed (according to the buffer) and if said move direction was pressed again
+    /// </summary>
+    /// <param name="c"></param>
+    /// <returns></returns>
+    public static bool Dashing(Character c) {
+        return (c.InputMoveDirection.x==-1 && c.DashBuffer[0]>0)
+            || (c.InputMoveDirection.x==+1 && c.DashBuffer[1]>0)
+            || (c.InputMoveDirection.y==-1 && c.DashBuffer[2]>0)
+            || (c.InputMoveDirection.y==+1 && c.DashBuffer[3]>0);
+    }
+
+    public static AimMovementOrientation GetAimMovementOrientation(Character c) {
+        float aimMovementNorm = Vector3.Dot(c.MoveDirection.normalized, c.InputAimVector.normalized);
+        return aimMovementNorm switch {
+            >.707f => AimMovementOrientation.PARALLEL,
+            <-.707f => AimMovementOrientation.ANTIPARALLEL,
+            _ => AimMovementOrientation.PERPENDICULAR
+        };
+    }
+
+    public static RotationMovementOrientation GetRotationMovementOrientation(Character c) {
+        Vector3 relativeMoveDirection = Quaternion.Inverse(c.transform.rotation) * c.MoveDirection;
+
+        if (relativeMoveDirection.x>0 == c.IsRotatingClockwise()) {
+            return RotationMovementOrientation.WITH;
+        } else {
+            return RotationMovementOrientation.AGAINST;
         }
     }
 }
@@ -69,6 +111,15 @@ public class CharacterStateRunning : CharacterState {
     protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
+        } else if (MovementUtils.Dashing(Character)) {
+            for (int i = 0; i < Character.DashBuffer.Length; i++) { Character.DashBuffer[i]=0;}
+
+            AimMovementOrientation a = MovementUtils.GetAimMovementOrientation(Character);
+            return a switch {
+                AimMovementOrientation.PARALLEL => Factory.Dashing(),
+                AimMovementOrientation.PERPENDICULAR => Factory.Slipping(),
+                _ => Factory.BackDashing()
+            };
         } else {
             return null;
         }
@@ -83,7 +134,10 @@ public class CharacterStateRunning : CharacterState {
     protected override void FixedUpdateState() {
         // TODO what if I'm in the air? Air control?
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
-        float strafeSpeed = Character.BaseSpeed * MovementUtils.StrafeSpeedMultiplier(Character.MoveDirection, Character.InputAimDirection);
+        float strafeSpeed = Character.BaseSpeed * MovementUtils.StrafeSpeedMultiplier(
+            Character.MoveDirection.normalized,
+            Character.InputAimVector.normalized
+        );
 
         float dSpeed = Mathf.Clamp(
             Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
@@ -124,6 +178,126 @@ public class CharacterStateRunning : CharacterState {
     }
 }
 
+public class CharacterStateDashing : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+    private readonly int _duration = 12;
+    private readonly float[] velocityCurve = new float[]{.01f, .3f, .3f, .3f, .3f, .3f, .3f, .2f, .1f, 0f, 0f, 0f};
+    private int _frame;
+
+    public CharacterStateDashing(Character _machine, CharacterStateFactory _factory)
+    : base(_machine, _factory) {
+        _isRootState = false;
+    }
+
+    protected override CharacterState CheckGetNewState() {
+        if (++_frame==_duration) {
+            return Factory.Running();
+        } else {
+            return null;
+        }
+    }
+
+    public override void EnterState() {
+        Character.Velocity = Character.InputAimVector.normalized*velocityCurve[0];
+        _frame = 0;
+    }
+
+    protected override void FixedUpdateState() => Character.Velocity = Character.Velocity.normalized*velocityCurve[_frame];
+    protected override void ExitState() {}
+    protected override void InitializeSubState() {}
+
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (collidable is StageTerrain terrain && info!=null) {
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else if (collidable is Character otherCharacter) {
+            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
+            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+public class CharacterStateSlipping : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+    private readonly int _duration = 8;
+    private int _timer;
+
+    public CharacterStateSlipping(Character _machine, CharacterStateFactory _factory)
+    : base(_machine, _factory) {
+        _isRootState = false;
+    }
+
+    protected override CharacterState CheckGetNewState() {
+        if (--_timer==0) {
+            return Factory.Running();
+        } else {
+            return null;
+        }
+    }
+
+    public override void EnterState() {
+        Character.Velocity = Quaternion.AngleAxis(
+            Mathf.Atan(
+                Character.InputAimVector.magnitude
+            )*Mathf.Rad2Deg,
+            (
+                (Quaternion.Inverse(Character.transform.rotation)*Character.MoveDirection).x<0
+                ? Vector3.down : Vector3.up
+            )
+        ) * Character.InputAimVector.normalized * .3f;
+        _timer = _duration;
+    }
+
+    protected override void ExitState() => Character.Velocity = Character.Velocity.normalized*Character.BaseSpeed;
+    protected override void FixedUpdateState() {}
+    protected override void InitializeSubState() {}
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
+}
+
+public class CharacterStateBackDashing : CharacterState {
+    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
+    private readonly int _duration = 18;
+    private int _timer;
+
+    public CharacterStateBackDashing(Character _machine, CharacterStateFactory _factory)
+    : base(_machine, _factory) {
+        _isRootState = false;
+    }
+
+    protected override CharacterState CheckGetNewState() {
+        if (--_timer==0) {
+            return Factory.Running();
+        } else {
+            return null;
+        }
+    }
+
+    public override void EnterState() {
+        Character.Velocity = -Character.InputAimVector.normalized*.2f;
+        _timer = _duration;
+    }
+
+    protected override void FixedUpdateState() => Character.Velocity = -Character.InputAimVector.normalized*.2f;
+    protected override void ExitState() => Character.Velocity = Character.Velocity.normalized*Character.BaseSpeed;
+    protected override void InitializeSubState() {}
+
+    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
+        if (collidable is StageTerrain terrain && info!=null) {
+            Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
+            return true;
+        } else if (collidable is Character otherCharacter) {
+            Vector3 decollisionVector = CollisionUtils.GetDecollisionVector(Character, otherCharacter);
+            Character.Transform.position += MovementUtils.inXZ(decollisionVector);
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
 public class CharacterStateSliding : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
 
@@ -140,14 +314,15 @@ public class CharacterStateSliding : CharacterState {
         }
     }
 
-    public override void EnterState() {
-        base.EnterState();
-    }
-
+    public override void EnterState() => base.EnterState();
     protected override void ExitState() {}
+    protected override void InitializeSubState() {}
 
     protected override void FixedUpdateState() {
-        float movementDotAim = Vector3.Dot(Character.InputMoveDirection, Character.InputAimDirection);
+        float movementDotAim = Vector3.Dot(
+            Character.InputMoveDirection.normalized,
+            Character.InputAimVector.normalized
+        );
 
         if (Character.IsGrounded()) {
             if (movementDotAim<-.5f) {
@@ -157,8 +332,6 @@ public class CharacterStateSliding : CharacterState {
             }
         }
     }
-
-    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain terrain && info!=null) {

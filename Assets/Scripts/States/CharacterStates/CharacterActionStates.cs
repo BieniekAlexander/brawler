@@ -106,7 +106,7 @@ public class CharacterStateBlocking : CharacterState {
         // - if you're running, shielding towards the direction of movement should rotate you (but not too much the same dir?)
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
-        Vector3 shieldDirection = Character.InputAimDirection;
+        Vector3 shieldDirection = Character.InputAimVector;
         float directionDot = Mathf.Max(Vector3.Dot(MovementUtils.inXZ(Character.Velocity).normalized, shieldDirection), 0);
         
         Character.Velocity = Vector3.RotateTowards(

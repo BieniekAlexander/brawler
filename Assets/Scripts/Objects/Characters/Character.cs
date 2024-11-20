@@ -87,7 +87,19 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
 
-    public Vector2 InputMoveDirection { get; set; } = new();
+    private static readonly int _dashBufferDuration = 10;
+    private Vector2 _inputMoveDirection = new(); 
+    public Vector2 InputMoveDirection { 
+        get => _inputMoveDirection;
+        set { // handling dash buffer
+            if (_inputMoveDirection.x==-1 && value.x==0) { DashBuffer[0] = _dashBufferDuration;}
+            if (_inputMoveDirection.x==+1 && value.x==0) { DashBuffer[1] = _dashBufferDuration;}
+            if (_inputMoveDirection.y==-1 && value.y==0) { DashBuffer[2] = _dashBufferDuration;}
+            if (_inputMoveDirection.y==+1 && value.y==0) { DashBuffer[3] = _dashBufferDuration;}
+            _inputMoveDirection = value;
+        }
+    }
+
     public Vector3 MoveDirection {
         get {
             // TODO is this the best way to do this
@@ -97,7 +109,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    public Vector3 InputAimDirection { // TODO make sure that the Y position is locked to the character's Y
+    public Vector3 InputAimVector { // TODO make sure that the Y position is locked to the character's Y
         get {
             return CursorTransform.position-cc.transform.position;
         }
@@ -117,7 +129,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
             float yRotationDiff = Mathf.DeltaAngle(newRotation.eulerAngles.y, transform.rotation.eulerAngles.y);
             if (Mathf.Abs(yRotationDiff) > MinimumRotationThreshold) {
-                RotatingClockwise = (yRotationDiff<0);
+                RotatingClockwise = yRotationDiff<0;
             }
 
             transform.rotation = newRotation;
@@ -152,7 +164,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             if (aimPlane.Raycast(ray, out float distance)) {
                 Vector3 aimPoint = ray.GetPoint(distance);
                 // cursor position getting locked to Z by inputrelaimpos set
-                InputAimDirection = MovementUtils.inXZ(aimPoint-cc.transform.position);
+                InputAimVector = MovementUtils.inXZ(aimPoint-cc.transform.position);
             }
         }
     }
@@ -275,7 +287,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public CharacterFrameInput GetCharacterFrameInput() {
         return new CharacterFrameInput(
-            InputAimDirection,
+            InputAimVector,
             MoveDirection,
             InputBlocking,
             InputCastId
@@ -646,6 +658,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
+        for (int i = 0; i < DashBuffer.Length; i++) { DashBuffer[i]--;}
+
         TickCasts();
         HandleCollisions();
     }
@@ -675,8 +689,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     /* IMoves Methods */
     public float BaseSpeed { get; set; } = .125f;
-    public float RunAcceleration = .01f;
+    public float RunAcceleration = .05f;
     public readonly float Friction = .003f;
+    [HideInInspector] public int[] DashBuffer = new int[4]{0,0,0,0};
 
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }
@@ -725,17 +740,15 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public float TakeKnockBack(Vector3 contactPoint, int hitStopDuration, Vector3 knockBackVector, int hitStunDuration, HitTier hitTier) {
         float knockBackFactor;
+        bool hitsShield = HitsShield(contactPoint);
 
-        if (HitsShield(contactPoint)) {
-            if (Shield.ParryWindow > 0) {
-                EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
-                Cast.Initiate(Invulnerability, this, transform, null, false, null);
-                Parried = true;
-                // TODO:
-                // - reflect projectiles
-                // - set 
-            }
-
+        if (hitsShield && Shield.ParryWindow > 0) {
+            EffectInvulnerable Invulnerability = Instantiate(ParryInvulnerabilityPrefab, transform);
+            Cast.Initiate(Invulnerability, this, transform, null, false, null);
+            Parried = true;
+            // TODO:
+            // - reflect projectiles
+            // - set 
             return 0; // TODO more interesting knockback interactions
         } else {
             if (InvulnerableStack>0) {
@@ -762,7 +775,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                 HitStopTimer = hitStopDuration;
 
                 if (KnockBack != Vector3.zero) {
-                    if (hitTier >= HitTier.Heavy) {
+                    if (hitsShield) {
+                        Velocity += KnockBack;
+                    } else if (hitTier >= HitTier.Heavy) {
                         SwitchState(StateFactory.BlownBack());
                     } else if (hitTier == HitTier.Medium) {
                         SwitchState(StateFactory.KnockedBack());
@@ -881,7 +896,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     private FileStream _recordControlStream = null;
     private void WriteCharacterFrameInput(FileStream outputStream) {
         CharacterFrameInput input = new CharacterFrameInput(
-            InputAimDirection,
+            InputAimVector,
             InputMoveDirection,
             InputBlocking,
             InputCastId
@@ -892,7 +907,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void LoadCharacterFrameInput(CharacterFrameInput input) {
-        InputAimDirection = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
+        InputAimVector = new Vector3(input.AimDirectionX, 0, input.AimDirectionZ);
         InputMoveDirection = new Vector2(input.MoveDirectionX, input.MoveDirectionZ);
         InputCastId = input.CastId;
         InputBlocking = input.Blocking;

@@ -47,10 +47,7 @@ public abstract class CharacterState {
             SwitchState(newState);
         } else {
             FixedUpdateState();
-
-            if (SubState != null) {
-                SubState.FixedUpdateStates();
-            }
+            SubState?.FixedUpdateStates();
         }
     }
 
@@ -60,8 +57,8 @@ public abstract class CharacterState {
 
         if (_isRootState) {
             Character.State = newState;
-        } else if (SuperState != null) {
-            SuperState.SetSubState(newState);
+        } else {
+            SuperState?.SetSubState(newState);
         }
     }
 
@@ -70,10 +67,7 @@ public abstract class CharacterState {
     }
 
     protected void SetSubState(CharacterState newSubState) {
-        if (SubState!=null) {
-        SubState.ExitState();
-        }
-
+        SubState?.ExitState();
         SubState = newSubState;
         SubState.SetSuperState(this);
     }
@@ -81,7 +75,7 @@ public abstract class CharacterState {
     public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);
 
     public bool StateInHierarchy(Type stateType) {
-        if (this.GetType()==stateType) {
+        if (GetType()==stateType) {
             return true;
         } else if (SubState != null) {
             return SubState.StateInHierarchy(stateType);

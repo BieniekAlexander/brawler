@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 8
+  Duration: 5
   BusyTimer: 0
   Encumbers: 0
   Stuns: 0
@@ -73,21 +73,21 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   TriggerTransformations:
-  - PolarPosition: {x: -42.5687, y: 0.9667782}
-    Dimension: {x: 0.8, y: 0.25, z: 0.25}
-    Rotation: {x: 0, y: 0.83180255, z: 0, w: 0.5550716}
-  - PolarPosition: {x: -35.402718, y: 1.085756}
-    Dimension: {x: 0.8, y: 0.25, z: 0.25}
-    Rotation: {x: 0, y: 0.8170011, z: 0, w: 0.5766362}
-  - PolarPosition: {x: -24.729698, y: 1.1450069}
-    Dimension: {x: 0.8, y: 0.25, z: 0.25}
-    Rotation: {x: 0, y: 0.79922295, z: 0, w: 0.6010347}
-  - PolarPosition: {x: -12.586315, y: 1.1885625}
-    Dimension: {x: 0.8, y: 0.25, z: 0.25}
-    Rotation: {x: 0, y: 0.7675325, z: 0, w: 0.6410099}
-  - PolarPosition: {x: -0.42197272, y: 1.2220331}
-    Dimension: {x: 0.8, y: 0.25, z: 0.25}
-    Rotation: {x: 0, y: 0.7181172, z: 0, w: 0.6959222}
+  - PolarPosition: {x: -9.6547165, y: 0.9301747}
+    Dimension: {x: 0.5972948, y: 0.25, z: 0.49658772}
+    Rotation: {x: 0, y: 0.21838795, z: 0, w: 0.9758621}
+  - PolarPosition: {x: -5.86812, y: 1.0856892}
+    Dimension: {x: 0.5972948, y: 0.25, z: 0.49658772}
+    Rotation: {x: 0, y: 0.18602793, z: 0, w: 0.9825445}
+  - PolarPosition: {x: -4.776186, y: 1.1409619}
+    Dimension: {x: 0.5972948, y: 0.25, z: 0.49658772}
+    Rotation: {x: 0, y: 0.17665704, z: 0, w: 0.9842724}
+  - PolarPosition: {x: -4.776186, y: 1.1409619}
+    Dimension: {x: 0.5972948, y: 0.25, z: 0.49658772}
+    Rotation: {x: 0, y: 0.17665704, z: 0, w: 0.9842724}
+  - PolarPosition: {x: -4.776186, y: 1.1409619}
+    Dimension: {x: 0.5972948, y: 0.25, z: 0.49658772}
+    Rotation: {x: 0, y: 0.17665704, z: 0, w: 0.9842724}
   - PolarPosition: {x: 7.1072984, y: 1.2042532}
     Dimension: {x: 0.8, y: 0.25, z: 0.25}
     Rotation: {x: 0, y: 0.72594357, z: 0, w: 0.68775433}

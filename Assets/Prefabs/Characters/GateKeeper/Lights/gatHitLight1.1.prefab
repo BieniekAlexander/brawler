@@ -49,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 5
+  Duration: 3
   BusyTimer: 0
   Encumbers: 0
   Stuns: 0
@@ -82,18 +82,6 @@ MonoBehaviour:
   - PolarPosition: {x: -5.129691, y: 1.1184796}
     Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
     Rotation: {x: 0.52321976, y: 0.52052504, z: 0.47835422, w: 0.47589076}
-  - PolarPosition: {x: -4.819792, y: 1.1902087}
-    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
-    Rotation: {x: 0.5219242, y: 0.51923615, z: 0.47976747, w: 0.4772967}
-  - PolarPosition: {x: -4.342305, y: 1.3207914}
-    Dimension: {x: 0.45789, y: 0.3483233, z: 0.69803774}
-    Rotation: {x: 0.5199206, y: 0.5172428, z: 0.48193806, w: 0.47945616}
-  - PolarPosition: {x: -4.9655027, y: 1.1553359}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.52253395, y: 0.51984257, z: 0.47910345, w: 0.47663602}
-  - PolarPosition: {x: -4.9655027, y: 1.1553359}
-    Dimension: {x: 0.3, y: 0.23186, z: 0.43772355}
-    Rotation: {x: 0.52253395, y: 0.51984257, z: 0.47910345, w: 0.47663602}
   RetriggerDuration: 60
   HitsEnemies: 1
   HitsFriendlies: 0

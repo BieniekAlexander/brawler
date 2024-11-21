@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4732197686106141231
 MonoBehaviour:
@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AboutResolution: 0
   TargetResolution: 0
-  Duration: 65
-  BusyTimer: 55
+  Duration: 49
+  BusyTimer: 45
   Encumbers: 0
   Stuns: 0
   RotationCap: 180
@@ -64,7 +64,7 @@ MonoBehaviour:
   Mirrored: 0
   Indefinite: 0
   FrameCastablesMap:
-    m_keys: 120000001a000000
+    m_keys: 0f00000014000000
     m_values:
     - data:
       - {fileID: 4918249452027163949, guid: b5f2e05bd06337d4790ded6c179e50fc, type: 3}

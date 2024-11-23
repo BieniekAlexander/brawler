@@ -106,21 +106,20 @@ public class CharacterStateBlocking : CharacterState {
         // - if you're running, shielding towards the direction of movement should rotate you (but not too much the same dir?)
         // - the faster you move, the more finnicky it should be
         // - :) https://www.youtube.com/watch?v=v3zT3Z5apaM
-        Vector3 shieldDirection = Character.InputAimVector;
-        float directionDot = Mathf.Max(Vector3.Dot(MovementUtils.inXZ(Character.Velocity).normalized, shieldDirection), 0);
+        // Vector3 shieldDirection = Character.InputAimVector;
+        // float directionDot = Mathf.Max(Vector3.Dot(MovementUtils.inXZ(Character.Velocity).normalized, shieldDirection), 0);
         
-        Character.Velocity = Vector3.RotateTowards(
-            MovementUtils.inXZ(Character.Velocity),
-            Vector3.RotateTowards(Character.Velocity, -shieldDirection, 90f*Mathf.Deg2Rad*directionDot, 0),
-            _rotationalSpeed, // rotate at speed according to whether we're running TODO tune rotation scaling
-            0
-        );
+        // Character.Velocity = Vector3.RotateTowards(
+        //     MovementUtils.inXZ(Character.Velocity),
+        //     Vector3.RotateTowards(Character.Velocity, -shieldDirection, 90f*Mathf.Deg2Rad*directionDot, 0),
+        //     _rotationalSpeed, // rotate at speed according to whether we're running TODO tune rotation scaling
+        //     0
+        // );
 
-        if (directionDot > .5f) {
-            float acceleration = _maxAcceleration*directionDot;
-            Character.Velocity = MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration);
-        }
-        
+        // if (directionDot > .5f) {
+        //     float acceleration = _maxAcceleration*directionDot;
+        //     Character.Velocity = MovementUtils.ChangeMagnitude(MovementUtils.inXZ(Character.Velocity), -acceleration);
+        // }
     }
 
     protected override void InitializeSubState() {

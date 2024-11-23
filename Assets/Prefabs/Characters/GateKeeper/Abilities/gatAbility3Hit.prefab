@@ -74,7 +74,7 @@ MonoBehaviour:
     m_values: []
   TriggerTransformations:
   - PolarPosition: {x: 0, y: 0}
-    Dimension: {x: 5, y: 5, z: 5}
+    Dimension: {x: 8, y: 8, z: 8}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
   RetriggerDuration: 30
   HitsEnemies: 1

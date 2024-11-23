@@ -12,6 +12,10 @@ public enum RotationMovementOrientation {
 }
 
 public static class MovementUtils {
+    public static Vector3 toXZ(Vector2 vector) {
+        return new Vector3(vector.x, 0f, vector.y);
+    }
+
     public static Vector3 inXZ(Vector3 vector) {
         return Vector3.Scale(vector, new Vector3(1, 0, 1));
     }
@@ -73,15 +77,25 @@ public static class MovementUtils {
     /// </summary>
     /// <param name="c"></param>
     /// <returns></returns>
-    public static bool Dashing(Character c) {
-        return (c.InputMoveDirection.x==-1 && c.DashBuffer[0]>0)
-            || (c.InputMoveDirection.x==+1 && c.DashBuffer[1]>0)
-            || (c.InputMoveDirection.y==-1 && c.DashBuffer[2]>0)
-            || (c.InputMoveDirection.y==+1 && c.DashBuffer[3]>0);
+    public static Vector3 GetDashDirection(Character c) {
+        if (
+            (c.InputMoveDirection.x<0f && c.DashBuffer[0]>0)
+            || (c.InputMoveDirection.x>0f && c.DashBuffer[1]>0)
+            || (c.InputMoveDirection.y<0f && c.DashBuffer[2]>0)
+            || (c.InputMoveDirection.y>0f && c.DashBuffer[3]>0)
+        ) {
+            return new Vector3(
+                c.DashBuffer[0]>0?-1:(c.DashBuffer[1]>0?1:0),
+                0f,
+                c.DashBuffer[2]>0?-1:(c.DashBuffer[3]>0?1:0)
+            ).normalized;
+        } else {
+            return Vector3.zero;
+        }
     }
 
-    public static AimMovementOrientation GetAimMovementOrientation(Character c) {
-        float aimMovementNorm = Vector3.Dot(c.MoveDirection.normalized, c.InputAimVector.normalized);
+    public static AimMovementOrientation GetAimMovementOrientation(Vector3 aimDirVector, Vector3 moveDirVector) {
+        float aimMovementNorm = Vector3.Dot(moveDirVector.normalized, aimDirVector.normalized);
         return aimMovementNorm switch {
             >.707f => AimMovementOrientation.PARALLEL,
             <-.707f => AimMovementOrientation.ANTIPARALLEL,
@@ -111,37 +125,39 @@ public class CharacterStateRunning : CharacterState {
     protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
-        } else if (MovementUtils.Dashing(Character)) {
+        } else {
+            Vector3 dashDirection = MovementUtils.GetDashDirection(Character);
+
+            if (dashDirection != Vector3.zero) {
             for (int i = 0; i < Character.DashBuffer.Length; i++) { Character.DashBuffer[i]=0;}
 
-            AimMovementOrientation a = MovementUtils.GetAimMovementOrientation(Character);
+            AimMovementOrientation a = MovementUtils.GetAimMovementOrientation(Character.InputAimVector, dashDirection);
             return a switch {
                 AimMovementOrientation.PARALLEL => Factory.Dashing(),
                 AimMovementOrientation.PERPENDICULAR => Factory.Slipping(),
                 _ => Factory.BackDashing()
-            };
-        } else {
-            return null;
+                };
+            } else {
+                return null;
+            }
         }
     }
 
-    public override void EnterState() {
-        base.EnterState();
-    }
-
-    protected override void ExitState() { }
+    public override void EnterState() => base.EnterState();
+    protected override void ExitState() {}
+    protected override void InitializeSubState() {}
 
     protected override void FixedUpdateState() {
-        // TODO what if I'm in the air? Air control?
         Vector3 horizontalVelocity = MovementUtils.inXZ(Character.Velocity);
-        float strafeSpeed = Character.BaseSpeed * MovementUtils.StrafeSpeedMultiplier(
+        float strafeSpeedMult = MovementUtils.StrafeSpeedMultiplier(
             Character.MoveDirection.normalized,
             Character.InputAimVector.normalized
         );
 
         float dSpeed = Mathf.Clamp(
-            Character.BaseSpeed - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
-            0, Character.RunAcceleration
+            strafeSpeedMult*Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude) - Vector3.Dot(horizontalVelocity, Character.MoveDirection),
+            Character.Friction*(strafeSpeedMult-1),
+            Character.RunAcceleration
         );
 
         Vector3 newVelocity = Vector3.ClampMagnitude(
@@ -150,22 +166,17 @@ public class CharacterStateRunning : CharacterState {
                 ? -horizontalVelocity.normalized
                 : Character.MoveDirection
             ),
-            Mathf.Max(
-                strafeSpeed,
-                horizontalVelocity.magnitude-Character.Friction
-            )
+            Mathf.Max(Character.BaseSpeed, horizontalVelocity.magnitude)
         );
-
+              
         Character.Velocity = MovementUtils.setXZ(
             Character.Velocity,
             (Vector3.Dot(horizontalVelocity, newVelocity)<0) ? Vector3.zero : newVelocity
         );
     }
 
-    protected override void InitializeSubState() {}
-
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
-        if (collidable is StageTerrain terrain && info!=null) {
+        if (collidable is StageTerrain && info!=null) {
             Character.Velocity = MovementUtils.GetBounce(Character.Velocity, info.Normal);
             return true;
         } else if (collidable is Character otherCharacter) {
@@ -180,8 +191,8 @@ public class CharacterStateRunning : CharacterState {
 
 public class CharacterStateDashing : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
-    private readonly int _duration = 12;
-    private readonly float[] velocityCurve = new float[]{.01f, .3f, .3f, .3f, .3f, .3f, .3f, .2f, .1f, 0f, 0f, 0f};
+    private readonly int _duration = 4;
+    private readonly float[] velocityCurve = new float[]{.13f, .15f, .17f, .19f};
     private int _frame;
 
     public CharacterStateDashing(Character _machine, CharacterStateFactory _factory)
@@ -222,7 +233,7 @@ public class CharacterStateDashing : CharacterState {
 
 public class CharacterStateSlipping : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
-    private readonly int _duration = 8;
+    private readonly int _duration = 12;
     private int _timer;
 
     public CharacterStateSlipping(Character _machine, CharacterStateFactory _factory)
@@ -319,15 +330,19 @@ public class CharacterStateSliding : CharacterState {
     protected override void InitializeSubState() {}
 
     protected override void FixedUpdateState() {
-        float movementDotAim = Vector3.Dot(
+        float VelocityDotAim = Vector3.Dot(
             Character.InputMoveDirection.normalized,
-            Character.InputAimVector.normalized
+            Character.Velocity.normalized
         );
 
         if (Character.IsGrounded()) {
-            if (movementDotAim<-.5f) {
-                Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.RunAcceleration);
-            } else if (movementDotAim<.5f || SuperState.Type!=CharacterStateType.ACTION) {
+            if (VelocityDotAim<-.5f) {
+                Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -2*Character.Friction);
+            }
+            //  else if (VelocityDotAim<.5f || SuperState.Type!=CharacterStateType.ACTION) {
+            //     // Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
+            // } 
+            else {
                 Character.Velocity = MovementUtils.ChangeMagnitude(Character.Velocity, -Character.Friction);
             }
         }

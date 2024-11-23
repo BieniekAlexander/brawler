@@ -92,10 +92,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Vector2 InputMoveDirection { 
         get => _inputMoveDirection;
         set { // handling dash buffer
-            if (_inputMoveDirection.x==-1 && value.x==0) { DashBuffer[0] = _dashBufferDuration;}
-            if (_inputMoveDirection.x==+1 && value.x==0) { DashBuffer[1] = _dashBufferDuration;}
-            if (_inputMoveDirection.y==-1 && value.y==0) { DashBuffer[2] = _dashBufferDuration;}
-            if (_inputMoveDirection.y==+1 && value.y==0) { DashBuffer[3] = _dashBufferDuration;}
+            if (_inputMoveDirection.x<0f && value.x==0f) { DashBuffer[0] = _dashBufferDuration;}
+            if (_inputMoveDirection.x>0f && value.x==0f) { DashBuffer[1] = _dashBufferDuration;}
+            if (_inputMoveDirection.y<0f && value.y==0f) { DashBuffer[2] = _dashBufferDuration;}
+            if (_inputMoveDirection.y>0f && value.y==0f) { DashBuffer[3] = _dashBufferDuration;}
             _inputMoveDirection = value;
         }
     }
@@ -658,7 +658,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
-        for (int i = 0; i < DashBuffer.Length; i++) { DashBuffer[i]--;}
+        for (int i = 0; i < DashBuffer.Length; i++) { if (DashBuffer[i]>0) DashBuffer[i]--;}
 
         TickCasts();
         HandleCollisions();

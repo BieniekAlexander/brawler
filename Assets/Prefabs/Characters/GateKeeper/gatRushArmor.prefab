@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4029658419098420178}
   - component: {fileID: 377234719705160766}
   m_Layer: 0
-  m_Name: gatMovementArmor
+  m_Name: gatRushArmor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

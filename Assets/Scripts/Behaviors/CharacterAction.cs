@@ -178,7 +178,7 @@ public static class ActionAtoms {
 
     // Attack
     public static void Dash(CharacterBehavior state, CharacterFrameInput input) {
-        input.CastId = (int) CastId.Dash;
+        input.CastId = (int) CastId.Rush;
     }
 
     // Aim

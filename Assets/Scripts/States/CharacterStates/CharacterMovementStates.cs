@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 
 public enum AimMovementOrientation {
@@ -72,28 +74,6 @@ public static class MovementUtils {
         }
     }
 
-    /// <summary>
-    /// Fires if a move direction button was recently pressed (according to the buffer) and if said move direction was pressed again
-    /// </summary>
-    /// <param name="c"></param>
-    /// <returns></returns>
-    public static Vector3 GetDashDirection(Character c) {
-        if (
-            (c.InputMoveDirection.x<0f && c.DashBuffer[0]>0)
-            || (c.InputMoveDirection.x>0f && c.DashBuffer[1]>0)
-            || (c.InputMoveDirection.y<0f && c.DashBuffer[2]>0)
-            || (c.InputMoveDirection.y>0f && c.DashBuffer[3]>0)
-        ) {
-            return new Vector3(
-                c.DashBuffer[0]>0?-1:(c.DashBuffer[1]>0?1:0),
-                0f,
-                c.DashBuffer[2]>0?-1:(c.DashBuffer[3]>0?1:0)
-            ).normalized;
-        } else {
-            return Vector3.zero;
-        }
-    }
-
     public static AimMovementOrientation GetAimMovementOrientation(Vector3 aimDirVector, Vector3 moveDirVector) {
         float aimMovementNorm = Vector3.Dot(moveDirVector.normalized, aimDirVector.normalized);
         return aimMovementNorm switch {
@@ -114,10 +94,10 @@ public static class MovementUtils {
     }
 }
 
-public class CharacterStateRunning : CharacterState {
+public class CharacterStateWalking : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
 
-    public CharacterStateRunning(Character _machine, CharacterStateFactory _factory)
+    public CharacterStateWalking(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
     }
@@ -125,21 +105,10 @@ public class CharacterStateRunning : CharacterState {
     protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement != null) {
             return Factory.CommandMovement();
+        } else if (Character.InputDash) {
+            return Factory.Dashing();
         } else {
-            Vector3 dashDirection = MovementUtils.GetDashDirection(Character);
-
-            if (dashDirection != Vector3.zero) {
-            for (int i = 0; i < Character.DashBuffer.Length; i++) { Character.DashBuffer[i]=0;}
-
-            AimMovementOrientation a = MovementUtils.GetAimMovementOrientation(Character.InputAimVector, dashDirection);
-            return a switch {
-                AimMovementOrientation.PARALLEL => Factory.Dashing(),
-                AimMovementOrientation.PERPENDICULAR => Factory.Slipping(),
-                _ => Factory.BackDashing()
-                };
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
@@ -191,29 +160,32 @@ public class CharacterStateRunning : CharacterState {
 
 public class CharacterStateDashing : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
-    private readonly int _duration = 4;
     private readonly float[] velocityCurve = new float[]{.13f, .15f, .17f, .19f};
     private int _frame;
 
     public CharacterStateDashing(Character _machine, CharacterStateFactory _factory)
     : base(_machine, _factory) {
         _isRootState = false;
+        _frame = 0;
     }
 
     protected override CharacterState CheckGetNewState() {
-        if (++_frame==_duration) {
-            return Factory.Running();
+        if (!Character.InputDash) {
+            return Factory.Walking();
         } else {
             return null;
         }
     }
 
     public override void EnterState() {
-        Character.Velocity = Character.InputAimVector.normalized*velocityCurve[0];
         _frame = 0;
     }
 
-    protected override void FixedUpdateState() => Character.Velocity = Character.Velocity.normalized*velocityCurve[_frame];
+    protected override void FixedUpdateState() {
+        Character.Velocity = Character.InputAimVector.normalized*velocityCurve[_frame];
+        _frame = Math.Min(_frame+1, velocityCurve.Length-1);
+    }
+
     protected override void ExitState() {}
     protected override void InitializeSubState() {}
 
@@ -231,43 +203,6 @@ public class CharacterStateDashing : CharacterState {
     }
 }
 
-public class CharacterStateSlipping : CharacterState {
-    public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
-    private readonly int _duration = 12;
-    private int _timer;
-
-    public CharacterStateSlipping(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = false;
-    }
-
-    protected override CharacterState CheckGetNewState() {
-        if (--_timer==0) {
-            return Factory.Running();
-        } else {
-            return null;
-        }
-    }
-
-    public override void EnterState() {
-        Character.Velocity = Quaternion.AngleAxis(
-            Mathf.Atan(
-                Character.InputAimVector.magnitude
-            )*Mathf.Rad2Deg,
-            (
-                (Quaternion.Inverse(Character.transform.rotation)*Character.MoveDirection).x<0
-                ? Vector3.down : Vector3.up
-            )
-        ) * Character.InputAimVector.normalized * .3f;
-        _timer = _duration;
-    }
-
-    protected override void ExitState() => Character.Velocity = Character.Velocity.normalized*Character.BaseSpeed;
-    protected override void FixedUpdateState() {}
-    protected override void InitializeSubState() {}
-    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
-}
-
 public class CharacterStateBackDashing : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.MOVEMENT; }}
     private readonly int _duration = 18;
@@ -280,7 +215,7 @@ public class CharacterStateBackDashing : CharacterState {
 
     protected override CharacterState CheckGetNewState() {
         if (--_timer==0) {
-            return Factory.Running();
+            return Factory.Walking();
         } else {
             return null;
         }
@@ -372,7 +307,7 @@ public class CharacterStateCommandMovement : CharacterState {
 
     protected override CharacterState CheckGetNewState() {
         if (Character.CommandMovement == null) {
-            return Factory.Running();
+            return Factory.Walking();
         } else {
             return null;
         }

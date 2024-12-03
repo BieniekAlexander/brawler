@@ -28,7 +28,7 @@ public abstract class CharacterState {
 
     public static CharacterState GetSpawnState(CharacterStateFactory factory) {
         CharacterState root = factory.Ready();
-        root.SetSubState(factory.Running());
+        root.SetSubState(factory.Walking());
         return root;
     }
 

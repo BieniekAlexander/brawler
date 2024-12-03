@@ -25,7 +25,7 @@ public class CharacterStateReady : CharacterState {
     protected override void FixedUpdateState() {}
     protected override void ExitState(){}
     protected override void InitializeSubState() {
-        SetSubState(Factory.Running());
+        SetSubState(Factory.Walking());
     }
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;

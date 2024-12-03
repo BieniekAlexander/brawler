@@ -47,7 +47,7 @@ public class CastContainer {
 }
 
 public enum CastId {
-    Dash = 0,
+    Rush = 0,
     Light1 = 1,
     Light2 = 2,
     LightS = 3,
@@ -87,17 +87,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
 
-    private static readonly int _dashBufferDuration = 10;
+    public bool InputDash { get; private set; }
     private Vector2 _inputMoveDirection = new(); 
     public Vector2 InputMoveDirection { 
         get => _inputMoveDirection;
-        set { // handling dash buffer
-            if (_inputMoveDirection.x<0f && value.x==0f) { DashBuffer[0] = _dashBufferDuration;}
-            if (_inputMoveDirection.x>0f && value.x==0f) { DashBuffer[1] = _dashBufferDuration;}
-            if (_inputMoveDirection.y<0f && value.y==0f) { DashBuffer[2] = _dashBufferDuration;}
-            if (_inputMoveDirection.y>0f && value.y==0f) { DashBuffer[3] = _dashBufferDuration;}
-            _inputMoveDirection = value;
-        }
+        set => _inputMoveDirection = value;
     }
 
     public Vector3 MoveDirection {
@@ -169,13 +163,13 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    public void OnMovement(InputAction.CallbackContext context) {
-        InputMoveDirection = context.ReadValue<Vector2>();
-    }
+    public void OnMovement(InputAction.CallbackContext context) => InputMoveDirection = context.ReadValue<Vector2>();
+    public void OnDash(InputAction.CallbackContext context) {InputDash = context.ReadValueAsButton(); Debug.Log("dashing");}
 
-    public void OnDash(InputAction.CallbackContext context) {
+
+    public void OnRush(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Dash;
+            InputCastId = (int)CastId.Rush;
         }
     }
 
@@ -227,9 +221,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     // shields
-    public void OnBlock(InputAction.CallbackContext context) {
-        InputBlocking = context.ReadValueAsButton();
-    }
+    public void OnBlock(InputAction.CallbackContext context) => InputBlocking = context.ReadValueAsButton();
 
     // throws
     public void OnThrow1(InputAction.CallbackContext context) {
@@ -658,8 +650,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
-        for (int i = 0; i < DashBuffer.Length; i++) { if (DashBuffer[i]>0) DashBuffer[i]--;}
-
         TickCasts();
         HandleCollisions();
     }
@@ -691,7 +681,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public float BaseSpeed { get; set; } = .125f;
     public float RunAcceleration = .05f;
     public readonly float Friction = .003f;
-    [HideInInspector] public int[] DashBuffer = new int[4]{0,0,0,0};
 
     public Transform Transform { get { return transform; } }
     public CharacterController cc { get; set; }

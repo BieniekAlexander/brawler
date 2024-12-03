@@ -10,9 +10,8 @@ public class CharacterStateFactory {
         _character = character;
 
         // Movement
-        _stateDict["Running"] = new CharacterStateRunning(_character, this);
+        _stateDict["Walking"] = new CharacterStateWalking(_character, this);
         _stateDict["Dashing"] = new CharacterStateDashing(_character, this);
-        _stateDict["Slipping"] = new CharacterStateSlipping(_character, this);
         _stateDict["BackDashing"] = new CharacterStateBackDashing(_character, this);
         _stateDict["Sliding"] = new CharacterStateSliding(_character, this);
         _stateDict["CommandMovement"] = new CharacterStateCommandMovement(_character, this);
@@ -33,10 +32,9 @@ public class CharacterStateFactory {
     }
 
     // movement
-    public CharacterState Running() => _stateDict["Running"];
+    public CharacterState Walking() => _stateDict["Walking"];
     public CharacterState Dashing() => _stateDict["Dashing"];
     public CharacterState BackDashing() => _stateDict["BackDashing"];
-    public CharacterState Slipping() => _stateDict["Slipping"];
     public CharacterState Sliding() => _stateDict["Sliding"];
     public CharacterState CommandMovement() => _stateDict["CommandMovement"];
 

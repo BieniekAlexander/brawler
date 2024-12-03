@@ -599,7 +599,7 @@ MonoBehaviour:
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}
   castSlots:
-  - Name: Dash
+  - Name: Rush
     CastPrefab: {fileID: -8167662292094154702, guid: 7d64190e038d36a42b7dbc4efeedd6d5,
       type: 3}
     Costs:
@@ -762,40 +762,6 @@ MonoBehaviour:
   ActiveCastable: {fileID: 0}
   Parried: 0
   RunAcceleration: 0.01
-  DashBuffer: 00000000000000000000000000000000
-  animationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0.03830314
-      outSlope: 0.03830314
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.49999994
-      value: 1.0191516
-      inSlope: 0.0000000037252903
-      outSlope: 0.0000000037252903
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: -0.038303133
-      outSlope: -0.038303133
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   LifeCount: -1
 --- !u!114 &-530470556391363998
 MonoBehaviour:

@@ -11,7 +11,7 @@ public class CharacterStateKnockedDown : CharacterState {
     protected override CharacterState CheckGetNewState() {
         if (Character.InputMoveDirection != Vector2.zero) {
             return Factory.GettingUp();
-        } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
+        } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
         } else {
             return null;
@@ -37,7 +37,7 @@ public class CharacterStateTumbling : CharacterState {
     protected override CharacterState CheckGetNewState() {
         if (Character.InputMoveDirection != Vector2.zero) {
             return Factory.GettingUp();
-        } else if (Character.InputCastId == (int)CastId.Dash) { // TODO do I want to be reading directly from InputCastId?
+        } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
             return Factory.Rolling();
         } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return Factory.KnockedDown();

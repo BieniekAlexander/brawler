@@ -87,7 +87,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public Transform CursorTransform { get; private set; }
     private Plane aimPlane;
 
+    public bool InputJump { get; private set; }
     public bool InputDash { get; private set; }
+    public bool hasAirDash = false;
+
     private Vector2 _inputMoveDirection = new(); 
     public Vector2 InputMoveDirection { 
         get => _inputMoveDirection;
@@ -164,8 +167,14 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     }
 
     public void OnMovement(InputAction.CallbackContext context) => InputMoveDirection = context.ReadValue<Vector2>();
-    public void OnDash(InputAction.CallbackContext context) {InputDash = context.ReadValueAsButton(); Debug.Log("dashing");}
 
+    public void OnJump(InputAction.CallbackContext context) {
+        InputJump = context.ReadValueAsButton();
+    }
+
+    public void OnDash(InputAction.CallbackContext context) {
+        InputDash = context.ReadValueAsButton();
+    }
 
     public void OnRush(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
@@ -378,6 +387,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     void TickCasts() {
         // resolve cooldowns and cast expirations
         for (int i = 0; i<CastContainers.Length; i++) {
+
             if (CastContainers[i].charges < castSlots[i].DefaultChargeCount) {
                 if (--CastContainers[i].timer<=0) {
                     CastContainers[i].charges++;
@@ -443,13 +453,8 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     public CharacterStateFactory StateFactory;
     public CharacterState State { get; set ; }
 
-    public bool StateIsActive(Type state) {
-        return State.StateInHierarchy(state);
-    }
-
-    public void SwitchState(CharacterState state) {
-        State = state;
-        State.EnterState();
+    public void SwitchState(Type _characterStateType) {
+        State = State.SwapState(_characterStateType);
     }
 
     public bool Parried = false;
@@ -509,7 +514,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         // state
         _busyTimer = 0;
-        SwitchState(CharacterState.GetSpawnState(StateFactory));
+        SwitchState(CharacterState.GetSpawnState());
         InputCastId = -1;
     }
     
@@ -540,6 +545,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         // State
         StateFactory = new(this);
+        State = StateFactory.Get(CharacterState.GetSpawnState());
         OnRespawn();
     }
 
@@ -572,7 +578,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         /*
          * Trail Renderer
          */
-        tr.emitting=(Velocity.sqrMagnitude>12.6f*12.6f); // TODO return to this later
+        tr.emitting=(Velocity.sqrMagnitude>(.2f*.2f)); // TODO return to this later
     }
 
     private void Update() {
@@ -628,7 +634,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
 
         if (HitStopTimer--<=0) {
-            State.FixedUpdateStates();
+            if (State.FixedUpdateState() is CharacterState newState) {
+                State = newState;
+            }
 
             // TODO I think I'm gonna need more vertical velocity considerations wrt state
             if (!IsGrounded()) {
@@ -767,11 +775,11 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
                     if (hitsShield) {
                         Velocity += KnockBack;
                     } else if (hitTier >= HitTier.Heavy) {
-                        SwitchState(StateFactory.BlownBack());
+                        SwitchState(typeof(CharacterStateBlownBack));
                     } else if (hitTier == HitTier.Medium) {
-                        SwitchState(StateFactory.KnockedBack());
+                        SwitchState(typeof(CharacterStateKnockedBack));
                     } else if (hitTier == HitTier.Light) {
-                        SwitchState(StateFactory.PushedBack());
+                        SwitchState(typeof(CharacterStatePushedBack));
                     } else {
                         Velocity += KnockBack;
                     }
@@ -843,7 +851,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
         GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
         GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);
-        GUI.Label(new Rect(20, 160, 200, 20), State.getNames());
+        GUI.Label(new Rect(20, 160, 200, 20), State.Name);
     }
 
     /* ICollidable */
@@ -855,7 +863,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         GameObject collisionObject = hit.collider.gameObject;
 
         if (collisionObject.GetComponent<ICollidable>() is ICollidable collidable) {
-            return State.HandleCollisionWithStates(collidable, new CollisionInfo(hit.normal));
+            return State.OnCollideWith(collidable, new CollisionInfo(hit.normal));
         } else {
             throw new Exception("Unhandled collision type");
         }
@@ -870,7 +878,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         ) {
             return false;
         } else {
-            return State.HandleCollisionWithStates(other, info);
+            return State.OnCollideWith(other, info);
         }
     }
 

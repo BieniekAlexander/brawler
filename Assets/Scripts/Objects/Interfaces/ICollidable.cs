@@ -152,7 +152,7 @@ public static class CollisionUtils {
     public static void HandleCollisions(ICollidable thisCollidable) {
         HandleCollisions(thisCollidable, null, 0);
     }
-    
+
     public static Vector3 GetDecollisionVector(ICollidable thisCollidable, ICollidable otherCollidable) {
         if (thisCollidable is IMoves Mover) {
             if (Physics.ComputePenetration(
@@ -181,7 +181,6 @@ public static class CollisionUtils {
     public CollisionInfo(Vector3 _normal) {
         Normal = _normal;
     }
-    
 }
 
 /// <summary>

@@ -29,19 +29,19 @@ public class CharacterStrategyFactory {
         _transitionDict = new() {
             {
                 "Rush", new() {
-                    {CharacterStateType.ACTION, (new float[]{.994f, .005f, .001f}, new CharacterStrategy[]{null, Wait, Flee})},
+                    {CharacterStateType.ACTIVE, (new float[]{.994f, .005f, .001f}, new CharacterStrategy[]{null, Wait, Flee})},
                     {CharacterStateType.DISADVANTAGE, (new float[]{.992f, .004f, .004f}, new CharacterStrategy[]{null, Wait, Flee})},
                     {CharacterStateType.RECOVERY, (new float[]{.992f, .004f, .004f}, new CharacterStrategy[]{null, Wait, Flee})}
                 }
             }, {
                 "Wait", new() {
-                    {CharacterStateType.ACTION, (new float[]{.997f, .002f, .001f}, new CharacterStrategy[]{null, Rush, Flee})},
+                    {CharacterStateType.ACTIVE, (new float[]{.997f, .002f, .001f}, new CharacterStrategy[]{null, Rush, Flee})},
                     {CharacterStateType.DISADVANTAGE, (new float[]{.99f, .001f, .009f}, new CharacterStrategy[]{null, Rush, Flee})},
                     {CharacterStateType.RECOVERY, (new float[]{.99f, .001f, .009f}, new CharacterStrategy[]{null, Rush, Flee})}
                 }
             }, {
                 "Flee", new() {
-                    {CharacterStateType.ACTION, (new float[]{.99f, .008f, .002f}, new CharacterStrategy[]{null, Wait, Rush})},
+                    {CharacterStateType.ACTIVE, (new float[]{.99f, .008f, .002f}, new CharacterStrategy[]{null, Wait, Rush})},
                     {CharacterStateType.DISADVANTAGE, (new float[]{.99f, .009f, .001f}, new CharacterStrategy[]{null, Wait, Rush})},
                     {CharacterStateType.RECOVERY, (new float[]{.99f, .009f, .001f}, new CharacterStrategy[]{null, Wait, Rush})}
                 }
@@ -91,7 +91,7 @@ public class CharacterStrategyRush: CharacterStrategy {
     public CharacterStrategyRush(CharacterStrategyFactory factory): base(factory) {}
 
     override public CharacterAction GetAction(CharacterBehavior behavior) {
-        if (behavior.StateType == CharacterStateType.ACTION) {
+        if (behavior.StateType == CharacterStateType.ACTIVE) {
             if (CharacterObservations.CloseToEnemy(behavior)) {
                 return CharacterActionFactory.Attack();
             } else if (Random.Range(0f, 1f)<.5f) {
@@ -115,7 +115,7 @@ public class CharacterStrategyWait: CharacterStrategy {
     public CharacterStrategyWait(CharacterStrategyFactory factory): base(factory) {}
 
     override public CharacterAction GetAction(CharacterBehavior behavior) {
-        if (behavior.StateType == CharacterStateType.ACTION) {
+        if (behavior.StateType == CharacterStateType.ACTIVE) {
             if (CharacterObservations.CloseToEnemy(behavior) || Random.Range(0f, 1f)<.005f) { // E[x]=3.3s
                 return CharacterActionFactory.Attack();
             } else {
@@ -136,7 +136,7 @@ public class CharacterStrategyFlee: CharacterStrategy {
     public CharacterStrategyFlee(CharacterStrategyFactory factory): base(factory) {}
 
     override public CharacterAction GetAction(CharacterBehavior behavior) {
-        if (behavior.StateType == CharacterStateType.ACTION) {
+        if (behavior.StateType == CharacterStateType.ACTIVE) {
             return CharacterActionFactory.BackPedal(); // TODO something else
         } else if (behavior.StateType == CharacterStateType.DISADVANTAGE) {
             return CharacterActionFactory.Idle(); // TODO something else

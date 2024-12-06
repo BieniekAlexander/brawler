@@ -1,27 +1,20 @@
 using UnityEngine;
+using System;
 
 public class CharacterStateKnockedDown : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
 
-    public CharacterStateKnockedDown(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateKnockedDown(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.InputMoveDirection != Vector2.zero) {
-            return Factory.GettingUp();
+            return typeof(CharacterStateGettingUp);
         } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
-            return Factory.Rolling();
+            return typeof(CharacterStateRolling);
         } else {
             return null;
         }
     }
-
-    public override void EnterState() => base.EnterState();
-    protected override void ExitState() {}
-    protected override void FixedUpdateState() {}
-    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
@@ -29,35 +22,30 @@ public class CharacterStateKnockedDown : CharacterState {
 public class CharacterStateTumbling : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
 
-    public CharacterStateTumbling(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateTumbling(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.InputMoveDirection != Vector2.zero) {
-            return Factory.GettingUp();
+            return typeof(CharacterStateGettingUp);
         } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
-            return Factory.Rolling();
+            return typeof(CharacterStateRolling);
         } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
-            return Factory.KnockedDown();
+            return typeof(CharacterStateKnockedDown);
         } else {
             return null;
         }
-    }
-
-    public override void EnterState() {
-        base.EnterState();
     }
 
     protected override void ExitState() {
         Character.UnsetBusy();
     }
 
-    protected override void InitializeSubState() {
-        SetSubState(Factory.Sliding());
+    protected override void Tick()
+    {
+        if (Character.IsGrounded()) {
+            MovementUtils.Slide(Character);
+        }
     }
-    protected override void FixedUpdateState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
@@ -76,20 +64,17 @@ public class CharacterStateRolling : CharacterState {
     private float _rollSpeed = .15f;
     private int _recoveryDuration = 30;
 
-    public CharacterStateRolling(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateRolling(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.RecoveryTimer == 0) {
-            return Factory.Ready();
+            return typeof(CharacterStateStanding);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         // TODO not the prettiest place to do this, but I want this action to consume input
         // otherwise, I'm having an issue where the roll happens, but the dash input is still buffered
@@ -105,11 +90,9 @@ public class CharacterStateRolling : CharacterState {
         Character.UnsetBusy();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         Character.RecoveryTimer--;
     }
-
-    protected override void InitializeSubState() {}
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) {
         if (collidable is StageTerrain stageTerrain) {
@@ -127,20 +110,17 @@ public class CharacterStateGettingUp : CharacterState {
 
     private int _recoveryDuration = 60;
 
-    public CharacterStateGettingUp(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateGettingUp(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.RecoveryTimer == 0) {
-            return Factory.Ready();
+            return typeof(CharacterStateStanding);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
@@ -152,13 +132,9 @@ public class CharacterStateGettingUp : CharacterState {
         Character.UnsetBusy();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         Character.RecoveryTimer--;
     }
-
-    protected override void InitializeSubState() {}
-
-    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }
 
 public class CharacterStateGetUpAttacking : CharacterState {
@@ -166,20 +142,17 @@ public class CharacterStateGetUpAttacking : CharacterState {
 
     private int _recoveryDuration = 15;
 
-    public CharacterStateGetUpAttacking(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateGetUpAttacking(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.RecoveryTimer == 0) {
-            return Factory.Ready();
+            return typeof(CharacterStateStanding);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         Character.RecoveryTimer = _recoveryDuration;
         Character.Velocity = new();
@@ -191,11 +164,7 @@ public class CharacterStateGetUpAttacking : CharacterState {
         Character.UnsetBusy();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         Character.RecoveryTimer--;
     }
-
-    protected override void InitializeSubState() {}
-
-    public override bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 }

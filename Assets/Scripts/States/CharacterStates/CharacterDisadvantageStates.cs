@@ -30,20 +30,17 @@ public class CharacterStatePushedBack : CharacterState {
 
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
-    public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStatePushedBack(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         if (Character.HitStunTimer<=0) {
-            return Factory.Ready();
+            return typeof(CharacterStateStanding);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         Character.SetBusy(true, true, 0f);
 
@@ -62,18 +59,15 @@ public class CharacterStatePushedBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
+            MovementUtils.Slide(Character);
         }
     }
 
     protected override void ExitState() {
         Character.UnsetBusy();
-    }
-
-    protected override void InitializeSubState() {
-        SetSubState(Factory.Sliding());
     }
 
     public override bool OnCollideWith(ICollidable collidable, CollisionInfo info)  => false;
@@ -83,21 +77,18 @@ public class CharacterStateKnockedBack : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.DISADVANTAGE; }}
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
-    public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateKnockedBack(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         // TODO implement knockdown, teching
         if (Character.HitStunTimer<=0) {
-            return Factory.Tumbling();
+            return typeof(CharacterStateTumbling);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         Character.SetBusy(true, true, 0f);
 
@@ -116,14 +107,11 @@ public class CharacterStateKnockedBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
+            MovementUtils.Slide(Character);
         }
-    }
-
-    protected override void InitializeSubState() {
-        SetSubState(Factory.Sliding());
     }
 
     protected override void ExitState() {}
@@ -141,21 +129,18 @@ public class CharacterStateBlownBack : CharacterState {
     public override CharacterStateType Type {get {return CharacterStateType.DISADVANTAGE; }}
     private float _maxAngleChange = 15f*Mathf.Deg2Rad;
 
-    public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory)
-    : base(_machine, _factory) {
-        _isRootState = true;
-    }
+    public CharacterStateBlownBack(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override CharacterState CheckGetNewState() {
+    protected override Type GetNewStateType() {
         // TODO implement knockdown
         if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
-            return Factory.KnockedDown();
+            return typeof(CharacterStateKnockedDown);
         } else {
             return null;
         }
     }
 
-    public override void EnterState() {
+    protected override void EnterState() {
         base.EnterState();
         Character.SetBusy(true, true, 0f);
 
@@ -174,14 +159,11 @@ public class CharacterStateBlownBack : CharacterState {
         Character.KnockBack = new();
     }
 
-    protected override void FixedUpdateState() {
+    protected override void Tick() {
         if (Character.IsGrounded()) {
             Character.HitStunTimer--;
+            MovementUtils.Slide(Character);
         }
-    }
-
-    protected override void InitializeSubState() {
-        SetSubState(Factory.Sliding());
     }
 
     protected override void ExitState() { }

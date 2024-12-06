@@ -66,19 +66,19 @@ public class AnimationStateController : MonoBehaviour
 
         // disadvantage
         _animator.SetBool(_hitStoppedHash, _character.HitStopTimer>0);
-        _animator.SetBool(_pushedBackHash, _character.StateIsActive(typeof(CharacterStatePushedBack)));
-        _animator.SetBool(_knockedBackHash, _character.StateIsActive(typeof(CharacterStateKnockedBack)));
-        _animator.SetBool(_blownBackHash, _character.StateIsActive(typeof(CharacterStateBlownBack)));
+        _animator.SetBool(_pushedBackHash, _character.State is CharacterStatePushedBack);
+        _animator.SetBool(_knockedBackHash, _character.State is CharacterStateKnockedBack);
+        _animator.SetBool(_blownBackHash, _character.State is CharacterStateBlownBack);
 
         // recovery
-        _animator.SetBool(_tumblingHash, _character.StateIsActive(typeof(CharacterStateTumbling)));
-        _animator.SetBool(_rollingHash, _character.StateIsActive(typeof(CharacterStateRolling)));
-        _animator.SetBool(_gettingUpHash, _character.StateIsActive(typeof(CharacterStateGettingUp)));
-        _animator.SetBool(_knockedDownHash, _character.StateIsActive(typeof(CharacterStateKnockedDown)));
+        _animator.SetBool(_tumblingHash, _character.State is CharacterStateTumbling);
+        _animator.SetBool(_rollingHash, _character.State is CharacterStateRolling);
+        _animator.SetBool(_gettingUpHash, _character.State is CharacterStateGettingUp);
+        _animator.SetBool(_knockedDownHash, _character.State is CharacterStateKnockedDown);
 
         // action
-        _animator.SetBool(_readyHash, _character.StateIsActive(typeof(CharacterStateReady)));
-        _animator.SetBool(_busyHash, _character.StateIsActive(typeof(CharacterStateBusy)));
-        _animator.SetBool(_blockingHash, _character.StateIsActive(typeof(CharacterStateBlocking)));
+        _animator.SetBool(_readyHash, _character.State is CharacterStateStanding);
+        _animator.SetBool(_busyHash, _character.State is CharacterStateBusy);
+        _animator.SetBool(_blockingHash, _character.State is CharacterStateBlocking);
     }
 }

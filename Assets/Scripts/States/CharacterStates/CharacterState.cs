@@ -1,10 +1,9 @@
 using System;
 
 public enum CharacterStateType {
-    ACTION,
+    ACTIVE,
     DISADVANTAGE,
-    RECOVERY,
-    MOVEMENT
+    RECOVERY
 }
 
 public abstract class CharacterState {
@@ -14,94 +13,44 @@ public abstract class CharacterState {
 
     protected CharacterStateFactory _factory;
     public CharacterStateFactory Factory { get { return _factory; } set { _factory = value; } }
+    public abstract CharacterStateType Type { get; } // TODO I'll be reimplementing state organization, likely with a composition-type pattern, so probably change this
 
-    protected bool _isRootState = false;
-    public abstract CharacterStateType Type { get; }
-    public bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
-
-    protected CharacterState SuperState {get; private set; }
-    protected CharacterState SubState {get; private set; }
     public CharacterState(Character _machine, CharacterStateFactory _factory) {
         Character = _machine;
         Factory = _factory;
     }
 
-    public static CharacterState GetSpawnState(CharacterStateFactory factory) {
-        CharacterState root = factory.Ready();
-        root.SetSubState(factory.Walking());
-        return root;
+    public static Type GetSpawnState() {
+        return typeof(CharacterStateStanding);
     }
 
-    public virtual void EnterState() {
-        InitializeSubState();
-    }
-
-    protected abstract void FixedUpdateState();
-    protected abstract void ExitState();
-
-    protected abstract CharacterState CheckGetNewState();
-    protected abstract void InitializeSubState();
-
-    public void FixedUpdateStates() {
-        if (CheckGetNewState() is CharacterState newState) {
-            SwitchState(newState);
-        } else {
-            FixedUpdateState();
-            SubState?.FixedUpdateStates();
-        }
-    }
-
-    protected void SwitchState(CharacterState newState) {
+    public CharacterState SwapState(Type _newStateType) {
         ExitState();
+        CharacterState newState = Factory.Get(_newStateType);
         newState.EnterState();
+        return newState;
+    }
 
-        if (_isRootState) {
-            Character.State = newState;
+    protected virtual void EnterState() {}
+    protected virtual void ExitState() {}
+    protected abstract Type GetNewStateType();
+    protected virtual void Tick() {}
+
+    public CharacterState FixedUpdateState() {
+        if (GetNewStateType() is Type newStateType) {
+            ExitState();
+            CharacterState newState = Factory.Get(newStateType);
+            newState.EnterState();
+            return newState;
         } else {
-            SuperState?.SetSubState(newState);
+            Tick();
+            return null;
         }
     }
 
-    private void SetSuperState(CharacterState newSuperState) {
-        SuperState = newSuperState;
-    }
+    public virtual bool OnCollideWith(ICollidable collidable, CollisionInfo info) => false;
 
-    protected void SetSubState(CharacterState newSubState) {
-        SubState?.ExitState();
-        SubState = newSubState;
-        SubState.SetSuperState(this);
-    }
-
-    public abstract bool OnCollideWith(ICollidable collidable, CollisionInfo info);
-
-    public bool StateInHierarchy(Type stateType) {
-        if (GetType()==stateType) {
-            return true;
-        } else if (SubState != null) {
-            return SubState.StateInHierarchy(stateType);
-        } else {
-            return false;
-        }
-    }
-
-    public virtual bool HandleCollisionWithStates(ICollidable collidable, CollisionInfo info) {
-        bool ret = false;
-
-        ret |= OnCollideWith(collidable, info);
-
-        if (SubState != null) {
-           ret |= SubState.HandleCollisionWithStates(collidable, info);
-        }
-
-        return ret;
-    }
-
-    override public string ToString() {
-        return GetType().Name.Replace("CharacterState", "");
-    }
-
-    public string getNames() {
-        string subStateNames = (SubState!=null)?SubState.getNames():"";
-        return $"{this}->{subStateNames}";
+    public virtual string Name { 
+        get => GetType().Name.Replace("CharacterState", "");
     }
 }

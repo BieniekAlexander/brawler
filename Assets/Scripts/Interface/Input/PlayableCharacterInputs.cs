@@ -46,7 +46,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""dash"",
+                    ""name"": ""rush"",
                     ""type"": ""PassThrough"",
                     ""id"": ""58017b8a-e844-4de3-80ec-6258c336ede2"",
                     ""expectedControlType"": ""Button"",
@@ -55,9 +55,18 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""rush"",
+                    ""name"": ""jump"",
                     ""type"": ""Button"",
                     ""id"": ""03841b82-074c-4841-af00-16aa08a8a2ac"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""79a8a516-0028-483d-8071-52694c716cae"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -67,7 +76,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""name"": ""block"",
                     ""type"": ""Button"",
                     ""id"": ""6799233d-eda8-4a5c-a64d-cf710a687472"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -76,7 +85,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""name"": ""light1"",
                     ""type"": ""Button"",
                     ""id"": ""6efbe99c-c453-4ef7-baaf-1eba0682fa37"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -290,37 +299,26 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""8726d689-fb1b-428c-a85e-6ca7428bebac"",
-                    ""path"": ""OneModifier"",
+                    ""name"": """",
+                    ""id"": ""a3cca5a5-5272-4fb6-a804-d97611060f54"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""rush"",
-                    ""isComposite"": true,
+                    ""action"": ""jump"",
+                    ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""Modifier"",
-                    ""id"": ""e466efcf-4109-4f7e-a1ee-9847d1576008"",
-                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""name"": """",
+                    ""id"": ""ca8f9dde-3832-42d7-a3e7-10e08b4d391c"",
+                    ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""rush"",
+                    ""action"": ""dash"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Binding"",
-                    ""id"": ""09267d47-28bc-4ec8-8246-4c5512c4c7bc"",
-                    ""path"": ""<Keyboard>/leftAlt"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""rush"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
@@ -468,7 +466,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                 {
                     ""name"": """",
                     ""id"": ""581e2e5c-e670-4a6f-b20f-664ea0e77f72"",
-                    ""path"": ""<Keyboard>/space"",
+                    ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -945,7 +943,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""dash"",
+                    ""action"": ""rush"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -958,8 +956,9 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
         m_character = asset.FindActionMap("character", throwIfNotFound: true);
         m_character_aim = m_character.FindAction("aim", throwIfNotFound: true);
         m_character_movement = m_character.FindAction("movement", throwIfNotFound: true);
-        m_character_dash = m_character.FindAction("dash", throwIfNotFound: true);
         m_character_rush = m_character.FindAction("rush", throwIfNotFound: true);
+        m_character_jump = m_character.FindAction("jump", throwIfNotFound: true);
+        m_character_dash = m_character.FindAction("dash", throwIfNotFound: true);
         m_character_block = m_character.FindAction("block", throwIfNotFound: true);
         m_character_light1 = m_character.FindAction("light1", throwIfNotFound: true);
         m_character_light2 = m_character.FindAction("light2", throwIfNotFound: true);
@@ -1048,8 +1047,9 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
     private List<ICharacterActions> m_CharacterActionsCallbackInterfaces = new List<ICharacterActions>();
     private readonly InputAction m_character_aim;
     private readonly InputAction m_character_movement;
-    private readonly InputAction m_character_dash;
     private readonly InputAction m_character_rush;
+    private readonly InputAction m_character_jump;
+    private readonly InputAction m_character_dash;
     private readonly InputAction m_character_block;
     private readonly InputAction m_character_light1;
     private readonly InputAction m_character_light2;
@@ -1076,8 +1076,9 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
         public CharacterActions(@PlayableCharacterInputs wrapper) { m_Wrapper = wrapper; }
         public InputAction @aim => m_Wrapper.m_character_aim;
         public InputAction @movement => m_Wrapper.m_character_movement;
-        public InputAction @dash => m_Wrapper.m_character_dash;
         public InputAction @rush => m_Wrapper.m_character_rush;
+        public InputAction @jump => m_Wrapper.m_character_jump;
+        public InputAction @dash => m_Wrapper.m_character_dash;
         public InputAction @block => m_Wrapper.m_character_block;
         public InputAction @light1 => m_Wrapper.m_character_light1;
         public InputAction @light2 => m_Wrapper.m_character_light2;
@@ -1113,12 +1114,15 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
             @movement.started += instance.OnMovement;
             @movement.performed += instance.OnMovement;
             @movement.canceled += instance.OnMovement;
-            @dash.started += instance.OnDash;
-            @dash.performed += instance.OnDash;
-            @dash.canceled += instance.OnDash;
             @rush.started += instance.OnRush;
             @rush.performed += instance.OnRush;
             @rush.canceled += instance.OnRush;
+            @jump.started += instance.OnJump;
+            @jump.performed += instance.OnJump;
+            @jump.canceled += instance.OnJump;
+            @dash.started += instance.OnDash;
+            @dash.performed += instance.OnDash;
+            @dash.canceled += instance.OnDash;
             @block.started += instance.OnBlock;
             @block.performed += instance.OnBlock;
             @block.canceled += instance.OnBlock;
@@ -1189,12 +1193,15 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
             @movement.started -= instance.OnMovement;
             @movement.performed -= instance.OnMovement;
             @movement.canceled -= instance.OnMovement;
-            @dash.started -= instance.OnDash;
-            @dash.performed -= instance.OnDash;
-            @dash.canceled -= instance.OnDash;
             @rush.started -= instance.OnRush;
             @rush.performed -= instance.OnRush;
             @rush.canceled -= instance.OnRush;
+            @jump.started -= instance.OnJump;
+            @jump.performed -= instance.OnJump;
+            @jump.canceled -= instance.OnJump;
+            @dash.started -= instance.OnDash;
+            @dash.performed -= instance.OnDash;
+            @dash.canceled -= instance.OnDash;
             @block.started -= instance.OnBlock;
             @block.performed -= instance.OnBlock;
             @block.canceled -= instance.OnBlock;
@@ -1276,8 +1283,9 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
     {
         void OnAim(InputAction.CallbackContext context);
         void OnMovement(InputAction.CallbackContext context);
-        void OnDash(InputAction.CallbackContext context);
         void OnRush(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnDash(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
         void OnLight1(InputAction.CallbackContext context);
         void OnLight2(InputAction.CallbackContext context);

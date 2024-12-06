@@ -596,166 +596,147 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   me: 0
+  hasAirDash: 0
   ShieldPrefab: {fileID: -4671031975909978345, guid: c34f2897523aa4d418e1a6542365dd2d,
     type: 3}
   castSlots:
   - Name: Rush
     CastPrefab: {fileID: -8167662292094154702, guid: 7d64190e038d36a42b7dbc4efeedd6d5,
       type: 3}
+    type: 0
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 1
       energy: 0
     Cooldown: 60
     DefaultChargeCount: 1
-  - Name: Light1
+  - Name: Light
     CastPrefab: {fileID: 6447237145091032774, guid: dde3ed861901527448a1de30d9005c81,
       type: 3}
+    type: 1
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
-    Cooldown: 14
+    Cooldown: 11
     DefaultChargeCount: 1
-  - Name: Light2
+  - Name: Light+
     CastPrefab: {fileID: 4209523939935771002, guid: 7585e0cd12bbe0742b81275f5baac19c,
       type: 3}
+    type: 1
+    posture: 0
+    orientation: 1
     Costs:
-      charges: 0
       energy: 0
-    Cooldown: 20
+    Cooldown: 11
     DefaultChargeCount: 1
-  - Name: LightS
+  - Name: Light-
     CastPrefab: {fileID: 585766600846117122, guid: 31915890dbae8b2418757e8099c90292,
       type: 3}
+    type: 1
+    posture: 0
+    orientation: 2
     Costs:
-      charges: 1
       energy: 0
-    Cooldown: 40
+    Cooldown: 11
     DefaultChargeCount: 1
-  - Name: Medium1
-    CastPrefab: {fileID: 4207541412499467509, guid: 7943d1cff1211374280e2ce7ac9b5f48,
-      type: 3}
-    Costs:
-      charges: 0
-      energy: 0
-    Cooldown: 30
-    DefaultChargeCount: 1
-  - Name: Medium2
+  - Name: Medium
     CastPrefab: {fileID: 4976466725045762006, guid: 56a86ee0cbbe519498cec7613c6f0326,
       type: 3}
+    type: 2
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
-      energy: 0
-    Cooldown: 36
-    DefaultChargeCount: 1
-  - Name: MediumS
-    CastPrefab: {fileID: 799165592850238794, guid: 521bbdf56313d1842875469ae25827cb,
-      type: 3}
-    Costs:
-      charges: 1
-      energy: 0
-    Cooldown: 40
-    DefaultChargeCount: 1
-  - Name: Heavy1
-    CastPrefab: {fileID: 4732197686106141231, guid: 2e3a6645b87a9334e8cd02234d177d48,
-      type: 3}
-    Costs:
-      charges: 0
-      energy: 0
-    Cooldown: 65
-    DefaultChargeCount: 1
-  - Name: Heavy2
-    CastPrefab: {fileID: 6826065171707727716, guid: f21133612c22cdf40b33e99e86f32a8e,
-      type: 3}
-    Costs:
-      charges: 0
-      energy: 0
-    Cooldown: 75
-    DefaultChargeCount: 1
-  - Name: HeavyS
-    CastPrefab: {fileID: 8598508159451603624, guid: 795b9e2be3f95f146af44074bb6013a3,
-      type: 3}
-    Costs:
-      charges: 1
-      energy: 0
-    Cooldown: 55
-    DefaultChargeCount: 1
-  - Name: Throw1
-    CastPrefab: {fileID: 3464759251752078316, guid: 6e3e1d948562c8e4b979fbbc5a46f799,
-      type: 3}
-    Costs:
-      charges: 0
       energy: 0
     Cooldown: 20
     DefaultChargeCount: 1
-  - Name: Throw2
-    CastPrefab: {fileID: 3464759251752078316, guid: 0f596be0f31e96f4bb67e9435a744f25,
+  - Name: Heavy
+    CastPrefab: {fileID: 4732197686106141231, guid: 2e3a6645b87a9334e8cd02234d177d48,
       type: 3}
+    type: 3
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
-    Cooldown: 50
+    Cooldown: 40
     DefaultChargeCount: 1
-  - Name: ThrowS
-    CastPrefab: {fileID: 3464759251752078316, guid: f6823de59b97ead4a9ea73650ee6b35a,
+  - Name: Throw
+    CastPrefab: {fileID: 3464759251752078316, guid: 6e3e1d948562c8e4b979fbbc5a46f799,
       type: 3}
+    type: 0
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 1
       energy: 0
-    Cooldown: 60
+    Cooldown: 20
     DefaultChargeCount: 1
   - Name: Ability1
     CastPrefab: {fileID: 7405340235297773501, guid: 3d6dd7a86490df4499b2ff34804a415a,
       type: 3}
+    type: 5
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
     Cooldown: 300
     DefaultChargeCount: 1
   - Name: Ability2
     CastPrefab: {fileID: 120673913938575115, guid: 469574eaa84921f4786fc776685488b8,
       type: 3}
+    type: 6
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
     Cooldown: 300
     DefaultChargeCount: 1
   - Name: Ability3
     CastPrefab: {fileID: 6882466414408210628, guid: 2a303c578e901304e8c19b01081c4993,
       type: 3}
+    type: 7
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
     Cooldown: 1200
     DefaultChargeCount: 1
   - Name: Ability4
     CastPrefab: {fileID: 3442410745517630681, guid: caab8487e143fc84d993b0c69bfcff39,
       type: 3}
+    type: 8
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 0
     Cooldown: 480
     DefaultChargeCount: 1
   - Name: Special1
     CastPrefab: {fileID: 5910319733208110140, guid: 64a4052fd17840448b22a3436d2433ab,
       type: 3}
+    type: 0
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 50
     Cooldown: 300
     DefaultChargeCount: -4
   - Name: Special2
     CastPrefab: {fileID: 6244843261149292953, guid: ab37a100ef51dfe44901abfbe55118f8,
       type: 3}
+    type: 0
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 50
     Cooldown: 300
     DefaultChargeCount: 1
   - Name: Ultimate
     CastPrefab: {fileID: 8415808389734030167, guid: ab4f757c686100349a9259478c0e8b61,
       type: 3}
+    type: 11
+    posture: 0
+    orientation: 0
     Costs:
-      charges: 0
       energy: 100
     Cooldown: 1800
     DefaultChargeCount: 1

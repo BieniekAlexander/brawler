@@ -82,7 +82,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""light1"",
+                    ""name"": ""light"",
                     ""type"": ""Button"",
                     ""id"": ""6efbe99c-c453-4ef7-baaf-1eba0682fa37"",
                     ""expectedControlType"": """",
@@ -91,100 +91,28 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""light2"",
+                    ""name"": ""medium"",
                     ""type"": ""Button"",
                     ""id"": ""c8e7466a-1c5c-4cd0-98e3-31a459176f26"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""boostedLight"",
-                    ""type"": ""Button"",
-                    ""id"": ""4e495e9e-6745-4925-8d77-c3e0181c2533"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""medium1"",
-                    ""type"": ""Button"",
-                    ""id"": ""ab2900fa-aeb8-440d-b6be-963dfcf91056"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""medium2"",
+                    ""name"": ""heavy"",
                     ""type"": ""Button"",
-                    ""id"": ""d04cbfee-619d-44fc-8638-c0479e5d113a"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""boostedMedium"",
-                    ""type"": ""Button"",
-                    ""id"": ""f0363c49-7e1c-4105-b161-bc9aea3cd4b7"",
+                    ""id"": ""d59f23eb-ad21-4af9-b53d-b78e756c4b72"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""heavy1"",
-                    ""type"": ""Button"",
-                    ""id"": ""5a69b126-bb2f-4369-96e4-ae16f779b7db"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""heavy2"",
-                    ""type"": ""Button"",
-                    ""id"": ""503c263f-e657-4bc3-b587-c3f10007c43a"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""boostedHeavy"",
-                    ""type"": ""Button"",
-                    ""id"": ""7e44cf9b-7864-40c6-8035-ffcb250a5541"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""throw1"",
+                    ""name"": ""throw"",
                     ""type"": ""Button"",
                     ""id"": ""cd4e2a1f-0f90-456f-97e9-51fb88996b76"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""throw2"",
-                    ""type"": ""Button"",
-                    ""id"": ""cef4c676-3f7d-4799-b498-bcb854841719"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""boostedThrow"",
-                    ""type"": ""Button"",
-                    ""id"": ""faca5904-be86-4bbe-acde-c5f865e05f15"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -193,7 +121,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""name"": ""ability1"",
                     ""type"": ""Button"",
                     ""id"": ""ca228c90-9d79-4782-830a-c1d545e07dc8"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -261,42 +189,9 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""light1"",
+                    ""action"": ""light"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""6b633829-3731-40c1-9aae-3a36de276886"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium1"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""2865cbad-2092-4f2a-b62a-75bab3f42206"",
-                    ""path"": ""<Keyboard>/shift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""de6393e1-b721-47ae-b7aa-6b92ad320fb9"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
@@ -312,7 +207,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                 {
                     ""name"": """",
                     ""id"": ""ca8f9dde-3832-42d7-a3e7-10e08b4d391c"",
-                    ""path"": ""<Keyboard>/ctrl"",
+                    ""path"": ""<Keyboard>/shift"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -327,7 +222,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""throw1"",
+                    ""action"": ""throw"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -338,7 +233,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""throw1"",
+                    ""action"": ""throw"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -349,7 +244,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""throw1"",
+                    ""action"": ""throw"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -360,51 +255,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""throw1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4d1d5722-c212-4572-b838-08e3ddf04b71"",
-                    ""path"": ""<Keyboard>/r"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""throw2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""02db7937-eee1-4165-ad8c-389ba9c7bfeb"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""throw2"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""0ac5f213-f15d-42ca-8419-ddb4bd0dfec7"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""throw2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""be347fe6-221e-4cb1-838d-ace97bd03480"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""throw2"",
+                    ""action"": ""throw"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -466,90 +317,13 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                 {
                     ""name"": """",
                     ""id"": ""581e2e5c-e670-4a6f-b20f-664ea0e77f72"",
-                    ""path"": ""<Keyboard>/shift"",
+                    ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""block"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""1c38e173-ba53-482f-9dfd-2116498c1426"",
-                    ""path"": ""<Keyboard>/t"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""0a463c49-b4aa-4585-8231-67be2e27470c"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""5447c178-e92e-445f-9323-bccac1dfb225"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""85c42796-f278-4159-90ca-4c58ce1bcf2f"",
-                    ""path"": ""<Mouse>/middleButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""d03e8a99-416f-4603-8357-a7c3849608d8"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""5565e472-3685-46d6-82a1-0ceb5e3d672f"",
-                    ""path"": ""<Keyboard>/leftShift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""1ec74604-0ae2-47d5-89b0-8503dbd1002d"",
-                    ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedThrow"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""One Modifier"",
@@ -657,185 +431,20 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""light2"",
+                    ""action"": ""medium"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bf20fb7a-7adf-4b31-ba3f-d28500e5a363"",
+                    ""id"": ""85c8f57f-9146-4cfd-9d25-e61ecd42c264"",
                     ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""boostedLight"",
+                    ""action"": ""heavy"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""ef4fa377-bc54-4544-b513-dcd90e99c670"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium2"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""1720ff93-7970-4da6-88d1-7aca9d72f731"",
-                    ""path"": ""<Keyboard>/shift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""131b0151-f767-43e2-a930-ee625078cb81"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""medium2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""38c8443e-2306-47a6-833d-d13d1795c089"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedMedium"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""867d579e-48f3-4d3b-97be-25cfc051b324"",
-                    ""path"": ""<Keyboard>/shift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedMedium"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""d795e94a-4746-4238-a803-a3e1c9af40be"",
-                    ""path"": ""<Mouse>/middleButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedMedium"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""bbb2992c-64c6-4f03-a8ef-2cc9e039d18c"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy1"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""8bb2d328-06c0-481e-a2db-6fedb4a36747"",
-                    ""path"": ""<Keyboard>/ctrl"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""22fccc22-5e14-480d-8be0-151cc2046ff6"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy1"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""18114b79-837c-4dff-b1b6-c4903da2f027"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy2"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""9495dbb5-0e77-448c-b2c4-c1406885d1d5"",
-                    ""path"": ""<Keyboard>/ctrl"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""b5188584-214e-43a4-b775-504700248981"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""heavy2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""One Modifier"",
-                    ""id"": ""b6a99ebe-9702-45c2-93a5-06d2bbf0e27a"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedHeavy"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""ac1ef15f-658c-4a00-87be-dff7000a679f"",
-                    ""path"": ""<Keyboard>/ctrl"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedHeavy"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""6a9eaece-aa4f-47c4-96da-9a1412e69f75"",
-                    ""path"": ""<Mouse>/middleButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""boostedHeavy"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""One Modifier"",
@@ -960,18 +569,10 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
         m_character_jump = m_character.FindAction("jump", throwIfNotFound: true);
         m_character_dash = m_character.FindAction("dash", throwIfNotFound: true);
         m_character_block = m_character.FindAction("block", throwIfNotFound: true);
-        m_character_light1 = m_character.FindAction("light1", throwIfNotFound: true);
-        m_character_light2 = m_character.FindAction("light2", throwIfNotFound: true);
-        m_character_boostedLight = m_character.FindAction("boostedLight", throwIfNotFound: true);
-        m_character_medium1 = m_character.FindAction("medium1", throwIfNotFound: true);
-        m_character_medium2 = m_character.FindAction("medium2", throwIfNotFound: true);
-        m_character_boostedMedium = m_character.FindAction("boostedMedium", throwIfNotFound: true);
-        m_character_heavy1 = m_character.FindAction("heavy1", throwIfNotFound: true);
-        m_character_heavy2 = m_character.FindAction("heavy2", throwIfNotFound: true);
-        m_character_boostedHeavy = m_character.FindAction("boostedHeavy", throwIfNotFound: true);
-        m_character_throw1 = m_character.FindAction("throw1", throwIfNotFound: true);
-        m_character_throw2 = m_character.FindAction("throw2", throwIfNotFound: true);
-        m_character_boostedThrow = m_character.FindAction("boostedThrow", throwIfNotFound: true);
+        m_character_light = m_character.FindAction("light", throwIfNotFound: true);
+        m_character_medium = m_character.FindAction("medium", throwIfNotFound: true);
+        m_character_heavy = m_character.FindAction("heavy", throwIfNotFound: true);
+        m_character_throw = m_character.FindAction("throw", throwIfNotFound: true);
         m_character_ability1 = m_character.FindAction("ability1", throwIfNotFound: true);
         m_character_ability2 = m_character.FindAction("ability2", throwIfNotFound: true);
         m_character_ability3 = m_character.FindAction("ability3", throwIfNotFound: true);
@@ -1051,18 +652,10 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
     private readonly InputAction m_character_jump;
     private readonly InputAction m_character_dash;
     private readonly InputAction m_character_block;
-    private readonly InputAction m_character_light1;
-    private readonly InputAction m_character_light2;
-    private readonly InputAction m_character_boostedLight;
-    private readonly InputAction m_character_medium1;
-    private readonly InputAction m_character_medium2;
-    private readonly InputAction m_character_boostedMedium;
-    private readonly InputAction m_character_heavy1;
-    private readonly InputAction m_character_heavy2;
-    private readonly InputAction m_character_boostedHeavy;
-    private readonly InputAction m_character_throw1;
-    private readonly InputAction m_character_throw2;
-    private readonly InputAction m_character_boostedThrow;
+    private readonly InputAction m_character_light;
+    private readonly InputAction m_character_medium;
+    private readonly InputAction m_character_heavy;
+    private readonly InputAction m_character_throw;
     private readonly InputAction m_character_ability1;
     private readonly InputAction m_character_ability2;
     private readonly InputAction m_character_ability3;
@@ -1080,18 +673,10 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
         public InputAction @jump => m_Wrapper.m_character_jump;
         public InputAction @dash => m_Wrapper.m_character_dash;
         public InputAction @block => m_Wrapper.m_character_block;
-        public InputAction @light1 => m_Wrapper.m_character_light1;
-        public InputAction @light2 => m_Wrapper.m_character_light2;
-        public InputAction @boostedLight => m_Wrapper.m_character_boostedLight;
-        public InputAction @medium1 => m_Wrapper.m_character_medium1;
-        public InputAction @medium2 => m_Wrapper.m_character_medium2;
-        public InputAction @boostedMedium => m_Wrapper.m_character_boostedMedium;
-        public InputAction @heavy1 => m_Wrapper.m_character_heavy1;
-        public InputAction @heavy2 => m_Wrapper.m_character_heavy2;
-        public InputAction @boostedHeavy => m_Wrapper.m_character_boostedHeavy;
-        public InputAction @throw1 => m_Wrapper.m_character_throw1;
-        public InputAction @throw2 => m_Wrapper.m_character_throw2;
-        public InputAction @boostedThrow => m_Wrapper.m_character_boostedThrow;
+        public InputAction @light => m_Wrapper.m_character_light;
+        public InputAction @medium => m_Wrapper.m_character_medium;
+        public InputAction @heavy => m_Wrapper.m_character_heavy;
+        public InputAction @throw => m_Wrapper.m_character_throw;
         public InputAction @ability1 => m_Wrapper.m_character_ability1;
         public InputAction @ability2 => m_Wrapper.m_character_ability2;
         public InputAction @ability3 => m_Wrapper.m_character_ability3;
@@ -1126,42 +711,18 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
             @block.started += instance.OnBlock;
             @block.performed += instance.OnBlock;
             @block.canceled += instance.OnBlock;
-            @light1.started += instance.OnLight1;
-            @light1.performed += instance.OnLight1;
-            @light1.canceled += instance.OnLight1;
-            @light2.started += instance.OnLight2;
-            @light2.performed += instance.OnLight2;
-            @light2.canceled += instance.OnLight2;
-            @boostedLight.started += instance.OnBoostedLight;
-            @boostedLight.performed += instance.OnBoostedLight;
-            @boostedLight.canceled += instance.OnBoostedLight;
-            @medium1.started += instance.OnMedium1;
-            @medium1.performed += instance.OnMedium1;
-            @medium1.canceled += instance.OnMedium1;
-            @medium2.started += instance.OnMedium2;
-            @medium2.performed += instance.OnMedium2;
-            @medium2.canceled += instance.OnMedium2;
-            @boostedMedium.started += instance.OnBoostedMedium;
-            @boostedMedium.performed += instance.OnBoostedMedium;
-            @boostedMedium.canceled += instance.OnBoostedMedium;
-            @heavy1.started += instance.OnHeavy1;
-            @heavy1.performed += instance.OnHeavy1;
-            @heavy1.canceled += instance.OnHeavy1;
-            @heavy2.started += instance.OnHeavy2;
-            @heavy2.performed += instance.OnHeavy2;
-            @heavy2.canceled += instance.OnHeavy2;
-            @boostedHeavy.started += instance.OnBoostedHeavy;
-            @boostedHeavy.performed += instance.OnBoostedHeavy;
-            @boostedHeavy.canceled += instance.OnBoostedHeavy;
-            @throw1.started += instance.OnThrow1;
-            @throw1.performed += instance.OnThrow1;
-            @throw1.canceled += instance.OnThrow1;
-            @throw2.started += instance.OnThrow2;
-            @throw2.performed += instance.OnThrow2;
-            @throw2.canceled += instance.OnThrow2;
-            @boostedThrow.started += instance.OnBoostedThrow;
-            @boostedThrow.performed += instance.OnBoostedThrow;
-            @boostedThrow.canceled += instance.OnBoostedThrow;
+            @light.started += instance.OnLight;
+            @light.performed += instance.OnLight;
+            @light.canceled += instance.OnLight;
+            @medium.started += instance.OnMedium;
+            @medium.performed += instance.OnMedium;
+            @medium.canceled += instance.OnMedium;
+            @heavy.started += instance.OnHeavy;
+            @heavy.performed += instance.OnHeavy;
+            @heavy.canceled += instance.OnHeavy;
+            @throw.started += instance.OnThrow;
+            @throw.performed += instance.OnThrow;
+            @throw.canceled += instance.OnThrow;
             @ability1.started += instance.OnAbility1;
             @ability1.performed += instance.OnAbility1;
             @ability1.canceled += instance.OnAbility1;
@@ -1205,42 +766,18 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
             @block.started -= instance.OnBlock;
             @block.performed -= instance.OnBlock;
             @block.canceled -= instance.OnBlock;
-            @light1.started -= instance.OnLight1;
-            @light1.performed -= instance.OnLight1;
-            @light1.canceled -= instance.OnLight1;
-            @light2.started -= instance.OnLight2;
-            @light2.performed -= instance.OnLight2;
-            @light2.canceled -= instance.OnLight2;
-            @boostedLight.started -= instance.OnBoostedLight;
-            @boostedLight.performed -= instance.OnBoostedLight;
-            @boostedLight.canceled -= instance.OnBoostedLight;
-            @medium1.started -= instance.OnMedium1;
-            @medium1.performed -= instance.OnMedium1;
-            @medium1.canceled -= instance.OnMedium1;
-            @medium2.started -= instance.OnMedium2;
-            @medium2.performed -= instance.OnMedium2;
-            @medium2.canceled -= instance.OnMedium2;
-            @boostedMedium.started -= instance.OnBoostedMedium;
-            @boostedMedium.performed -= instance.OnBoostedMedium;
-            @boostedMedium.canceled -= instance.OnBoostedMedium;
-            @heavy1.started -= instance.OnHeavy1;
-            @heavy1.performed -= instance.OnHeavy1;
-            @heavy1.canceled -= instance.OnHeavy1;
-            @heavy2.started -= instance.OnHeavy2;
-            @heavy2.performed -= instance.OnHeavy2;
-            @heavy2.canceled -= instance.OnHeavy2;
-            @boostedHeavy.started -= instance.OnBoostedHeavy;
-            @boostedHeavy.performed -= instance.OnBoostedHeavy;
-            @boostedHeavy.canceled -= instance.OnBoostedHeavy;
-            @throw1.started -= instance.OnThrow1;
-            @throw1.performed -= instance.OnThrow1;
-            @throw1.canceled -= instance.OnThrow1;
-            @throw2.started -= instance.OnThrow2;
-            @throw2.performed -= instance.OnThrow2;
-            @throw2.canceled -= instance.OnThrow2;
-            @boostedThrow.started -= instance.OnBoostedThrow;
-            @boostedThrow.performed -= instance.OnBoostedThrow;
-            @boostedThrow.canceled -= instance.OnBoostedThrow;
+            @light.started -= instance.OnLight;
+            @light.performed -= instance.OnLight;
+            @light.canceled -= instance.OnLight;
+            @medium.started -= instance.OnMedium;
+            @medium.performed -= instance.OnMedium;
+            @medium.canceled -= instance.OnMedium;
+            @heavy.started -= instance.OnHeavy;
+            @heavy.performed -= instance.OnHeavy;
+            @heavy.canceled -= instance.OnHeavy;
+            @throw.started -= instance.OnThrow;
+            @throw.performed -= instance.OnThrow;
+            @throw.canceled -= instance.OnThrow;
             @ability1.started -= instance.OnAbility1;
             @ability1.performed -= instance.OnAbility1;
             @ability1.canceled -= instance.OnAbility1;
@@ -1287,18 +824,10 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
         void OnJump(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
-        void OnLight1(InputAction.CallbackContext context);
-        void OnLight2(InputAction.CallbackContext context);
-        void OnBoostedLight(InputAction.CallbackContext context);
-        void OnMedium1(InputAction.CallbackContext context);
-        void OnMedium2(InputAction.CallbackContext context);
-        void OnBoostedMedium(InputAction.CallbackContext context);
-        void OnHeavy1(InputAction.CallbackContext context);
-        void OnHeavy2(InputAction.CallbackContext context);
-        void OnBoostedHeavy(InputAction.CallbackContext context);
-        void OnThrow1(InputAction.CallbackContext context);
-        void OnThrow2(InputAction.CallbackContext context);
-        void OnBoostedThrow(InputAction.CallbackContext context);
+        void OnLight(InputAction.CallbackContext context);
+        void OnMedium(InputAction.CallbackContext context);
+        void OnHeavy(InputAction.CallbackContext context);
+        void OnThrow(InputAction.CallbackContext context);
         void OnAbility1(InputAction.CallbackContext context);
         void OnAbility2(InputAction.CallbackContext context);
         void OnAbility3(InputAction.CallbackContext context);

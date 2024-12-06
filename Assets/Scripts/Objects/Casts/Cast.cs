@@ -34,7 +34,6 @@ public enum CastableCondition {
 
 [Serializable]
 public class CastCosts {
-    [Range(0, 1)] public int charges = 0;
     [Range(0, 100)] public int energy = 0;
 }
 

@@ -1,14 +1,15 @@
 using UnityEngine;
 
-public enum AimMovementOrientation {
-    PARALLEL,
-    PERPENDICULAR,
-    ANTIPARALLEL
+public enum MovementOrientation {
+    Neutral = 0,
+    Advancing = 1,
+    Retreating = 2
 }
 
-public enum RotationMovementOrientation {
-    WITH,
-    AGAINST
+public enum CharacterPosture {
+    Normal = 0,
+    Squatting = 1,
+    Aerial = 2
 }
 
 public static class MovementUtils {
@@ -75,23 +76,13 @@ public static class MovementUtils {
         }
     }
 
-    public static AimMovementOrientation GetAimMovementOrientation(Vector3 aimDirVector, Vector3 moveDirVector) {
+    public static MovementOrientation GetAimMovementOrientation(Vector3 aimDirVector, Vector3 moveDirVector) {
         float aimMovementNorm = Vector3.Dot(moveDirVector.normalized, aimDirVector.normalized);
         return aimMovementNorm switch {
-            >.707f => AimMovementOrientation.PARALLEL,
-            <-.707f => AimMovementOrientation.ANTIPARALLEL,
-            _ => AimMovementOrientation.PERPENDICULAR
+            >.707f => MovementOrientation.Advancing,
+            <-.707f => MovementOrientation.Retreating,
+            _ => MovementOrientation.Neutral
         };
-    }
-
-    public static RotationMovementOrientation GetRotationMovementOrientation(Character c) {
-        Vector3 relativeMoveDirection = Quaternion.Inverse(c.transform.rotation) * c.MoveDirection;
-
-        if (relativeMoveDirection.x>0 == c.IsRotatingClockwise()) {
-            return RotationMovementOrientation.WITH;
-        } else {
-            return RotationMovementOrientation.AGAINST;
-        }
     }
 
     /* Movement Stuff */

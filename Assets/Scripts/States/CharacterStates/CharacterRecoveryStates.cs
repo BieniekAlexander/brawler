@@ -9,7 +9,7 @@ public class CharacterStateKnockedDown : CharacterState {
     protected override Type GetNewStateType() {
         if (Character.InputMoveDirection != Vector2.zero) {
             return typeof(CharacterStateGettingUp);
-        } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
+        } else if (Character.InputCastId == (int)CastType.Rush) { // TODO do I want to be reading directly from InputCastId?
             return typeof(CharacterStateRolling);
         } else {
             return null;
@@ -27,7 +27,7 @@ public class CharacterStateTumbling : CharacterState {
     protected override Type GetNewStateType() {
         if (Character.InputMoveDirection != Vector2.zero) {
             return typeof(CharacterStateGettingUp);
-        } else if (Character.InputCastId == (int)CastId.Rush) { // TODO do I want to be reading directly from InputCastId?
+        } else if (Character.InputCastId == (int)CastType.Rush) { // TODO do I want to be reading directly from InputCastId?
             return typeof(CharacterStateRolling);
         } else if (Mathf.Approximately(Character.Velocity.magnitude, 0f)) {
             return typeof(CharacterStateKnockedDown);

@@ -31,15 +31,9 @@ public class CastPlayer : MonoBehaviour {
     private int duration;
 
     private int[] castIds = new int[] {
-        (int) CastId.Light1,
-        (int) CastId.Light2,
-        (int) CastId.LightS,
-        (int) CastId.Medium1,
-        (int) CastId.Medium2,
-        (int) CastId.MediumS,
-        (int) CastId.Heavy1,
-        (int) CastId.Heavy2,
-        (int) CastId.HeavyS
+        (int) CastType.Light,
+        (int) CastType.Medium,
+        (int) CastType.Heavy
     };
 
     private Dictionary<CastEditorControls, KeyCode[]> EditorControlMapping = new Dictionary<CastEditorControls, KeyCode[]>(){
@@ -117,7 +111,8 @@ public class CastPlayer : MonoBehaviour {
     private void InitializeCast(int castId) {
         DeleteInstantiatedCasts();
 
-        CastPrefab = Caster.CastContainers[castId].CastSlot.CastPrefab;
+        // TODO return to this - I just hardcoded the default vals
+        CastPrefab = Caster.CastMap[((CastType) castId, CharacterPosture.Normal, MovementOrientation.Neutral)].CastSlot.CastPrefab;
         ActiveCastables = new();
         Debug.Log(CastPrefab.name);
 
@@ -279,7 +274,7 @@ public class CastPlayer : MonoBehaviour {
 
     void OnGUI() {
         // TODO remove: here for debugging
-        GUI.Label(new Rect(20, 40, 200, 20), $"Cast: {(CastId) castIds[editorIndex]}");
+        GUI.Label(new Rect(20, 40, 200, 20), $"Cast: {(CastType) castIds[editorIndex]}");
         GUI.Label(new Rect(20, 70, 200, 20), $"Frame {frame}/{duration-1} (total {duration})");
     }
 }

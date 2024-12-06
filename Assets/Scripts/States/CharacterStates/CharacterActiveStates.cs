@@ -16,7 +16,7 @@ public class CharacterStateStanding : CharacterState {
 		} else if (Character.CommandMovement != null) {
 			return typeof(CharacterStateCommandMovement);
 		} else if (Character.InputJump) {
-			return typeof(CharacterStateJumpSquatting);
+			return typeof(CharacterStateSquatting);
 		} else  {
 			return null;
 		}
@@ -124,23 +124,25 @@ public class CharacterStateDashing : CharacterState {
 	public override CharacterStateType Type {get {return CharacterStateType.ACTIVE; }}
 	private readonly int _duration = 15;
 	private readonly float[] velocityCurve = new float[] {
-		.01f,	.01f,	.01f,	.2f,	.3f,
+		.01f,	.01f,	.01f,	.01f,	.01f,
+		.2f,  	.3f, 	.3f,  	.3f,	.3f,
 		.3f,  	.3f, 	.3f,  	.3f,	.3f,
-		.3f,  	.3f, 	.3f,  	.3f,	.3f,
-		.3f
+		.125f
 	};
 
 	private int _frame;
 	public CharacterStateDashing(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
 	protected override Type GetNewStateType() {
-		if (_frame>=_duration-5 && Character.InputJump) {
-			return typeof(CharacterStateJumpSquatting);
-		} else if (_frame>=_duration) {
-			if (Character.InputDash) {
+		if (_frame>=_duration) {
+			return typeof(CharacterStateStanding);
+		} else if (_frame>=_duration-5) {
+			if (Character.InputJump) {
+				return typeof(CharacterStateSquatting);
+			} else if (Character.InputDash) {
 				return typeof(CharacterStateSliding);
 			} else {
-				return typeof(CharacterStateStanding);
+				return null;
 			}
 		} else {
 			return null;
@@ -168,12 +170,12 @@ public class CharacterStateDashing : CharacterState {
 	}
 }
 
-public class CharacterStateJumpSquatting : CharacterState {
+public class CharacterStateSquatting : CharacterState {
 	public override CharacterStateType Type {get {return CharacterStateType.ACTIVE; }}
 	private readonly int duration = 6;
 	private int _frame;
 
-	public CharacterStateJumpSquatting(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
+	public CharacterStateSquatting(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
 	protected override Type GetNewStateType() {
 		if (Character.InputDash) {
@@ -254,8 +256,12 @@ public class CharacterStateAerial : CharacterState {
 	protected override Type GetNewStateType() {
 		if (Character.InputDash && Character.hasAirDash) {
 			return typeof(CharacterStateAirDashing);
-		} else if (Character.IsGrounded()) {
-			return typeof(CharacterStateStanding);
+		} else if (Character.IsGrounded()){
+			if (Character.InputDash) {
+				return typeof(CharacterStateSliding);
+			} else {
+				return typeof(CharacterStateStanding);
+			}
 		} else {
 			return null;
 		}

@@ -15,13 +15,24 @@ public class CastSlot {
         CastPrefab = null;
         Cooldown = -1;
         DefaultChargeCount = 1;
+        posture = CharacterPosture.Normal;
     }
 
+    // metadatad
     public string Name;
+
+    // cast
     public Cast CastPrefab;
+
+    // conditions
+    public CastType type;
+    public CharacterPosture posture;
+    public MovementOrientation orientation;
+
+    // resources
     public CastCosts Costs;
     public int Cooldown;
-    public int DefaultChargeCount;
+    public int DefaultChargeCount;    
 }
 
 public class CastContainer {
@@ -46,27 +57,19 @@ public class CastContainer {
     public int charges;
 }
 
-public enum CastId {
+public enum CastType {
     Rush = 0,
-    Light1 = 1,
-    Light2 = 2,
-    LightS = 3,
-    Medium1 = 4,
-    Medium2 = 5,
-    MediumS = 6,
-    Heavy1 = 7,
-    Heavy2 = 8,
-    HeavyS = 9,
-    Throw1 = 10,
-    Throw2 = 11,
-    ThrowS = 12,
-    Ability1 = 13,
-    Ability2 = 14,
-    Ability3 = 15,
-    Ability4 = 16,
-    Special1 = 17,
-    Special2 = 18,
-    Ultimate = 19
+    Light = 1,
+    Medium = 2,
+    Heavy = 3,
+    Throw = 4,
+    Ability1 = 5,
+    Ability2 = 6,
+    Ability3 = 7,
+    Ability4 = 8,
+    Special1 = 9,
+    Special2 = 10,
+    Ultimate = 11
     
 }
 
@@ -178,111 +181,71 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public void OnRush(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Rush;
+            InputCastId = (int)CastType.Rush;
         }
     }
 
     // attacks
-    public void OnLight1(InputAction.CallbackContext context) {
+    public void OnLight(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Light1;
+            InputCastId = (int)CastType.Light;
         }
     }
-    public void OnLight2(InputAction.CallbackContext context) {
+    public void OnMedium(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Light2;
+            InputCastId = (int)CastType.Medium;
         }
     }
-    public void OnBoostedLight(InputAction.CallbackContext context) {
+
+    public void OnHeavy(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.LightS;
+            InputCastId = (int)CastType.Heavy;
         }
     }
-    public void OnMedium1(InputAction.CallbackContext context) {
+
+    public void OnThrow(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Medium1;
-        }
-    }
-    public void OnMedium2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Medium2;
-        }
-    }
-    public void OnBoostedMedium(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.MediumS;
-        }
-    }
-    public void OnHeavy1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Heavy1;
-        }
-    }
-    public void OnHeavy2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Heavy2;
-        }
-    }
-    public void OnBoostedHeavy(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.HeavyS;
+            InputCastId = (int)CastType.Throw;
         }
     }
 
     // shields
     public void OnBlock(InputAction.CallbackContext context) => InputBlocking = context.ReadValueAsButton();
 
-    // throws
-    public void OnThrow1(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Throw1;
-        }
-    }
-    public void OnThrow2(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Throw2;
-        }
-    }
-    public void OnBoostedThrow(InputAction.CallbackContext context) {
-        if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.ThrowS;
-        }
-    }
-
     // abilities
     public void OnAbility1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Ability1;
+            InputCastId = (int)CastType.Ability1;
         }
     }
     public void OnAbility2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Ability2;
+            InputCastId = (int)CastType.Ability2;
         }
     }
     public void OnAbility3(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Ability3;
+            InputCastId = (int)CastType.Ability3;
         }
     }
     public void OnAbility4(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Ability4;
+            InputCastId = (int)CastType.Ability4;
         }
     }
     public void OnSpecial1(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Special1;
+            InputCastId = (int)CastType.Special1;
         }
     }
     public void OnSpecial2(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Special2;
+            InputCastId = (int)CastType.Special2;
         }
     }
     public void OnUltimate(InputAction.CallbackContext context) {
         if (context.ReadValueAsButton()) {
-            InputCastId = (int)CastId.Ultimate;
+            InputCastId = (int)CastType.Ultimate;
         }
     }
 
@@ -307,12 +270,10 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         characterActions.Disable();
     }
 
-    private static HashSet<int> attackCastIdSet = new(){(int) CastId.Light1, (int) CastId.Light2, (int) CastId.LightS, (int) CastId.Medium1, (int) CastId.Medium2, (int) CastId.MediumS, (int) CastId.Heavy1, (int) CastId.Heavy2, (int) CastId.HeavyS};
-
-    private bool _hasResourcesForCast(CastCosts costs) => energy >= costs.energy && Charges >= costs.charges;
+    private static HashSet<int> attackCastIdSet = new(){(int) CastType.Light, (int) CastType.Medium, (int) CastType.Heavy, (int) CastType.Throw};
+    private bool _hasResourcesForCast(CastCosts costs) => energy >= costs.energy;
     private void useCastResources(CastCosts costs) {
         energy -= costs.energy;
-        Charges -= costs.charges;
     }
 
     /* Casts */
@@ -326,11 +287,22 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             }
         }
 
+        CastContainer castContainer = CastMap.ContainsKey(
+            ((CastType) castId, GetPosture(), MovementUtils.GetAimMovementOrientation(InputAimVector, MoveDirection))
+         ) ? CastMap[
+            ((CastType) castId, GetPosture(), MovementUtils.GetAimMovementOrientation(InputAimVector, MoveDirection))
+        ] : CastMap[
+            ((CastType) castId, CharacterPosture.Normal, MovementOrientation.Neutral)
+        ];
+
+        CastContainer cdContainer = castContainer; 
+
+        // TODO return to this :) the purpose of this was to have some abilities sharsdssssssssssde cooldowns,
+        // but I'm refactoring how abilities are stored, so this'll be a pain to fix, and I'm not sure if I'll keep it anyway
         // charges are shared if defaultChargeCount<0 - index is indicated by the negated index
-        CastContainer castContainer = CastContainers[castId];
-        CastContainer cdContainer = (castSlots[castId].DefaultChargeCount>=0)
-             ? castContainer
-             : CastContainers[castId+castSlots[castId].DefaultChargeCount];
+        // CastContainer cdContainer = (castSlots[castId].DefaultChargeCount>=0)
+        //      ? castContainer
+        //      : CastMap[castId+castSlots[castId].DefaultChargeCount];
 
         if (cdContainer.charges == 0) {
             // we're updating another cast - allowed
@@ -386,30 +358,21 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     /// <returns>The index if the cast being casted, or -1 if otherwise</returns>
     void TickCasts() {
         // resolve cooldowns and cast expirations
-        for (int i = 0; i<CastContainers.Length; i++) {
-
-            if (CastContainers[i].charges < castSlots[i].DefaultChargeCount) {
-                if (--CastContainers[i].timer<=0) {
-                    CastContainers[i].charges++;
-                    CastContainers[i].timer = castSlots[i].Cooldown;
+        foreach (var pair in CastMap) {
+            CastContainer c = pair.Value;
+            if (c.charges < c.CastSlot.DefaultChargeCount) {
+                if (--c.timer<=0) {
+                    c.charges++;
+                    c.timer = c.CastSlot.Cooldown;
                 }
             }
         }
     }    
 
-    private void HandleCharges() {
-        rechargeTimer=(Charges>=maxCharges) ? rechargeRate : rechargeTimer-1;
-        if (rechargeTimer<=0) {
-            Charges+=1;
-            rechargeTimer=rechargeRate;
-        }
-    }
-
     /* ICasts */
-    [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastId)).Select(name => new CastSlot(name)).ToArray();
-    public CastContainer[] CastContainers = new CastContainer[Enum.GetNames(typeof(CastId)).Length];
-    public static int[] boostedIds = new int[] { (int)CastId.LightS, (int)CastId.MediumS, (int)CastId.HeavyS, (int)CastId.ThrowS };
-    public static int[] specialIds = new int[] { (int)CastId.Special1, (int)CastId.Special2 };
+    [SerializeField] private CastSlot[] castSlots = Enum.GetNames(typeof(CastType)).Select(name => new CastSlot(name)).ToArray();
+    public Dictionary<(CastType, CharacterPosture, MovementOrientation), CastContainer> CastMap = new();
+    public static int[] specialIds = new int[] { (int)CastType.Special1, (int)CastType.Special2 };
     public int CastBufferTimer { get; private set; } = 0;
     public Cast ActiveCastable = null;
     private int _nextCastId;
@@ -423,8 +386,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         }
     }
 
-    private int maxCharges = 5;
-    public int Charges { get; set; } = 4;
     private int rechargeRate = 300;
     private int rechargeTimer = 0;
     private int energy = 10000; // TODO lower
@@ -445,7 +406,7 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public List<Cast> Children {
         get {
-            return (from CastContainer cc in CastContainers select cc.RootCastable).ToList();
+            return (from CastContainer cc in CastMap select cc.RootCastable).ToList();
         }
     }
 
@@ -455,6 +416,17 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     public void SwitchState(Type _characterStateType) {
         State = State.SwapState(_characterStateType);
+    }
+
+    public CharacterPosture GetPosture() {
+        // TODO make sure this gives me what I want in all cases :)
+        if (State is CharacterStateSquatting) {
+            return CharacterPosture.Squatting;
+        } else if (State is CharacterStateAerial || State is CharacterStateAirDashing) {
+            return CharacterPosture.Aerial;
+        } else {
+            return CharacterPosture.Normal;
+        }
     }
 
     public bool Parried = false;
@@ -536,7 +508,12 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
         // initialize casts
         for (int i = 0; i<castSlots.Length; i++) {
-            CastContainers[i] = new CastContainer(castSlots[i], this, castSlots[i].Name);
+            
+            CastMap[
+                (castSlots[i].type,
+                castSlots[i].posture,
+                castSlots[i].orientation
+            )] = new CastContainer(castSlots[i], this, castSlots[i].Name);
         }
 
         // Visuals
@@ -551,34 +528,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
 
     private void HandleVisuals() {
         /*
-         * Bolt Indicator
-         */
-        // duration
-        if (InvulnerableStack>0)
-            Material.color = new Color(255, 255, 255);
-        else if (HitStopTimer>0)
-            Material.color = new Color(0, 0, 0);
-        else if (State is CharacterStateBlownBack // disadvantage
-            || State is CharacterStateKnockedBack
-            || State is CharacterStatePushedBack)
-            Material.color = new Color(255, 0, 0);
-        else if (State is CharacterStateTumbling // vulnerable
-            || State is CharacterStateKnockedDown)
-            Material.color = new Color(125, 125, 0);
-        else if (State is CharacterStateRolling // recovering
-            || State is CharacterStateGettingUp)
-            Material.color = new Color(255, 255, 0);
-        else if (InputCastId >= 0)
-            Material.color=Color.magenta;
-        else if (Charges>0)
-            Material.color=Color.green;
-        else
-            Material.color=Color.gray;
-
-        /*
          * Trail Renderer
          */
-        tr.emitting=(Velocity.sqrMagnitude>(.2f*.2f)); // TODO return to this later
+        tr.emitting =(Velocity.sqrMagnitude>(.2f*.2f)); // TODO return to this later
     }
 
     private void Update() {
@@ -647,8 +599,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
             
             cc.Move(Velocity);
         }
-        
-        HandleCharges();
 
         if (CastBufferTimer-- == 0) {
             InputCastId = -1;
@@ -848,10 +798,9 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
         // TODO remove: here for debugging
         if (!me) return;
         GUI.Label(new Rect(20, 40, 200, 20), MovementUtils.inXZ(Velocity).magnitude+"m/tick");
-        GUI.Label(new Rect(20, 70, 200, 20), Charges+"/"+maxCharges);
-        GUI.Label(new Rect(20, 100, 200, 20), "HP: "+HP);
-        GUI.Label(new Rect(20, 130, 200, 20), "Energy: "+energy);
-        GUI.Label(new Rect(20, 160, 200, 20), State.Name);
+        GUI.Label(new Rect(20, 70, 200, 20), "HP: "+HP);
+        GUI.Label(new Rect(20, 100, 200, 20), "Energy: "+energy);
+        GUI.Label(new Rect(20, 130, 200, 20), State.Name);
     }
 
     /* ICollidable */

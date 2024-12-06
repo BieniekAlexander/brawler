@@ -91,7 +91,7 @@ public static class ContextSteering {
 
 public static class AttackBehaviorUtils { // super rough implementation to get some attack behavior going
     public static int GetAttackCastId() {
-        return Random.Range((int) CastId.Light1, (int) CastId.HeavyS);
+        return Random.Range((int) CastType.Light, (int) CastType.Heavy);
     }
 }
 
@@ -178,7 +178,7 @@ public static class ActionAtoms {
 
     // Attack
     public static void Dash(CharacterBehavior state, CharacterFrameInput input) {
-        input.CastId = (int) CastId.Rush;
+        input.CastId = (int) CastType.Rush;
     }
 
     // Aim

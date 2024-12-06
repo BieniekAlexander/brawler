@@ -7,12 +7,14 @@ public class EffectGatUltimate : Effect {
    override protected void OnInitialize() {
         base.OnInitialize();
         Character character = About.gameObject.GetComponent<Character>();
-        character.CastContainers[(int)CastId.Ability4].charges += 4;
+        // TODO fix later :)
+        // character.CastMap[(int)CastType.Ability4].charges += 4;
     }
 
     override protected void OnDestruction() {
         if (About.gameObject.GetComponent<Character>() is Character character) {
-            character.CastContainers[(int)CastId.Ability4].charges = Math.Min(character.CastContainers[(int)CastId.Ultimate].charges, 1);
+            // TODO fix later :)
+            // character.CastMap[(int)CastType.Ability4].charges = Math.Min(character.CastMap[(int)CastType.Ultimate].charges, 1);
         }
     }
 

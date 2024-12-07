@@ -1,84 +1,79 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEditor.Animations;
+using UnityEngine.Assertions;
+using ServiceStack;
+
+[Serializable]
+public class AnimationStatePair {
+    public string name;
+    public AnimationClip animation;
+}
 
 public class AnimationStateController : MonoBehaviour
 {
-    Animator _animator;
-    Character _character;
+    private AnimatorController animatorController;
+    private Animator animator;
+    private Character character;
+    private float timer = 1f;
+    private float duration = 0f;
+    private string currentStateName = "";
 
-    // movement
-    int _runningHash;
-    int _sprintingHash;
-    // TODO maybe some jumping stuff
-
-    // disadvantage
-    int _hitStoppedHash;
-    int _pushedBackHash;
-    int _knockedBackHash;
-    int _blownBackHash;
-
-    // recovery
-    int _tumblingHash;
-    int _rollingHash;
-    int _gettingUpHash;
-    int _knockedDownHash;
-
-    // action
-    int _readyHash;
-    int _blockingHash;
-    int _busyHash;
-
-
-    // Start is called before the first frame update
+    // pattern for setting animation in code https://www.youtube.com/watch?v=ZwLekxsSY3Y
+    // https://stackoverflow.com/a/41728640/3600382
     void Start()
     {
-        _animator = GetComponent<Animator>();
-        _character = GetComponent<Character>();
+        character = GetComponent<Character>();
+        animator = GetComponent<Animator>();
+        animatorController = (AnimatorController) animator.runtimeAnimatorController;
 
-        // movement
-        _runningHash = Animator.StringToHash("MovementRunning");
-        _sprintingHash = Animator.StringToHash("MovementSprinting");
+        List<string> animatorStateNames = getAnimatorStateNames();
+        IEnumerable<CharacterState> states = (
+            from t in typeof(CharacterState).Assembly.GetTypes() 
+            where t.IsSubclassOf(typeof(CharacterState)) && !t.IsAbstract
+            select character.StateFactory.Get(t)
+        );
+    
+        List<string> unaccountedForStates = (
+            from s in states
+            where !animatorStateNames.Contains(s.Name)
+            select s.Name
+        ).ToList();
 
-        // disadvantage
-        _hitStoppedHash = Animator.StringToHash("DisadvantageHitStopped");
-        _pushedBackHash = Animator.StringToHash("DisadvantagePushedBack");
-        _knockedBackHash = Animator.StringToHash("DisadvantageKnockedBack");
-        _blownBackHash = Animator.StringToHash("DisadvantageBlownBack");
-
-        // recovery
-        _tumblingHash = Animator.StringToHash("RecoveryTumbling");
-        _rollingHash = Animator.StringToHash("RecoveryRolling");
-        _gettingUpHash = Animator.StringToHash("RecoveryGettingUp");
-        _knockedDownHash = Animator.StringToHash("RecoveryKnockedDown");
-
-        // action
-        _readyHash = Animator.StringToHash("ActionReady");
-        _blockingHash = Animator.StringToHash("ActionBlocking");
-        _busyHash = Animator.StringToHash("ActionBusy");
-
+        Assert.IsTrue(
+            unaccountedForStates.Count() == 0,
+            $"Animation states not accounted for: {unaccountedForStates.Join(", ")}"
+        );
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // movement
-        _animator.SetBool(_runningHash, _character.Velocity.sqrMagnitude > .0025);
-        _animator.SetBool(_sprintingHash, _character.Velocity.sqrMagnitude > Mathf.Pow(_character.BaseSpeed+.01f, 2));
+        timer += Time.deltaTime;
 
-        // disadvantage
-        _animator.SetBool(_hitStoppedHash, _character.HitStopTimer>0);
-        _animator.SetBool(_pushedBackHash, _character.State is CharacterStatePushedBack);
-        _animator.SetBool(_knockedBackHash, _character.State is CharacterStateKnockedBack);
-        _animator.SetBool(_blownBackHash, _character.State is CharacterStateBlownBack);
-
-        // recovery
-        _animator.SetBool(_tumblingHash, _character.State is CharacterStateTumbling);
-        _animator.SetBool(_rollingHash, _character.State is CharacterStateRolling);
-        _animator.SetBool(_gettingUpHash, _character.State is CharacterStateGettingUp);
-        _animator.SetBool(_knockedDownHash, _character.State is CharacterStateKnockedDown);
-
-        // action
-        _animator.SetBool(_readyHash, _character.State is CharacterStateStanding);
-        _animator.SetBool(_busyHash, _character.State is CharacterStateBusy);
-        _animator.SetBool(_blockingHash, _character.State is CharacterStateBlocking);
+        if (timer > duration || character.State.Name!=currentStateName) {
+            currentStateName = character.State.Name;
+            animator.CrossFade(currentStateName, .2f);
+            duration = animator.GetCurrentAnimatorStateInfo(0).length;
+            timer = 0f;
+        }
     }
+
+    private List<string> getAnimatorStateNames() {
+        List<string> stateNames = new();
+        AnimatorControllerLayer[] allLayer = animatorController.layers;
+
+        for (int i = 0; i < allLayer.Length; i++) {
+            ChildAnimatorState[] states = allLayer[i].stateMachine.states;
+
+            for (int j = 0; j < states.Length; j++) {
+                stateNames.Add(states[j].state.name);
+            }
+        }
+
+        return stateNames;
+    }
+
+    
 }

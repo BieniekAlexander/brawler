@@ -75,8 +75,8 @@ public enum CastType {
 
 public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterActions, ICollidable {
     // is this me? TODO better way to do this
-    [SerializeField] public bool me = false;
-    [SerializeField] public int TeamBitMask { get; set; } = 1;
+    [HideInInspector] public bool me = false;
+    [HideInInspector] public int TeamBitMask { get; set; } = 1;
 
     /* Visuals */
     // Bolt Visualization
@@ -492,7 +492,6 @@ public class Character : MonoBehaviour, IDamageable, IMoves, ICasts, ICharacterA
     
     private void Awake() {
         // Controls
-        if (me) SetMe(); // TODO lazy way to set up controls
         RespawnDelayEffectPrefab = Resources.Load<GameObject>("RespawnDelayEffect"); // TODO put this in a scriptable object
         aimPlane = new Plane(Vector3.up, transform.position);
         GameObject cursorGameObject = new GameObject("Player Cursor Object");

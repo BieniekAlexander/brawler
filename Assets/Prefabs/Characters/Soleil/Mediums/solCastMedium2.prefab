@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3059344016903470191}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5634063031192742342
 MonoBehaviour:
@@ -41,22 +41,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 3059344016903470191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bfa08fb49d549843a02b77a1f511d08, type: 3}
+  m_Script: {fileID: 11500000, guid: 4838a23ee68cd064b8f354b1efd1e373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectPefabs: []
-  commandMovementPrefab: {fileID: 0}
+  AboutResolution: 0
+  TargetResolution: 0
+  Duration: 20
+  BusyTimer: 15
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 0
+  Range: 0.5
+  RecastCooldown: 0
+  AttackCooldown: 0
+  DestroyOnRecast: 0
+  DestroyOnAttack: 0
+  DestroyOnCollision: 0
+  DestroyWithParent: 0
+  DataExpression:
+    expression: 0
+  Target: {fileID: 0}
+  Mirrored: 0
+  Indefinite: 0
   FrameCastablesMap:
-    m_keys: 07000000
+    m_keys: 05000000
     m_values:
     - data:
-      - {fileID: 2262324922672949534, guid: 91e9d058ec1d71e428d16fbc441b036d, type: 3}
+      - {fileID: 2445238925043839964, guid: 0f2c388e6fac7c04b84d5f3aaec52102, type: 3}
   ConditionCastablesMap:
     m_keys: 
     m_values: []
-  Frame: 0
-  startupTime: 0
-  Encumbering: 0
-  duration: 20
-  Origin: {fileID: 0}
-  statusEffects: []

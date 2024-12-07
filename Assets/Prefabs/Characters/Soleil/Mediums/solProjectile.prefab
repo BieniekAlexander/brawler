@@ -28,13 +28,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1744938037854677688}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.3, z: 0.2}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!23 &3622492193066194745
 MeshRenderer:
@@ -53,6 +53,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -121,12 +124,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32123bcbcb8ecd74389fb619474629b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Positioning: 2
-  TargetResolution: 0
+  AboutResolution: 3
+  TargetResolution: 1
   Duration: 15
-  EncumberTime: 0
+  BusyTimer: 0
+  Encumbers: 0
+  Stuns: 0
+  RotationCap: 180
   Range: 1
+  RecastCooldown: 0
+  AttackCooldown: 0
   DestroyOnRecast: 0
+  DestroyOnAttack: 0
   DestroyOnCollision: 1
   DestroyWithParent: 0
   DataExpression:
@@ -138,13 +147,13 @@ MonoBehaviour:
     m_keys: 
     m_values: []
   ConditionCastablesMap:
-    m_keys: 01000000
+    m_keys: 02000000
     m_values:
     - data:
-      - {fileID: 4918249452027163949, guid: 250aca5cfbcfd3848b2164d638e05787, type: 3}
+      - {fileID: 2262324922672949534, guid: 91e9d058ec1d71e428d16fbc441b036d, type: 3}
   RotationalControl: 0
   baseSpeedExpression:
-    expression: (+ 20 (* 2 (Speed (Caster this))))
+    expression: (+ .2 (* 2 (Speed (Caster this))))
   _hp: 5
 --- !u!96 &2350912441906259594
 TrailRenderer:
@@ -164,6 +173,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

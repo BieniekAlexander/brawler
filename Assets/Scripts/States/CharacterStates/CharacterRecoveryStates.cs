@@ -137,34 +137,34 @@ public class CharacterStateGettingUp : CharacterState {
     }
 }
 
-public class CharacterStateGetUpAttacking : CharacterState {
-    public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
+// public class CharacterStateGetUpAttacking : CharacterState {
+//     public override CharacterStateType Type {get {return CharacterStateType.RECOVERY; }}
 
-    private int _recoveryDuration = 15;
+//     private int _recoveryDuration = 15;
 
-    public CharacterStateGetUpAttacking(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
+//     public CharacterStateGetUpAttacking(Character _machine, CharacterStateFactory _factory): base(_machine, _factory) {}
 
-    protected override Type GetNewStateType() {
-        if (Character.RecoveryTimer == 0) {
-            return typeof(CharacterStateStanding);
-        } else {
-            return null;
-        }
-    }
+//     protected override Type GetNewStateType() {
+//         if (Character.RecoveryTimer == 0) {
+//             return typeof(CharacterStateStanding);
+//         } else {
+//             return null;
+//         }
+//     }
 
-    protected override void EnterState() {
-        base.EnterState();
-        Character.RecoveryTimer = _recoveryDuration;
-        Character.Velocity = new();
-        Character.InvulnerableStack++;
-    }
+//     protected override void EnterState() {
+//         base.EnterState();
+//         Character.RecoveryTimer = _recoveryDuration;
+//         Character.Velocity = new();
+//         Character.InvulnerableStack++;
+//     }
 
-    protected override void ExitState() {
-        Character.InvulnerableStack--;
-        Character.UnsetBusy();
-    }
+//     protected override void ExitState() {
+//         Character.InvulnerableStack--;
+//         Character.UnsetBusy();
+//     }
 
-    protected override void Tick() {
-        Character.RecoveryTimer--;
-    }
-}
+//     protected override void Tick() {
+//         Character.RecoveryTimer--;
+//     }
+// }

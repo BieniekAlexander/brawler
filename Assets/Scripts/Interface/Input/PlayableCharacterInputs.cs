@@ -130,7 +130,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                     ""name"": ""ability2"",
                     ""type"": ""Button"",
                     ""id"": ""37c2848a-7965-49a0-82a1-69d9c9a1f8cf"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -240,7 +240,7 @@ public partial class @PlayableCharacterInputs: IInputActionCollection2, IDisposa
                 {
                     ""name"": ""modifier"",
                     ""id"": ""717b62a6-f26b-4ee9-ba86-b6115742da17"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

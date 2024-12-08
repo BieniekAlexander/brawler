@@ -673,7 +673,7 @@ MonoBehaviour:
   - Name: Throw
     CastPrefab: {fileID: 3464759251752078316, guid: 6e3e1d948562c8e4b979fbbc5a46f799,
       type: 3}
-    type: 0
+    type: 4
     posture: 0
     orientation: 0
     Costs:
@@ -767,13 +767,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animatorController: {fileID: 9100000, guid: d70445a8fd2ef194f8bb729cd61b3642, type: 2}
-  stateAnimationPairs:
-  - name: Idle
-    animation: {fileID: -203655887218126122, guid: e7afff468802bd141b369cf462ccbc02,
-      type: 3}
-  - name: running
-    animation: {fileID: -203655887218126122, guid: 45cdfab9692a10c448be4617e8e0d854,
-      type: 3}
 --- !u!114 &-5139024230135778853
 MonoBehaviour:
   m_ObjectHideFlags: 0
